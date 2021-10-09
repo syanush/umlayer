@@ -1,8 +1,10 @@
 from PySide6.QtWidgets import *
 
 
-# Our main window class
 class MainWindow(QWidget):
+    """Main window of the UMLayer application
+    """
+
     def __init__(self):
         super().__init__()
         self.initGUI()
@@ -31,7 +33,6 @@ class MainWindow(QWidget):
 
         if reply == QMessageBox.Yes:
             event.accept()
-            print('Window closed')
+            print('Main window closed.')
         else:
             event.ignore()
-

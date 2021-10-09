@@ -1,26 +1,36 @@
 import sys
 
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
-
-from gui import app
+from gui.app import UMLayerApplication
 from gui.mainwindow import MainWindow
 
 
+def run_application():
+    """Construct and run the UMLayer application
+    """
+
+    app = UMLayerApplication(sys.argv)
+    main_window = MainWindow()
+    main_window.center()
+    app.setActiveWindow(main_window)
+    result_code = app.exec()
+    main_window = None
+    app = None
+    return result_code
+
+
 def main():
+    """Start function
+    """
+
     try:
-        # print(PySide6.__version__)
-        # print(PySide6.QtCore.__version__)
-        myApp = QApplication(sys.argv)
-        myWindow = MainWindow()
-        myWindow.center()
-        myApp.exec()
-        sys.exit(0)
+        errcode = run_application()
     except SystemExit:
-        print("Closing MainWindow...")
+        errcode = 0
     except Exception:
         print(sys.exc_info()[1])
+        errcode = 1
+
+    sys.exit(errcode)
 
 
 if __name__ == '__main__':
