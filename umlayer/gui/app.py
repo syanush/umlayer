@@ -1,3 +1,6 @@
+import logging
+
+from PySide6.QtCore import *
 from PySide6.QtWidgets import *
 
 
@@ -9,3 +12,9 @@ class UMLayerApplication(QApplication):
 
     def __init__(self, args):
         super().__init__(args)
+
+        QCoreApplication.setOrganizationName("SpiralArms")
+        QCoreApplication.setOrganizationDomain("spiralarms.org")
+        QCoreApplication.setApplicationName("UMLayer")
+
+        logging.info("Application constructor finished")
