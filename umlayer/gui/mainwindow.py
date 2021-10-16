@@ -78,7 +78,69 @@ class MainWindow(QMainWindow):
 
     def createCentralWidget(self):
         self.centralWidget = QWidget()
+
+        self.scene = QGraphicsScene(0, 0, 400, 200)
+        self.createScene()
+
+        self.view = QGraphicsView(self.scene, self.centralWidget)
+        self.view.setRenderHint(QPainter.RenderHint.Antialiasing)
+        self.view.show()
+
         self.setCentralWidget(self.centralWidget)
+
+    def createScene(self):
+        rect = QGraphicsRectItem(0, 0, 200, 50)
+
+        # Set the origin (position) of the rectangle in the scene.
+        rect.setPos(50, 20)
+
+        # Define the brush (fill).
+        brush = QBrush(Qt.red)
+        rect.setBrush(brush)
+
+        # Define the pen (line)
+        pen = QPen(Qt.cyan)
+        pen.setWidth(10)
+        rect.setPen(pen)
+
+        ellipse = QGraphicsEllipseItem(0, 0, 100, 100)
+        ellipse.setPos(75, 30)
+
+        brush = QBrush(Qt.blue)
+        ellipse.setBrush(brush)
+
+        pen = QPen(Qt.green)
+        pen.setWidth(5)
+        ellipse.setPen(pen)
+
+        # Add the items to the scene. Items are stacked in the order they are added.
+        self.scene.addItem(ellipse)
+        self.scene.addItem(rect)
+
+        # Movable items
+        ellipse.setFlags(QGraphicsItem.ItemIsMovable | QGraphicsItem.ItemIsSelectable)
+        rect.setFlags(QGraphicsItem.ItemIsMovable | QGraphicsItem.ItemIsSelectable)
+
+        textitem = self.scene.addText("QGraphics is fun!")
+        textitem.setPos(150, 120)
+        textitem.setFlags(QGraphicsItem.ItemIsMovable | QGraphicsItem.ItemIsSelectable)
+
+        polygon = self.scene.addPolygon(
+            QPolygonF(
+                [
+                    QPointF(30, 60),
+                    QPointF(70, 40),
+                    QPointF(40, 20),
+                    QPointF(20, 15),
+                ]),
+            QPen(Qt.GlobalColor.darkGreen),
+        )
+        polygon.setFlags(QGraphicsItem.ItemIsMovable | QGraphicsItem.ItemIsSelectable)
+
+        pixmap = QPixmap("open.png")
+        pixmapitem = self.scene.addPixmap(pixmap)
+        pixmapitem.setPos(250, 70)
+        pixmapitem.setFlags(QGraphicsItem.ItemIsMovable)
 
     def setupComponents(self):
         """ Initialize visual components
