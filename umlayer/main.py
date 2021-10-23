@@ -49,10 +49,7 @@ def main():
     except SystemExit:
         errcode = 0
     except Exception:
-        # logging.error(sys.exc_info()[0])
-        # logging.error(sys.exc_info()[1])
         logging.exception(traceback.format_exc())
-        #logging.error(sys.exc_info()[2])
         errcode = 1
 
     sys.exit(errcode)
