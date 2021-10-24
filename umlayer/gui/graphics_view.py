@@ -9,7 +9,7 @@ from PySide6.QtWidgets import *
 class GraphicsView(QGraphicsView):
 
     def getMainWindow(self):
-        return self.parent().parent().parent()
+        return self.parent().parent()
 
     def mouseMoveEvent(self, e: QMouseEvent):
         main_window = self.getMainWindow()

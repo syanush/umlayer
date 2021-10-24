@@ -89,10 +89,24 @@ class MainWindow(QMainWindow):
     def createCentralWidget(self):
         self.centralWidget = QWidget()
 
-        splitter = QSplitter(Qt.Horizontal)
-
+        # create project tree
+        treeWindow = QDockWidget('Project', self)
         self.treeView = QTreeView()
-        splitter.addWidget(self.treeView)
+        treeWindow.setWidget(self.treeView)
+        #treeWindow.setFeatures(QDockWidget.NoDockWidgetFeatures)
+        self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, treeWindow)
+
+        # create elements
+        elementsWindow = QDockWidget('Elements', self)
+        self.elementsView = QTextEdit()
+        elementsWindow.setWidget(self.elementsView)
+        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, elementsWindow)
+
+        # create property editor
+        propertyWindow = QDockWidget('Property editor', self)
+        self.propertyView = QTextEdit()
+        propertyWindow.setWidget(self.propertyView)
+        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, propertyWindow)
 
         self.scene = QGraphicsScene() # 0, 0, 400, 200
         # self.createScene()
@@ -104,10 +118,9 @@ class MainWindow(QMainWindow):
             QPainter.SmoothPixmapTransform |
             QPainter.VerticalSubpixelPositioning
         )
-        splitter.addWidget(self.sceneView)
 
         vbox = QVBoxLayout()
-        vbox.addWidget(splitter)
+        vbox.addWidget(self.sceneView)
         self.centralWidget.setLayout(vbox)
 
         self.setCentralWidget(self.centralWidget)
