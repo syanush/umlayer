@@ -13,9 +13,10 @@ class MainWindow(QMainWindow):
     """Main window of the UMLayer application
     """
 
-    def __init__(self):
+    def __init__(self, project_logic):
         super().__init__()
 
+        self.project_logic = project_logic
         self.readSettings()
         self.initGUI()
 
@@ -86,27 +87,22 @@ class MainWindow(QMainWindow):
             self.aStatusLabel.setText('Loading...')
         return
 
-    def createCentralWidget(self):
-        self.centralWidget = QWidget()
-
-        # create project tree
-        treeWindow = QDockWidget('Project', self)
-        self.treeView = QTreeView()
-        treeWindow.setWidget(self.treeView)
-        #treeWindow.setFeatures(QDockWidget.NoDockWidgetFeatures)
-        self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, treeWindow)
-
+    def createElementsWindow(self):
         # create elements
         elementsWindow = QDockWidget('Elements', self)
         self.elementsView = QTextEdit()
         elementsWindow.setWidget(self.elementsView)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, elementsWindow)
 
+    def createPropertyEditor(self):
         # create property editor
         propertyWindow = QDockWidget('Property editor', self)
         self.propertyView = QTextEdit()
         propertyWindow.setWidget(self.propertyView)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, propertyWindow)
+
+    def createCentralWidget(self):
+        self.centralWidget = QWidget()
 
         self.scene = QGraphicsScene() # 0, 0, 400, 200
         # self.createScene()
@@ -183,6 +179,9 @@ class MainWindow(QMainWindow):
         """
 
         self.createStatusBar()  # used in actions
+        self.createProjectTree()
+        self.createElementsWindow()
+        self.createPropertyEditor()
         self.createCentralWidget()  # used in actions
 
         self.createActions()
@@ -321,3 +320,32 @@ class MainWindow(QMainWindow):
         #     QMessageBox.No)
 
         return reply == QMessageBox.Yes
+
+    def _itemize(self, element):
+        item = QStandardItem(element.name)
+        children = self.project_logic.project.children(element.id)
+        for child in children:
+            child_item = self._itemize(child)
+            item.appendRow([child_item])
+        return item
+
+    def createProjectTree(self):
+        # create project tree widget
+        treeWindow = QDockWidget('Project', self)
+        self.treeView = QTreeView()
+        self.treeView.setHeaderHidden(True)
+        treeWindow.setWidget(self.treeView)
+        self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, treeWindow)
+
+        # create tree data model
+        root = self.project_logic.project.root
+        root_item = self._itemize(root)
+        sti = QStandardItemModel()
+        sti.appendRow([root_item])
+        sti.setHorizontalHeaderLabels([''])
+        self.treeView.setModel(sti)
+
+        # index = sti.indexFromModel(root_item)
+        # self.treeView.expand(index)
+
+        self.treeView.expandAll()

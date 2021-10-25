@@ -7,6 +7,8 @@ from PySide6.QtCore import QCoreApplication
 
 from gui.app import UMLayerApplication
 from gui.mainwindow import MainWindow
+from model.project import Project
+from model.project_logic import ProjectLogic
 
 
 def run_application():
@@ -18,7 +20,8 @@ def run_application():
 
     app = UMLayerApplication(sys.argv)
 
-    main_window = MainWindow()
+    project_logic = ProjectLogic()
+    main_window = MainWindow(project_logic)
     app.setActiveWindow(main_window)
 
     # Pretend that a file download is in progress
