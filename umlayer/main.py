@@ -7,7 +7,6 @@ from PySide6.QtCore import QCoreApplication
 
 from gui.app import UMLayerApplication
 from gui.mainwindow import MainWindow
-from model.project import Project
 from model.project_logic import ProjectLogic
 
 

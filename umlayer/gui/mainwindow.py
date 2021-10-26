@@ -8,6 +8,9 @@ from .graphics_view import GraphicsView
 from .user_element import UserElement
 from .line_element import LineElement
 
+from model.folder import Folder
+from model.diagram import Diagram
+
 
 class MainWindow(QMainWindow):
     """Main window of the UMLayer application
@@ -322,18 +325,49 @@ class MainWindow(QMainWindow):
         return reply == QMessageBox.Yes
 
     def _itemize(self, element):
+        element_type_to_icon_file = {
+            Folder: 'folder.png',
+            Diagram: 'diagram.png'
+        }
+
         item = QStandardItem(element.name)
+        item.setData(element.id, Qt.UserRole)
+        item.setIcon(QIcon(element_type_to_icon_file[type(element)]))
+
         children = self.project_logic.project.children(element.id)
         for child in children:
             child_item = self._itemize(child)
             item.appendRow([child_item])
         return item
 
+    def onTreeViewCustomContextMenuRequested(self, point):
+        # show context menu
+        index = self.treeView.indexAt(point)
+        if not index.isValid():
+            return
+
+        item = self.treeView.model().itemFromIndex(index)
+        element_id = item.data(Qt.UserRole)
+        element = self.project_logic.project.get(element_id)
+
+        element_type_to_context_actions = {
+            Folder: [QAction(QIcon('about.png'), 'A&bout',
+                             self, statusTip="Displays info about the app",
+                             triggered=self.aboutHelp)],
+            Diagram: []
+        }
+
+        menu = QMenu(self.treeView)
+        menu.addActions(element_type_to_context_actions[type(element)])
+        menu.exec(self.treeView.viewport().mapToGlobal(point))
+
     def createProjectTree(self):
         # create project tree widget
         treeWindow = QDockWidget('Project', self)
         self.treeView = QTreeView()
         self.treeView.setHeaderHidden(True)
+        self.treeView.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.treeView.customContextMenuRequested.connect(self.onTreeViewCustomContextMenuRequested)
         treeWindow.setWidget(self.treeView)
         self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, treeWindow)
 
