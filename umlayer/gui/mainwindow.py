@@ -325,14 +325,7 @@ class MainWindow(QMainWindow):
         return reply == QMessageBox.Yes
 
     def _itemize(self, element):
-        element_type_to_icon_file = {
-            Folder: 'folder.png',
-            Diagram: 'diagram.png'
-        }
-
-        item = QStandardItem(element.name)
-        item.setData(element.id, Qt.UserRole)
-        item.setIcon(QIcon(element_type_to_icon_file[type(element)]))
+        item = self.makeItem(element)
 
         children = self.project_logic.project.children(element.id)
         for child in children:
@@ -351,9 +344,9 @@ class MainWindow(QMainWindow):
         element = self.project_logic.project.get(element_id)
 
         element_type_to_context_actions = {
-            Folder: [QAction(QIcon('about.png'), 'A&bout',
-                             self, statusTip="Displays info about the app",
-                             triggered=self.aboutHelp)],
+            Folder: [QAction(QIcon('create_folder.png'), 'Create folder',
+                             self, statusTip='Create folder',
+                             triggered=self.createFolder)],
             Diagram: []
         }
 
@@ -361,13 +354,49 @@ class MainWindow(QMainWindow):
         menu.addActions(element_type_to_context_actions[type(element)])
         menu.exec(self.treeView.viewport().mapToGlobal(point))
 
+    def getSelectedItem(self):
+        indexes = self.treeView.selectedIndexes()
+
+        if not indexes:
+            return None
+
+        index = indexes[0]
+
+        if not index.isValid():
+            return None
+
+        item = self.treeView.model().itemFromIndex(index)
+        return item
+
+    def onCloseEditor(self, editor:QAbstractItemDelegate, hint):
+        item = self.getSelectedItem()
+        parent = item.parent()
+
+        parent.sortChildren(0, Qt.SortOrder.AscendingOrder)
+
+        # model = item.model()
+        # model.layoutChanged.emit()
+
+        # first_index = parent.child(0).index()
+        # last_index = parent.child(parent.rowCount() - 1).index()
+        # model.dataChanged.emit(first_index, last_index)
+        # self.treeView.dataChanged(first_index, last_index)
+        # self.treeView.repaint()
+
+        self.treeView.scrollTo(item.index())
+
     def createProjectTree(self):
-        # create project tree widget
         treeWindow = QDockWidget('Project', self)
         self.treeView = QTreeView()
         self.treeView.setHeaderHidden(True)
         self.treeView.setContextMenuPolicy(Qt.CustomContextMenu)
         self.treeView.customContextMenuRequested.connect(self.onTreeViewCustomContextMenuRequested)
+        self.treeView.setSelectionMode(QAbstractItemView.SingleSelection)  # disable light blue selection
+        self.treeView.setUniformRowHeights(True)
+        self.treeView.setWordWrap(False)
+        self.treeView.itemDelegate().closeEditor.connect(self.onCloseEditor)
+        # self.treeView.setStyleSheet("""""")
+
         treeWindow.setWidget(self.treeView)
         self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, treeWindow)
 
@@ -377,9 +406,37 @@ class MainWindow(QMainWindow):
         sti = QStandardItemModel()
         sti.appendRow([root_item])
         sti.setHorizontalHeaderLabels([''])
+        sti.setSortRole(Qt.DisplayRole)
+
+        self.treeView.sortByColumn(0, Qt.SortOrder.AscendingOrder)
+        self.treeView.setSortingEnabled(True)
         self.treeView.setModel(sti)
-
-        # index = sti.indexFromModel(root_item)
-        # self.treeView.expand(index)
-
         self.treeView.expandAll()
+
+    def makeItem(self, element):
+        element_type_to_icon_file = {
+            Folder: 'folder.png',
+            Diagram: 'diagram.png'
+        }
+
+        item = QStandardItem(element.name)
+        item.setData(element.id, Qt.UserRole)
+        item.setIcon(QIcon(element_type_to_icon_file[type(element)]))
+        return item
+
+    def createFolder(self):
+        parent:QStandardItem = self.getSelectedItem()
+        parent_index = parent.index()
+
+        self.treeView.expand(parent_index)
+
+        parent_id = parent.data(Qt.UserRole)
+        folder = self.project_logic.create_folder(parent_id)
+        item = self.makeItem(folder)
+
+        parent.insertRow(0, [item])
+
+        item_index = item.index()
+        self.treeView.scrollTo(item_index)
+        self.treeView.setCurrentIndex(item_index)
+        self.treeView.edit(item_index)
