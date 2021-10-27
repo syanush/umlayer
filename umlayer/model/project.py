@@ -1,5 +1,7 @@
 """Diagrams belong to a project"""
 
+import jsonpickle
+
 from uuid import UUID
 from .element import Element
 from .node import Node
@@ -44,11 +46,20 @@ class Project:
 
         Throws exceptions in case of errors
         """
-        pass
+
+        if filename is None:
+            raise ValueError('filename is None')
+
+        for element_id, node in self.nodes.items():
+            element = node.element
+            parent_id = node.parent_id
+            str_json = jsonpickle.encode(element)
+            print(f'{str(element_id)} {str(parent_id)} {str_json}')
 
     def load(self, filename: str):
         """Loads project data and settings from a file
 
          Throws exceptions in case of errors
          """
+        # jsonpickle.decode(frozen)
         pass

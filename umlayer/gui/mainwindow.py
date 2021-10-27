@@ -200,6 +200,9 @@ class MainWindow(QMainWindow):
 
         self.fileMenu.addAction(self.newAction)
         self.fileMenu.addAction(self.openAction)
+        self.fileMenu.addAction(self.saveAction)
+        self.fileMenu.addAction(self.saveAsAction)
+        self.fileMenu.addAction(self.closeAction)
         self.fileMenu.addSeparator()
         self.fileMenu.addAction(self.exitAction)
         self.editMenu.addAction(self.copyAction)
@@ -208,11 +211,20 @@ class MainWindow(QMainWindow):
         self.helpMenu.addAction(self.aboutAction)
 
     # Slots called when the menu actions are triggered
-    def newFile(self):
-        logging.info('Action: new file')
+    def newProject(self):
+        logging.info('Action: New')
 
-    def openFile(self):
-        logging.info('Action: open file')
+    def openProject(self):
+        logging.info('Action: Open')
+
+    def saveProject(self):
+        self.project_logic.project.save('')
+
+    def saveProjectAs(self):
+        logging.info('Action: Save As')
+
+    def closeProject(self):
+        logging.info('Action: Close')
 
     def exitFile(self):
         self.close()
@@ -266,15 +278,27 @@ class MainWindow(QMainWindow):
     def createActions(self):
         self.newAction = QAction(QIcon('new.png'), '&New',
                                  self, shortcut=QKeySequence.New,
-                                 statusTip="Create a New File",
-                                 triggered=self.newFile)
+                                 statusTip='Create a New Project',
+                                 triggered=self.newProject)
         self.openAction = QAction(QIcon('open.png'), '&Open',
                                   self, shortcut=QKeySequence.Open,
-                                  statusTip="Open a file in editor",
-                                  triggered=self.openFile)
-        self.exitAction = QAction(QIcon('exit.png'), 'E&xit',
-                                  self, shortcut="Ctrl+Q",
-                                  statusTip="Exit the Application",
+                                  statusTip='Open a project in editor',
+                                  triggered=self.openProject)
+        self.saveAction = QAction(QIcon('save.png'), '&Save',
+                                  self, shortcut=QKeySequence.Save,
+                                  statusTip='Save a project',
+                                  triggered=self.saveProject)
+        self.saveAsAction = QAction(QIcon('save_as.png'), 'Save As...',
+                                  self, shortcut=QKeySequence.SaveAs,
+                                  statusTip='Save a project',
+                                  triggered=self.saveProjectAs)
+        self.closeAction = QAction(QIcon('close.png'), '&Close',
+                                  self, shortcut=QKeySequence.Close,
+                                  statusTip='Close current project',
+                                  triggered=self.closeProject)
+        self.exitAction = QAction(QIcon('exit.png'), '&Quit',
+                                  self, shortcut=QKeySequence.Quit,
+                                  statusTip='Quit the Application',
                                   triggered=self.exitFile)
         self.copyAction = QAction(QIcon('copy.png'), 'C&opy',
                                   self, shortcut="Ctrl+C",
