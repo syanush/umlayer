@@ -14,6 +14,16 @@ class Project:
         self._add(root)
         self.root = root
 
+    def remove(self, element_id:UUID=None):
+        if element_id not in self.nodes.keys():
+            raise AttributeError("element_id")
+        self._remove(element_id)
+
+    def _remove(self, element_id:UUID=None):
+        for child in self.children(element_id):
+            self._remove(child.id)
+        del self.nodes[element_id]
+
     def add(self, element:Element, parent_id:UUID=None):
         if parent_id not in self.nodes.keys():
             raise AttributeError("parent_id")

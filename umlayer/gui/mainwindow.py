@@ -1,4 +1,5 @@
 import logging
+import pprint
 
 from PySide6.QtCore import *
 from PySide6.QtGui import *
@@ -62,6 +63,7 @@ class MainWindow(QMainWindow):
         self.aToolBar.addAction(self.addRectangleAction)
         self.aToolBar.addAction(self.addUserElementAction)
         self.aToolBar.addAction(self.addLineElementAction)
+        self.aToolBar.addAction(self.printElementsAction)
 
     def createStatusBar(self):
         """Create Status Bar
@@ -294,6 +296,9 @@ class MainWindow(QMainWindow):
         self.addLineElementAction = QAction(QIcon('line_element.png'), '&Line element',
                                             self, statusTip="Add line element",
                                             triggered=self.addLineElement)
+        self.printElementsAction = QAction(QIcon('cache.png'), 'Print',
+                                            self, statusTip="print",
+                                            triggered=self.printElements)
 
     def center(self):
         """Center the main window
@@ -344,11 +349,26 @@ class MainWindow(QMainWindow):
         element = self.project_logic.project.get(element_id)
 
         element_type_to_context_actions = {
-            Folder: [QAction(QIcon('create_folder.png'), 'Create folder',
-                             self, statusTip='Create folder',
-                             triggered=self.createFolder)],
-            Diagram: []
+            Folder: [
+                QAction(QIcon('diagram.png'), 'Create diagram',
+                        self, statusTip='Create diagram',
+                        triggered=self.createDiagram),
+                QAction(QIcon('create_folder.png'), 'Create folder',
+                        self, statusTip='Create folder',
+                        triggered=self.createFolder),
+                QAction(QIcon('delete.png'), 'Delete element',
+                        self, statusTip='Delete element',
+                        triggered=self.deleteElement),
+            ],
+            Diagram: [
+                QAction(QIcon('delete.png'), 'Delete element',
+                        self, statusTip='Delete element',
+                        triggered=self.deleteElement),
+            ]
         }
+
+        if element_id == self.project_logic.project.root.id:
+            del element_type_to_context_actions[Folder][2]
 
         menu = QMenu(self.treeView)
         menu.addActions(element_type_to_context_actions[type(element)])
@@ -368,20 +388,22 @@ class MainWindow(QMainWindow):
         item = self.treeView.model().itemFromIndex(index)
         return item
 
+    def elementFromItem(self, item):
+        element_id = item.data(Qt.UserRole)
+        element = self.project_logic.project.get(element_id)
+        return element
+
     def onCloseEditor(self, editor:QAbstractItemDelegate, hint):
-        item = self.getSelectedItem()
+        item:QStandardItem = self.getSelectedItem()
+
+        # set name after editing
+        element = self.elementFromItem(item)
+        if element.name != item.text:
+            element.name = item.text()
+            # set change flag
+
         parent = item.parent()
-
         parent.sortChildren(0, Qt.SortOrder.AscendingOrder)
-
-        # model = item.model()
-        # model.layoutChanged.emit()
-
-        # first_index = parent.child(0).index()
-        # last_index = parent.child(parent.rowCount() - 1).index()
-        # model.dataChanged.emit(first_index, last_index)
-        # self.treeView.dataChanged(first_index, last_index)
-        # self.treeView.repaint()
 
         self.treeView.scrollTo(item.index())
 
@@ -424,15 +446,15 @@ class MainWindow(QMainWindow):
         item.setIcon(QIcon(element_type_to_icon_file[type(element)]))
         return item
 
-    def createFolder(self):
+    def createElement(self, create_method):
         parent:QStandardItem = self.getSelectedItem()
         parent_index = parent.index()
 
         self.treeView.expand(parent_index)
 
         parent_id = parent.data(Qt.UserRole)
-        folder = self.project_logic.create_folder(parent_id)
-        item = self.makeItem(folder)
+        element = create_method(parent_id)
+        item = self.makeItem(element)
 
         parent.insertRow(0, [item])
 
@@ -440,3 +462,27 @@ class MainWindow(QMainWindow):
         self.treeView.scrollTo(item_index)
         self.treeView.setCurrentIndex(item_index)
         self.treeView.edit(item_index)
+
+    def createFolder(self):
+        self.createElement(self.project_logic.create_folder)
+
+    def createDiagram(self):
+        self.createElement(self.project_logic.create_diagram)
+
+    def deleteElement(self):
+        item: QStandardItem = self.getSelectedItem()
+        index = item.index()
+        model:QStandardItemModel = item.model()  # better to have permanent reference
+
+        # delete elements from model recursively
+        element_id = self.elementFromItem(item).id
+        self.project_logic.delete_element(element_id)
+
+        model.removeRow(index.row(), index.parent())
+        #a = model.takeRow(index)
+        pass
+
+    def printElements(self):
+        for node in self.project_logic.project.nodes.values():
+            print(f'{node.element.name}   {node.element.id}')
+        print()

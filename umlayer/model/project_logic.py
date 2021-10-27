@@ -17,6 +17,14 @@ class ProjectLogic:
         return self.project
 
     def create_folder(self, parent_id):
-        folder = Folder("New folder")
-        self.project.add(folder, parent_id)
-        return folder
+        element = Folder("New folder")
+        self.project.add(element, parent_id)
+        return element
+
+    def create_diagram(self, parent_id):
+        element = Diagram("New diagram")
+        self.project.add(element, parent_id)
+        return element
+
+    def delete_element(self, element_id):
+        self.project.remove(element_id)
