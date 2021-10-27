@@ -12,6 +12,7 @@ class ProjectLogic:
         self.project.add(Folder("1"), root.id)
         self.project.add(Folder("2"), root.id)
         self.project.add(Diagram("3"), root.id)
+        self.project.is_dirty = False
 
     def get_project(self):
         return self.project

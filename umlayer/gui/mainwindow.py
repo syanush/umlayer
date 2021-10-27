@@ -1,5 +1,4 @@
 import logging
-import pprint
 
 from PySide6.QtCore import *
 from PySide6.QtGui import *
@@ -21,6 +20,7 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.project_logic = project_logic
+        self.filename = 'Untitled.ulr'
         self.readSettings()
         self.initGUI()
 
@@ -47,11 +47,20 @@ class MainWindow(QMainWindow):
         settings.endGroup()
         logging.info('Settings loading finished')
 
+    EXTENSION = '.ulr'
+
+    def updateTitle(self):
+        filename = self.filename
+        if len(filename) >= 4 and filename.endswith(MainWindow.EXTENSION):
+            filename = filename[:-4]
+        star = ' *' if self.project_logic.project.is_dirty else ''
+        self.setWindowTitle(f'{filename}{star} \u2014 UMLayer')
+        self.show()
+
     def initGUI(self):
         logging.info('GUI initialization started')
         self.setupComponents()
-        self.setWindowTitle("UMLayer")
-        self.show()
+        self.updateTitle()
         logging.info('GUI initialization finished')
 
     def createToolBar(self):
@@ -213,18 +222,23 @@ class MainWindow(QMainWindow):
     # Slots called when the menu actions are triggered
     def newProject(self):
         logging.info('Action: New')
+        self.updateTitle()
 
     def openProject(self):
         logging.info('Action: Open')
+        self.updateTitle()
 
     def saveProject(self):
         self.project_logic.project.save('')
+        self.updateTitle()
 
     def saveProjectAs(self):
         logging.info('Action: Save As')
+        self.updateTitle()
 
     def closeProject(self):
         logging.info('Action: Close')
+        self.updateTitle()
 
     def exitFile(self):
         self.close()
@@ -334,24 +348,28 @@ class MainWindow(QMainWindow):
         self.move(qRect.topLeft())
 
     def closeEvent(self, event):
-        if self.userReallyWantsToQuit():
+        if self.saveFileIfNeeded():
             self.writeSettings()
             logging.info('Main window closed')
             event.accept()
         else:
             event.ignore()
 
-    def userReallyWantsToQuit(self) -> bool:
-        reply = QMessageBox.Yes
+    def saveFileIfNeeded(self) -> bool:
+        if not self.project_logic.project.is_dirty:
+            return True
 
-        # reply = QMessageBox.question(
-        #     self,
-        #     'Window Close',
-        #     'Are you sure you want to close the window?',
-        #     QMessageBox.Yes | QMessageBox.No,
-        #     QMessageBox.No)
+        reply = QMessageBox.question(
+            self,
+            'Warning \u2014 Umlayer',
+            'The current file has been modified.\nDo you want to save it?',
+            QMessageBox.Cancel | QMessageBox.Discard | QMessageBox.Save,
+            QMessageBox.Save)
 
-        return reply == QMessageBox.Yes
+        if reply == QMessageBox.Save:
+            self.saveProject()
+
+        return reply != QMessageBox.Cancel
 
     def _itemize(self, element):
         item = self.makeItem(element)
@@ -486,6 +504,7 @@ class MainWindow(QMainWindow):
         self.treeView.scrollTo(item_index)
         self.treeView.setCurrentIndex(item_index)
         self.treeView.edit(item_index)
+        self.updateTitle()
 
     def createFolder(self):
         self.createElement(self.project_logic.create_folder)
@@ -503,8 +522,8 @@ class MainWindow(QMainWindow):
         self.project_logic.delete_element(element_id)
 
         model.removeRow(index.row(), index.parent())
-        #a = model.takeRow(index)
-        pass
+        self.project_logic.project.is_dirty = True
+        self.updateTitle()
 
     def printElements(self):
         for node in self.project_logic.project.nodes.values():

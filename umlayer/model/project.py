@@ -11,6 +11,7 @@ class Project:
     def __init__(self):
         self.nodes = {}
         self.root = None
+        self.is_dirty = False
 
     def setRoot(self, root:Element):
         self._add(root)
@@ -20,6 +21,7 @@ class Project:
         if element_id not in self.nodes.keys():
             raise AttributeError("element_id")
         self._remove(element_id)
+        self.is_dirty = True
 
     def _remove(self, element_id:UUID=None):
         for child in self.children(element_id):
@@ -30,6 +32,7 @@ class Project:
         if parent_id not in self.nodes.keys():
             raise AttributeError("parent_id")
         self._add(element, parent_id)
+        self.is_dirty = True
 
     def _add(self, element:Element, parent_id:UUID=None):
         node = Node(element, parent_id)
@@ -56,10 +59,12 @@ class Project:
             str_json = jsonpickle.encode(element)
             print(f'{str(element_id)} {str(parent_id)} {str_json}')
 
+        self.is_dirty = False
+
     def load(self, filename: str):
         """Loads project data and settings from a file
 
          Throws exceptions in case of errors
          """
         # jsonpickle.decode(frozen)
-        pass
+        self.is_dirty = False
