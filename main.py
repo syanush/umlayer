@@ -5,9 +5,10 @@ import traceback
 
 from PySide6.QtCore import QCoreApplication
 
-from gui.app import UMLayerApplication
-from gui.mainwindow import MainWindow
-from model.project_logic import ProjectLogic
+from umlayer.gui.app import UMLayerApplication
+from umlayer.gui.mainwindow import MainWindow
+from umlayer.model.project_logic import ProjectLogic
+from umlayer.storage.project_storage_impl import ProjectStorageImpl
 
 
 def run_application():
@@ -19,7 +20,8 @@ def run_application():
 
     app = UMLayerApplication(sys.argv)
 
-    project_logic = ProjectLogic()
+    storage = ProjectStorageImpl()
+    project_logic = ProjectLogic(storage)
     main_window = MainWindow(project_logic)
     app.setActiveWindow(main_window)
 

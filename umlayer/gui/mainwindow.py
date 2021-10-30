@@ -8,8 +8,8 @@ from .graphics_view import GraphicsView
 from .user_element import UserElement
 from .line_element import LineElement
 
-from model.folder import Folder
-from model.diagram import Diagram
+from umlayer.model.folder import Folder
+from umlayer.model.diagram import Diagram
 
 
 class MainWindow(QMainWindow):
@@ -50,11 +50,17 @@ class MainWindow(QMainWindow):
     EXTENSION = '.ulr'
 
     def updateTitle(self):
-        filename = self.filename
-        if len(filename) >= 4 and filename.endswith(MainWindow.EXTENSION):
-            filename = filename[:-4]
-        star = ' *' if self.project_logic.project.is_dirty else ''
-        self.setWindowTitle(f'{filename}{star} \u2014 UMLayer')
+        title = 'UMLayer'
+
+        if self.filename:
+            filename = self.filename
+            if len(filename) >= 4 and filename.endswith(MainWindow.EXTENSION):
+                filename = filename[:-4]
+
+            star = ' *' if self.project_logic.project.is_dirty else ''
+            title = f'{filename}{star} \u2014 ' + title
+
+        self.setWindowTitle(title)
         self.show()
 
     def initGUI(self):
@@ -118,7 +124,7 @@ class MainWindow(QMainWindow):
     def createCentralWidget(self):
         self.centralWidget = QWidget()
 
-        self.scene = QGraphicsScene() # 0, 0, 400, 200
+        self.scene = QGraphicsScene()  # 0, 0, 400, 200
         # self.createScene()
 
         self.sceneView = GraphicsView(self.scene)
@@ -174,16 +180,16 @@ class MainWindow(QMainWindow):
         textitem.setFlags(QGraphicsItem.ItemIsMovable | QGraphicsItem.ItemIsSelectable)
 
         qpolygon = QPolygonF([
-                QPointF(30, 60),
-                QPointF(70, 40),
-                QPointF(40, 20),
-                QPointF(20, 15),
+            QPointF(30, 60),
+            QPointF(70, 40),
+            QPointF(40, 20),
+            QPointF(20, 15),
         ])
 
         polygon = self.scene.addPolygon(qpolygon, QPen(Qt.GlobalColor.darkGreen))
         polygon.setFlags(QGraphicsItem.ItemIsMovable | QGraphicsItem.ItemIsSelectable)
 
-        pixmap = QPixmap("open.png")
+        pixmap = QPixmap('resources/icons/open.png')
         pixmapitem = self.scene.addPixmap(pixmap)
         pixmapitem.setPos(250, 70)
         pixmapitem.setFlags(QGraphicsItem.ItemIsMovable)
@@ -222,23 +228,41 @@ class MainWindow(QMainWindow):
     # Slots called when the menu actions are triggered
     def newProject(self):
         logging.info('Action: New')
+        if not self.closeProject():
+            return
+        self.project_logic.new_project()
+
+        self.updateTreeDataModel()
+
+        self.filename = 'Untitled.ulr'
         self.updateTitle()
 
     def openProject(self):
         logging.info('Action: Open')
+        if not self.closeProject():
+            return
         self.updateTitle()
 
     def saveProject(self):
-        self.project_logic.project.save('')
+        self.project_logic.save('')
         self.updateTitle()
 
     def saveProjectAs(self):
         logging.info('Action: Save As')
         self.updateTitle()
 
-    def closeProject(self):
+    def closeProject(self) -> bool:
         logging.info('Action: Close')
+        if not self.saveFileIfNeeded():
+            return False
+
+        # close diagram windows
+
+        self.clearTreeDataModel()
+        self.project_logic.clear_project()
+        self.filename = None
         self.updateTitle()
+        return True
 
     def exitFile(self):
         self.close()
@@ -290,53 +314,53 @@ class MainWindow(QMainWindow):
 
     # Function to create actions for menus
     def createActions(self):
-        self.newAction = QAction(QIcon('new.png'), '&New',
+        self.newAction = QAction(QIcon('resources/icons/new.png'), '&New',
                                  self, shortcut=QKeySequence.New,
                                  statusTip='Create a New Project',
                                  triggered=self.newProject)
-        self.openAction = QAction(QIcon('open.png'), '&Open',
+        self.openAction = QAction(QIcon('resources/icons/open.png'), '&Open',
                                   self, shortcut=QKeySequence.Open,
                                   statusTip='Open a project in editor',
                                   triggered=self.openProject)
-        self.saveAction = QAction(QIcon('save.png'), '&Save',
+        self.saveAction = QAction(QIcon('resources/icons/save.png'), '&Save',
                                   self, shortcut=QKeySequence.Save,
                                   statusTip='Save a project',
                                   triggered=self.saveProject)
-        self.saveAsAction = QAction(QIcon('save_as.png'), 'Save As...',
-                                  self, shortcut=QKeySequence.SaveAs,
-                                  statusTip='Save a project',
-                                  triggered=self.saveProjectAs)
-        self.closeAction = QAction(QIcon('close.png'), '&Close',
-                                  self, shortcut=QKeySequence.Close,
-                                  statusTip='Close current project',
-                                  triggered=self.closeProject)
-        self.exitAction = QAction(QIcon('exit.png'), '&Quit',
+        self.saveAsAction = QAction(QIcon('resources/icons/save_as.png'), 'Save As...',
+                                    self, shortcut=QKeySequence.SaveAs,
+                                    statusTip='Save a project',
+                                    triggered=self.saveProjectAs)
+        self.closeAction = QAction(QIcon('resources/icons/close.png'), '&Close',
+                                   self, shortcut=QKeySequence.Close,
+                                   statusTip='Close current project',
+                                   triggered=self.closeProject)
+        self.exitAction = QAction(QIcon('resources/icons/exit.png'), '&Quit',
                                   self, shortcut=QKeySequence.Quit,
                                   statusTip='Quit the Application',
                                   triggered=self.exitFile)
-        self.copyAction = QAction(QIcon('copy.png'), 'C&opy',
+        self.copyAction = QAction(QIcon('resources/icons/copy.png'), 'C&opy',
                                   self, shortcut="Ctrl+C",
                                   statusTip="Copy",
                                   triggered=self.copy)
-        self.pasteAction = QAction(QIcon('paste.png'), '&Paste',
+        self.pasteAction = QAction(QIcon('resources/icons/paste.png'), '&Paste',
                                    self, shortcut="Ctrl+V",
                                    statusTip="Paste",
                                    triggered=self.paste)
-        self.aboutAction = QAction(QIcon('about.png'), 'A&bout',
+        self.aboutAction = QAction(QIcon('resources/icons/about.png'), 'A&bout',
                                    self, statusTip="Displays info about the app",
                                    triggered=self.aboutHelp)
-        self.addRectangleAction = QAction(QIcon('rectangle.png'), '&Rectangle',
-                                   self, statusTip="Add rectangle",
-                                   triggered=self.addRectangle)
-        self.addUserElementAction = QAction(QIcon('user_element.svg'), '&User element',
-                                          self, statusTip="Add user element",
-                                          triggered=self.addUserElement)
-        self.addLineElementAction = QAction(QIcon('line_element.png'), '&Line element',
+        self.addRectangleAction = QAction(QIcon('resources/icons/rectangle.png'), '&Rectangle',
+                                          self, statusTip="Add rectangle",
+                                          triggered=self.addRectangle)
+        self.addUserElementAction = QAction(QIcon('resources/icons/user_element.svg'), '&User element',
+                                            self, statusTip="Add user element",
+                                            triggered=self.addUserElement)
+        self.addLineElementAction = QAction(QIcon('resources/icons/line_element.png'), '&Line element',
                                             self, statusTip="Add line element",
                                             triggered=self.addLineElement)
-        self.printElementsAction = QAction(QIcon('cache.png'), 'Print',
-                                            self, statusTip="print",
-                                            triggered=self.printElements)
+        self.printElementsAction = QAction(QIcon('resources/icons/cache.png'), 'Print',
+                                           self, statusTip="print",
+                                           triggered=self.printElements)
 
     def center(self):
         """Center the main window
@@ -392,18 +416,18 @@ class MainWindow(QMainWindow):
 
         element_type_to_context_actions = {
             Folder: [
-                QAction(QIcon('diagram.png'), 'Create diagram',
+                QAction(QIcon('resources/icons/diagram.png'), 'Create diagram',
                         self, statusTip='Create diagram',
                         triggered=self.createDiagram),
-                QAction(QIcon('create_folder.png'), 'Create folder',
+                QAction(QIcon('resources/icons/create_folder.png'), 'Create folder',
                         self, statusTip='Create folder',
                         triggered=self.createFolder),
-                QAction(QIcon('delete.png'), 'Delete element',
+                QAction(QIcon('resources/icons/delete.png'), 'Delete element',
                         self, statusTip='Delete element',
                         triggered=self.deleteElement),
             ],
             Diagram: [
-                QAction(QIcon('delete.png'), 'Delete element',
+                QAction(QIcon('resources/icons/delete.png'), 'Delete element',
                         self, statusTip='Delete element',
                         triggered=self.deleteElement),
             ]
@@ -435,14 +459,14 @@ class MainWindow(QMainWindow):
         element = self.project_logic.project.get(element_id)
         return element
 
-    def onCloseEditor(self, editor:QAbstractItemDelegate, hint):
-        item:QStandardItem = self.getSelectedItem()
+    def onCloseEditor(self, editor: QAbstractItemDelegate, hint):
+        item: QStandardItem = self.getSelectedItem()
 
         # set name after editing
         element = self.elementFromItem(item)
         if element.name != item.text:
             element.name = item.text()
-            # set change flag
+            self.project_logic.project.is_dirty = True
 
         parent = item.parent()
         parent.sortChildren(0, Qt.SortOrder.AscendingOrder)
@@ -464,32 +488,40 @@ class MainWindow(QMainWindow):
         treeWindow.setWidget(self.treeView)
         self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, treeWindow)
 
-        # create tree data model
+        self.createTreeDataModel()
+
+    def createTreeDataModel(self):
+        self.sti = QStandardItemModel()
+        self.sti.setHorizontalHeaderLabels([''])
+        self.sti.setSortRole(Qt.DisplayRole)
+        self.treeView.setModel(self.sti)
+        self.treeView.setSortingEnabled(True)
+        self.updateTreeDataModel()
+
+    def updateTreeDataModel(self):
         root = self.project_logic.project.root
         root_item = self._itemize(root)
-        sti = QStandardItemModel()
-        sti.appendRow([root_item])
-        sti.setHorizontalHeaderLabels([''])
-        sti.setSortRole(Qt.DisplayRole)
-
+        self.sti.appendRow([root_item])
         self.treeView.sortByColumn(0, Qt.SortOrder.AscendingOrder)
-        self.treeView.setSortingEnabled(True)
-        self.treeView.setModel(sti)
         self.treeView.expandAll()
+
+    def clearTreeDataModel(self):
+        self.sti.clear()
 
     def makeItem(self, element):
         element_type_to_icon_file = {
-            Folder: 'folder.png',
-            Diagram: 'diagram.png'
+            Folder: 'resources/icons/folder.png',
+            Diagram: 'resources/icons/diagram.png'
         }
 
         item = QStandardItem(element.name)
         item.setData(element.id, Qt.UserRole)
-        item.setIcon(QIcon(element_type_to_icon_file[type(element)]))
+        element_type = type(element)
+        item.setIcon(QIcon(element_type_to_icon_file[element_type]))
         return item
 
     def createElement(self, create_method):
-        parent:QStandardItem = self.getSelectedItem()
+        parent: QStandardItem = self.getSelectedItem()
         parent_index = parent.index()
 
         self.treeView.expand(parent_index)
@@ -515,17 +547,17 @@ class MainWindow(QMainWindow):
     def deleteElement(self):
         item: QStandardItem = self.getSelectedItem()
         index = item.index()
-        model:QStandardItemModel = item.model()  # better to have permanent reference
+        model: QStandardItemModel = item.model()  # better to have permanent reference
 
         # delete elements from model recursively
-        element_id = self.elementFromItem(item).id
-        self.project_logic.delete_element(element_id)
+        element = self.elementFromItem(item)
+        self.project_logic.delete_element(element.id)
 
         model.removeRow(index.row(), index.parent())
         self.project_logic.project.is_dirty = True
         self.updateTitle()
 
     def printElements(self):
-        for node in self.project_logic.project.nodes.values():
-            print(f'{node.element.name}   {node.element.id}')
+        for element in self.project_logic.project.elements.values():
+            print(f'{element.name}   {element.id}')
         print()
