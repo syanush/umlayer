@@ -339,28 +339,37 @@ class MainWindow(QMainWindow):
                                   statusTip='Quit the Application',
                                   triggered=self.exitFile)
         self.copyAction = QAction(QIcon('resources/icons/copy.png'), 'C&opy',
-                                  self, shortcut="Ctrl+C",
-                                  statusTip="Copy",
+                                  self, shortcut='Ctrl+C',
+                                  statusTip='Copy',
                                   triggered=self.copy)
         self.pasteAction = QAction(QIcon('resources/icons/paste.png'), '&Paste',
-                                   self, shortcut="Ctrl+V",
-                                   statusTip="Paste",
+                                   self, shortcut='Ctrl+V',
+                                   statusTip='Paste',
                                    triggered=self.paste)
         self.aboutAction = QAction(QIcon('resources/icons/about.png'), 'A&bout',
-                                   self, statusTip="Displays info about the app",
+                                   self, statusTip='Displays info about the app',
                                    triggered=self.aboutHelp)
         self.addRectangleAction = QAction(QIcon('resources/icons/rectangle.png'), '&Rectangle',
-                                          self, statusTip="Add rectangle",
+                                          self, statusTip='Add rectangle',
                                           triggered=self.addRectangle)
         self.addUserElementAction = QAction(QIcon('resources/icons/user_element.svg'), '&User element',
-                                            self, statusTip="Add user element",
+                                            self, statusTip='Add user element',
                                             triggered=self.addUserElement)
         self.addLineElementAction = QAction(QIcon('resources/icons/line_element.png'), '&Line element',
-                                            self, statusTip="Add line element",
+                                            self, statusTip='Add line element',
                                             triggered=self.addLineElement)
         self.printElementsAction = QAction(QIcon('resources/icons/cache.png'), 'Print',
-                                           self, statusTip="print",
+                                           self, statusTip='print',
                                            triggered=self.printElements)
+        self.createDiagramAction = QAction(QIcon('resources/icons/diagram.png'), 'Create diagram',
+                                           self, statusTip='Create diagram',
+                                           triggered=self.createDiagram)
+        self.createFolderAction = QAction(QIcon('resources/icons/create_folder.png'), 'Create folder',
+                                          self, statusTip='Create folder',
+                                          triggered=self.createFolder)
+        self.deleteElementAction = QAction(QIcon('resources/icons/delete.png'), 'Delete element',
+                                           self, shortcut=QKeySequence.Delete, statusTip='Delete element',
+                                           triggered=self.deleteElement)
 
     def center(self):
         """Center the main window
@@ -414,30 +423,16 @@ class MainWindow(QMainWindow):
         element_id = item.data(Qt.UserRole)
         element = self.project_logic.project.get(element_id)
 
-        element_type_to_context_actions = {
-            Folder: [
-                QAction(QIcon('resources/icons/diagram.png'), 'Create diagram',
-                        self, statusTip='Create diagram',
-                        triggered=self.createDiagram),
-                QAction(QIcon('resources/icons/create_folder.png'), 'Create folder',
-                        self, statusTip='Create folder',
-                        triggered=self.createFolder),
-                QAction(QIcon('resources/icons/delete.png'), 'Delete element',
-                        self, statusTip='Delete element',
-                        triggered=self.deleteElement),
-            ],
-            Diagram: [
-                QAction(QIcon('resources/icons/delete.png'), 'Delete element',
-                        self, statusTip='Delete element',
-                        triggered=self.deleteElement),
-            ]
-        }
-
-        if element_id == self.project_logic.project.root.id:
-            del element_type_to_context_actions[Folder][2]
-
         menu = QMenu(self.treeView)
-        menu.addActions(element_type_to_context_actions[type(element)])
+
+        if type(element) is Folder:
+            menu.addAction(self.createDiagramAction)
+            menu.addAction(self.createFolderAction)
+            if element_id != self.project_logic.project.root.id:
+                menu.addAction(self.deleteElementAction)
+        elif type(element) is Diagram:
+            menu.addAction(self.deleteElementAction)
+
         menu.exec(self.treeView.viewport().mapToGlobal(point))
 
     def getSelectedItem(self):
@@ -489,6 +484,8 @@ class MainWindow(QMainWindow):
         self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, treeWindow)
 
         self.createTreeDataModel()
+
+        shortcut = QShortcut(QKeySequence.Delete, self.treeView, context=Qt.WidgetShortcut, activated=self.deleteElement)
 
     def createTreeDataModel(self):
         self.sti = QStandardItemModel()
@@ -546,11 +543,15 @@ class MainWindow(QMainWindow):
 
     def deleteElement(self):
         item: QStandardItem = self.getSelectedItem()
+        if item is None:
+            return
         index = item.index()
         model: QStandardItemModel = item.model()  # better to have permanent reference
 
         # delete elements from model recursively
         element = self.elementFromItem(item)
+        if element.id == self.project_logic.project.root.id:
+            return
         self.project_logic.delete_element(element.id)
 
         model.removeRow(index.row(), index.parent())
