@@ -16,13 +16,21 @@ class MainWindow(QMainWindow):
     """Main window of the UMLayer application
     """
 
+    DEFAULT_FILENAME = 'Untitled.ulr'
+
     def __init__(self, project_logic):
         super().__init__()
 
         self.project_logic = project_logic
-        self.filename = 'Untitled.ulr'
         self.readSettings()
+        self.setDefaultFileName()
         self.initGUI()
+
+    def isFileNameNotSet(self) -> bool:
+        return self.filename is None or self.filename == MainWindow.DEFAULT_FILENAME
+
+    def setDefaultFileName(self):
+        self.filename = MainWindow.DEFAULT_FILENAME
 
     def writeSettings(self):
         settings = QSettings()
@@ -49,11 +57,10 @@ class MainWindow(QMainWindow):
 
     EXTENSION = '.ulr'
 
-    def updateTitle(self):
+    def _updateTitle(self, filename):
         title = 'UMLayer'
 
-        if self.filename:
-            filename = self.filename
+        if filename:
             if len(filename) >= 4 and filename.endswith(MainWindow.EXTENSION):
                 filename = filename[:-4]
 
@@ -62,6 +69,9 @@ class MainWindow(QMainWindow):
 
         self.setWindowTitle(title)
         self.show()
+
+    def updateTitle(self):
+        self._updateTitle(self.filename)
 
     def initGUI(self):
         logging.info('GUI initialization started')
@@ -237,26 +247,93 @@ class MainWindow(QMainWindow):
         self.filename = 'Untitled.ulr'
         self.updateTitle()
 
+    def _getFileNameFromOpenDialog(self, caption=None):
+        fileName, selectedFilter = \
+            QFileDialog.getOpenFileName(
+                parent=None,
+                caption=caption,
+                dir=QDir.currentPath(),
+                filter="All (*);;Umlayer project (*.ulr)",
+                selectedFilter="Umlayer project (*.ulr)")
+        return fileName
+
     def openProject(self):
         logging.info('Action: Open')
         if not self.closeProject():
             return
-        self.updateTitle()
+
+        fileName = self._getFileNameFromOpenDialog('Open')
+
+        if len(fileName) == 0:
+            return
+
+        try:
+            self.doOpenProject(fileName)
+        except:
+            pass
+        else:
+            self.filename = fileName
+            self.updateTitle()
+
+    def doOpenProject(self, filename):
+        print(filename)
+
+    def _getFileNameFromSaveDialog(self, caption=None):
+        initial_filename = self.filename or MainWindow.DEFAULT_FILENAME
+        fileName, selectedFilter = \
+            QFileDialog.getSaveFileName(
+                parent=None,
+                caption=caption,
+                dir=QDir.currentPath() + '/' + initial_filename,
+                filter="All (*);;Umlayer project (*.ulr)",
+                selectedFilter="Umlayer project (*.ulr)")
+        return fileName
 
     def saveProject(self):
-        self.project_logic.save('')
-        self.updateTitle()
+        fileName = self._getFileNameFromSaveDialog('Save') if self.isFileNameNotSet() else self.filename
+
+        if len(fileName) == 0:
+            return
+
+        try:
+            self.doSaveProject(fileName)
+        except:
+            pass
+        else:
+            self.filename = fileName
+            self.updateTitle()
+
+    def doSaveProject(self, filename):
+        """Really save project"""
+        self.project_logic.save(filename)
 
     def saveProjectAs(self):
         logging.info('Action: Save As')
-        self.updateTitle()
+
+        fileName = self._getFileNameFromSaveDialog('Save as...')
+
+        if len(fileName) == 0:
+            return
+
+        try:
+            self.doSaveProject(fileName)
+        except:
+            pass
+        else:
+            self.filename = fileName
+            self.updateTitle()
+
+    def closeDiagramWindows(self) -> bool:
+        """Returns true if windows are closed successfully"""
+        pass
 
     def closeProject(self) -> bool:
         logging.info('Action: Close')
         if not self.saveFileIfNeeded():
             return False
 
-        # close diagram windows
+        if not self.closeDiagramWindows():
+            return False
 
         self.clearTreeDataModel()
         self.project_logic.clear_project()
@@ -485,7 +562,10 @@ class MainWindow(QMainWindow):
 
         self.createTreeDataModel()
 
-        shortcut = QShortcut(QKeySequence.Delete, self.treeView, context=Qt.WidgetShortcut, activated=self.deleteElement)
+        shortcut = QShortcut(QKeySequence.Delete,
+                             self.treeView,
+                             context=Qt.WidgetShortcut,
+                             activated=self.deleteElement)
 
     def createTreeDataModel(self):
         self.sti = QStandardItemModel()
