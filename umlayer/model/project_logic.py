@@ -53,13 +53,8 @@ class ProjectLogic:
         if filename is None:
             raise ValueError('filename is None')
 
-        self.storage.save(self.project.elements.values())
+        self.storage.save(self.project.elements.values(), filename)
         self.project.is_dirty = False
-
-        # for element_id, element in self.project.elements.items():
-        #     parent_id = element.parent_id
-        #     str_json = jsonpickle.encode(element)
-        #     print(f'{str(element_id)} {str(parent_id)} {str_json}')
 
     def load(self, filename: str):
         """Loads project data and settings from a file
@@ -67,7 +62,13 @@ class ProjectLogic:
         Throws exceptions in case of errors
         """
 
-        # for element in self.storage.load(filename):
-        #     self.project.
-        # self.elements
+        elements: list = self.storage.load(filename)
+
+        root = elements[0]
+        self.project.setRoot(root)
+
+        for element in elements:
+            if element.id != root.id:
+                self.project.add(element, element.parent_id)
+
         self.project.is_dirty = False

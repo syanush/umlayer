@@ -1,6 +1,8 @@
 """Project storage implementation"""
 
+import os
 import jsonpickle
+import sqlalchemy.engine.cursor
 
 from sqlalchemy import create_engine, text
 
@@ -9,8 +11,15 @@ from umlayer.model.project_storage import ProjectStorage
 
 
 class ProjectStorageImpl(ProjectStorage):
-    def save(self, elements: list[Element], filename: str = None):
-        engine = create_engine("sqlite+pysqlite:///:memory:", echo=True, future=True)
+    def save(self, elements: list[Element], filepath: str = None):
+        if os.path.exists(filepath):
+            os.remove(filepath)
+
+        dirname = os.path.dirname(filepath)
+        os.makedirs(dirname, exist_ok=True)
+
+        # engine = create_engine("sqlite+pysqlite:///:memory:", echo=True, future=True)
+        engine = create_engine("sqlite+pysqlite:///" + filepath, echo=True, future=True)
 
         with engine.begin() as conn:
             conn.execute(text("CREATE TABLE elements (id text PRIMARY KEY, json_data text)"))
@@ -20,13 +29,15 @@ class ProjectStorageImpl(ProjectStorage):
                 sql = f"INSERT INTO elements (id, json_data) VALUES ('{str(element.id)}', '{json_data}')"
                 conn.execute(text(sql))
 
-    def load(self, filename: str = None) -> list[Element]:
-        engine = create_engine("sqlite+pysqlite:///:memory:", echo=True, future=True)
+    def load(self, filepath: str = None) -> list[Element]:
+        # engine = create_engine("sqlite+pysqlite:///:memory:", echo=True, future=True)
+        engine = create_engine("sqlite+pysqlite:///" + filepath, echo=True, future=True)
 
         with engine.begin() as conn:
             sql = f"SELECT * FROM elements"
-            result = conn.execute(text(sql))
-            # restore elements here
-            # jsonpickle.decode(frozen)
-            elements = None
+            result: sqlalchemy.engine.cursor.CursorResult = conn.execute(text(sql))
+            # for id, frozen in result:
+            #     element = jsonpickle.decode(frozen)
+            #     print(id, element)
+            elements = [jsonpickle.decode(frozen) for _, frozen in result]
             return elements

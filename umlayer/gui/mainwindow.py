@@ -244,7 +244,7 @@ class MainWindow(QMainWindow):
 
         self.updateTreeDataModel()
 
-        self.filename = 'Untitled.ulr'
+        self.filename = MainWindow.DEFAULT_FILENAME
         self.updateTitle()
 
     def _getFileNameFromOpenDialog(self, caption=None):
@@ -269,14 +269,15 @@ class MainWindow(QMainWindow):
 
         try:
             self.doOpenProject(fileName)
-        except:
-            pass
+        except Exception as ex:
+            print(ex)
         else:
             self.filename = fileName
             self.updateTitle()
 
     def doOpenProject(self, filename):
-        print(filename)
+        self.project_logic.load(filename)
+        self.updateTreeDataModel()
 
     def _getFileNameFromSaveDialog(self, caption=None):
         initial_filename = self.filename or MainWindow.DEFAULT_FILENAME
@@ -317,7 +318,7 @@ class MainWindow(QMainWindow):
 
         try:
             self.doSaveProject(fileName)
-        except:
+        except Exception as ex:
             pass
         else:
             self.filename = fileName
@@ -325,7 +326,7 @@ class MainWindow(QMainWindow):
 
     def closeDiagramWindows(self) -> bool:
         """Returns true if windows are closed successfully"""
-        pass
+        return True
 
     def closeProject(self) -> bool:
         logging.info('Action: Close')
