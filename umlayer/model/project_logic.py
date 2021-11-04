@@ -42,6 +42,9 @@ class ProjectLogic:
         return element
 
     def delete_element(self, element_id: UUID):
+        """Delete elements from model recursively"""
+        if element_id == self.project.root.id:
+            return
         self.project.remove(element_id)
 
     def save(self, filename: str):

@@ -40,3 +40,12 @@ class Project:
 
     def children(self, parent_id: UUID) -> set[Element]:
         return set(element for element in self.elements.values() if element.parent_id == parent_id)
+
+    def count(self):
+        return len(self.elements)
+
+    def printElements(self):
+        """Debugging feature"""
+        for element in self.elements.values():
+            print(f'{element.name}   {element.id}')
+        print()

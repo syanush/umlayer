@@ -8,6 +8,11 @@ from .graphics_view import GraphicsView
 from .user_element import UserElement
 from .line_element import LineElement
 
+from .tree_view import TreeView
+from .standard_item_model import StandardItemModel
+
+import umlayer.model.constants as constants
+import umlayer.model.utils as utils
 from umlayer.model.folder import Folder
 from umlayer.model.diagram import Diagram
 
@@ -15,8 +20,6 @@ from umlayer.model.diagram import Diagram
 class MainWindow(QMainWindow):
     """Main window of the UMLayer application
     """
-
-    DEFAULT_FILENAME = 'Untitled.ulr'
 
     def __init__(self, project_logic):
         super().__init__()
@@ -26,11 +29,15 @@ class MainWindow(QMainWindow):
         self.setDefaultFileName()
         self.initGUI()
 
+    @property
+    def project(self):
+        return self.project_logic.project
+
     def isFileNameNotSet(self) -> bool:
-        return self.filename is None or self.filename == MainWindow.DEFAULT_FILENAME
+        return self.filename is None or self.filename == constants.DEFAULT_FILENAME
 
     def setDefaultFileName(self):
-        self.filename = MainWindow.DEFAULT_FILENAME
+        self.filename = constants.DEFAULT_FILENAME
 
     def writeSettings(self):
         settings = QSettings()
@@ -55,18 +62,11 @@ class MainWindow(QMainWindow):
         settings.endGroup()
         logging.info('Settings loading finished')
 
-    EXTENSION = '.ulr'
+    def is_dirty(self):
+        return self.project.is_dirty
 
     def _updateTitle(self, filename):
-        title = 'UMLayer'
-
-        if filename:
-            if len(filename) >= 4 and filename.endswith(MainWindow.EXTENSION):
-                filename = filename[:-4]
-
-            star = ' *' if self.project_logic.project.is_dirty else ''
-            title = f'{filename}{star} \u2014 ' + title
-
+        title = utils.build_window_title(filename, self.is_dirty())
         self.setWindowTitle(title)
         self.show()
 
@@ -242,9 +242,9 @@ class MainWindow(QMainWindow):
             return
         self.project_logic.new_project()
 
-        self.updateTreeDataModel()
+        self.treeView.updateTreeDataModel()
 
-        self.filename = MainWindow.DEFAULT_FILENAME
+        self.filename = constants.DEFAULT_FILENAME
         self.updateTitle()
 
     def _getFileNameFromOpenDialog(self, caption=None):
@@ -275,12 +275,14 @@ class MainWindow(QMainWindow):
             self.filename = fileName
             self.updateTitle()
 
+        self.printStats()
+
     def doOpenProject(self, filename):
         self.project_logic.load(filename)
-        self.updateTreeDataModel()
+        self.treeView.updateTreeDataModel()
 
     def _getFileNameFromSaveDialog(self, caption=None):
-        initial_filename = self.filename or MainWindow.DEFAULT_FILENAME
+        initial_filename = self.filename or constants.DEFAULT_FILENAME
         fileName, selectedFilter = \
             QFileDialog.getSaveFileName(
                 parent=None,
@@ -438,7 +440,7 @@ class MainWindow(QMainWindow):
                                             triggered=self.addLineElement)
         self.printElementsAction = QAction(QIcon('resources/icons/cache.png'), 'Print',
                                            self, statusTip='print',
-                                           triggered=self.printElements)
+                                           triggered=self.project.printElements)
         self.createDiagramAction = QAction(QIcon('resources/icons/diagram.png'), 'Create diagram',
                                            self, statusTip='Create diagram',
                                            triggered=self.createDiagram)
@@ -467,7 +469,7 @@ class MainWindow(QMainWindow):
             event.ignore()
 
     def saveFileIfNeeded(self) -> bool:
-        if not self.project_logic.project.is_dirty:
+        if not self.is_dirty():
             return True
 
         reply = QMessageBox.question(
@@ -482,138 +484,50 @@ class MainWindow(QMainWindow):
 
         return reply != QMessageBox.Cancel
 
-    def _itemize(self, element):
-        item = self.makeItem(element)
-
-        children = self.project_logic.project.children(element.id)
-        for child in children:
-            child_item = self._itemize(child)
-            item.appendRow([child_item])
-        return item
-
     def onTreeViewCustomContextMenuRequested(self, point):
         # show context menu
-        index = self.treeView.indexAt(point)
-        if not index.isValid():
+        item = self.treeView.getSelectedItem()
+
+        if item is None:
             return
 
-        item = self.treeView.model().itemFromIndex(index)
-        element_id = item.data(Qt.UserRole)
-        element = self.project_logic.project.get(element_id)
+        element = self.treeView.elementFromItem(item)
 
         menu = QMenu(self.treeView)
 
         if type(element) is Folder:
             menu.addAction(self.createDiagramAction)
             menu.addAction(self.createFolderAction)
-            if element_id != self.project_logic.project.root.id:
+            if element.id != self.project.root.id:
                 menu.addAction(self.deleteElementAction)
         elif type(element) is Diagram:
             menu.addAction(self.deleteElementAction)
 
         menu.exec(self.treeView.viewport().mapToGlobal(point))
 
-    def getSelectedItem(self):
-        indexes = self.treeView.selectedIndexes()
-
-        if not indexes:
-            return None
-
-        index = indexes[0]
-
-        if not index.isValid():
-            return None
-
-        item = self.treeView.model().itemFromIndex(index)
-        return item
-
-    def elementFromItem(self, item):
-        element_id = item.data(Qt.UserRole)
-        element = self.project_logic.project.get(element_id)
-        return element
-
-    def onCloseEditor(self, editor: QAbstractItemDelegate, hint):
-        item: QStandardItem = self.getSelectedItem()
-
-        # set name after editing
-        element = self.elementFromItem(item)
-        if element.name != item.text:
-            element.name = item.text()
-            self.project_logic.project.is_dirty = True
-
-        parent = item.parent()
-        parent.sortChildren(0, Qt.SortOrder.AscendingOrder)
-
-        self.treeView.scrollTo(item.index())
-
     def createProjectTree(self):
         treeWindow = QDockWidget('Project', self)
-        self.treeView = QTreeView()
-        self.treeView.setHeaderHidden(True)
-        self.treeView.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.treeView = TreeView(self, self.project_logic)
         self.treeView.customContextMenuRequested.connect(self.onTreeViewCustomContextMenuRequested)
-        self.treeView.setSelectionMode(QAbstractItemView.SingleSelection)  # disable light blue selection
-        self.treeView.setUniformRowHeights(True)
-        self.treeView.setWordWrap(False)
-        self.treeView.itemDelegate().closeEditor.connect(self.onCloseEditor)
-        # self.treeView.setStyleSheet("""""")
+        self.treeView.itemDelegate().closeEditor.connect(self.treeView.onCloseEditor)
 
         treeWindow.setWidget(self.treeView)
         self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, treeWindow)
 
-        self.createTreeDataModel()
+        self.sti = StandardItemModel()
+        self.treeView.setModel(self.sti)
+        self.treeView.updateTreeDataModel()
 
         shortcut = QShortcut(QKeySequence.Delete,
                              self.treeView,
                              context=Qt.WidgetShortcut,
                              activated=self.deleteElement)
 
-    def createTreeDataModel(self):
-        self.sti = QStandardItemModel()
-        self.sti.setHorizontalHeaderLabels([''])
-        self.sti.setSortRole(Qt.DisplayRole)
-        self.treeView.setModel(self.sti)
-        self.treeView.setSortingEnabled(True)
-        self.updateTreeDataModel()
-
-    def updateTreeDataModel(self):
-        root = self.project_logic.project.root
-        root_item = self._itemize(root)
-        self.sti.appendRow([root_item])
-        self.treeView.sortByColumn(0, Qt.SortOrder.AscendingOrder)
-        self.treeView.expandAll()
-
     def clearTreeDataModel(self):
         self.sti.clear()
 
-    def makeItem(self, element):
-        element_type_to_icon_file = {
-            Folder: 'resources/icons/folder.png',
-            Diagram: 'resources/icons/diagram.png'
-        }
-
-        item = QStandardItem(element.name)
-        item.setData(element.id, Qt.UserRole)
-        element_type = type(element)
-        item.setIcon(QIcon(element_type_to_icon_file[element_type]))
-        return item
-
     def createElement(self, create_method):
-        parent: QStandardItem = self.getSelectedItem()
-        parent_index = parent.index()
-
-        self.treeView.expand(parent_index)
-
-        parent_id = parent.data(Qt.UserRole)
-        element = create_method(parent_id)
-        item = self.makeItem(element)
-
-        parent.insertRow(0, [item])
-
-        item_index = item.index()
-        self.treeView.scrollTo(item_index)
-        self.treeView.setCurrentIndex(item_index)
-        self.treeView.edit(item_index)
+        self.treeView.createElement(create_method)
         self.updateTitle()
 
     def createFolder(self):
@@ -623,23 +537,10 @@ class MainWindow(QMainWindow):
         self.createElement(self.project_logic.create_diagram)
 
     def deleteElement(self):
-        item: QStandardItem = self.getSelectedItem()
-        if item is None:
-            return
-        index = item.index()
-        model: QStandardItemModel = item.model()  # better to have permanent reference
-
-        # delete elements from model recursively
-        element = self.elementFromItem(item)
-        if element.id == self.project_logic.project.root.id:
-            return
-        self.project_logic.delete_element(element.id)
-
-        model.removeRow(index.row(), index.parent())
-        self.project_logic.project.is_dirty = True
+        self.treeView.deleteElement()
         self.updateTitle()
+        self.printStats()
 
-    def printElements(self):
-        for element in self.project_logic.project.elements.values():
-            print(f'{element.name}   {element.id}')
-        print()
+    def printStats(self):
+        print('number of elements', self.project.count())
+        print('number of items', self.sti.count())

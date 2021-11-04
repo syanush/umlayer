@@ -1,0 +1,2 @@
+EXTENSION = '.ulr'
+DEFAULT_FILENAME = 'Untitled' + EXTENSION
