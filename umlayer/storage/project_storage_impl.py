@@ -6,12 +6,11 @@ import sqlalchemy.engine.cursor
 
 from sqlalchemy import create_engine, text
 
-from umlayer.model.element import Element
-from umlayer.model.project_storage import ProjectStorage
+from .. import model
 
 
-class ProjectStorageImpl(ProjectStorage):
-    def save(self, elements: list[Element], filepath: str = None):
+class ProjectStorageImpl(model.ProjectStorage):
+    def save(self, elements: list[model.Element], filepath: str = None):
         if os.path.exists(filepath):
             os.remove(filepath)
 
@@ -29,7 +28,7 @@ class ProjectStorageImpl(ProjectStorage):
                 sql = f"INSERT INTO elements (id, json_data) VALUES ('{str(element.id)}', '{json_data}')"
                 conn.execute(text(sql))
 
-    def load(self, filepath: str = None) -> list[Element]:
+    def load(self, filepath: str = None) -> list[model.Element]:
         # engine = create_engine("sqlite+pysqlite:///:memory:", echo=True, future=True)
         engine = create_engine("sqlite+pysqlite:///" + filepath, echo=True, future=True)
 

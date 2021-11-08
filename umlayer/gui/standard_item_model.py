@@ -1,9 +1,7 @@
 from PySide6.QtCore import *
 from PySide6.QtGui import *
-from PySide6.QtWidgets import *
 
-from umlayer.model.folder import Folder
-from umlayer.model.diagram import Diagram
+from .. import model
 
 
 class StandardItemModel(QStandardItemModel):
@@ -28,8 +26,8 @@ class StandardItemModel(QStandardItemModel):
     @staticmethod
     def makeItem(element):
         element_type_to_icon_file = {
-            Folder: 'resources/icons/folder.png',
-            Diagram: 'resources/icons/diagram.png'
+            model.Folder: 'resources/icons/folder.png',
+            model.Diagram: 'resources/icons/diagram.png'
         }
 
         item = QStandardItem(element.name)

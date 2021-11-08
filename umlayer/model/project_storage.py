@@ -3,7 +3,7 @@
 
 from abc import ABC, abstractmethod
 
-from .element import Element
+from . import Element
 
 
 class ProjectStorage(ABC):

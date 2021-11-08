@@ -4,17 +4,16 @@ from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
-from .graphics_view import GraphicsView
-from .user_element import UserElement
-from .line_element import LineElement
+from .. import model
+from ..model import constants, utils
 
-from .tree_view import TreeView
-from .standard_item_model import StandardItemModel
-
-import umlayer.model.constants as constants
-import umlayer.model.utils as utils
-from umlayer.model.folder import Folder
-from umlayer.model.diagram import Diagram
+from . import (
+    GraphicsView,
+    UserElement,
+    LineElement,
+    StandardItemModel,
+    TreeView
+)
 
 
 class MainWindow(QMainWindow):
@@ -34,10 +33,10 @@ class MainWindow(QMainWindow):
         return self.project_logic.project
 
     def isFileNameNotSet(self) -> bool:
-        return self.filename is None or self.filename == constants.DEFAULT_FILENAME
+        return self.filename is None or self.filename == model.constants.DEFAULT_FILENAME
 
     def setDefaultFileName(self):
-        self.filename = constants.DEFAULT_FILENAME
+        self.filename = model.constants.DEFAULT_FILENAME
 
     def writeSettings(self):
         settings = QSettings()
@@ -66,7 +65,7 @@ class MainWindow(QMainWindow):
         return self.project.is_dirty
 
     def _updateTitle(self, filename):
-        title = utils.build_window_title(filename, self.is_dirty())
+        title = model.utils.build_window_title(filename, self.is_dirty())
         self.setWindowTitle(title)
         self.show()
 
@@ -244,7 +243,7 @@ class MainWindow(QMainWindow):
 
         self.treeView.updateTreeDataModel()
 
-        self.filename = constants.DEFAULT_FILENAME
+        self.filename = model.constants.DEFAULT_FILENAME
         self.updateTitle()
 
     def _getFileNameFromOpenDialog(self, caption=None):
@@ -282,7 +281,7 @@ class MainWindow(QMainWindow):
         self.treeView.updateTreeDataModel()
 
     def _getFileNameFromSaveDialog(self, caption=None):
-        initial_filename = self.filename or constants.DEFAULT_FILENAME
+        initial_filename = self.filename or model.constants.DEFAULT_FILENAME
         fileName, selectedFilter = \
             QFileDialog.getSaveFileName(
                 parent=None,
@@ -495,12 +494,12 @@ class MainWindow(QMainWindow):
 
         menu = QMenu(self.treeView)
 
-        if type(element) is Folder:
+        if type(element) is model.Folder:
             menu.addAction(self.createDiagramAction)
             menu.addAction(self.createFolderAction)
             if element.id != self.project.root.id:
                 menu.addAction(self.deleteElementAction)
-        elif type(element) is Diagram:
+        elif type(element) is model.Diagram:
             menu.addAction(self.deleteElementAction)
 
         menu.exec(self.treeView.viewport().mapToGlobal(point))

@@ -5,10 +5,7 @@ import traceback
 
 from PySide6.QtCore import QCoreApplication
 
-from umlayer.gui.app import UMLayerApplication
-from umlayer.gui.mainwindow import MainWindow
-from umlayer.model.project_logic import ProjectLogic
-from umlayer.storage.project_storage_impl import ProjectStorageImpl
+from umlayer import model, gui, storage
 
 
 def run_application():
@@ -18,11 +15,11 @@ def run_application():
     logging.basicConfig(filename='umlayer.log', filemode='w', level=logging.INFO)
     logging.info('Application started')
 
-    app = UMLayerApplication(sys.argv)
+    app = gui.UMLayerApplication(sys.argv)
 
-    storage = ProjectStorageImpl()
-    project_logic = ProjectLogic(storage)
-    main_window = MainWindow(project_logic)
+    store = storage.ProjectStorageImpl()
+    project_logic = model.ProjectLogic(store)
+    main_window = gui.MainWindow(project_logic)
     app.setActiveWindow(main_window)
 
     # Pretend that a file download is in progress

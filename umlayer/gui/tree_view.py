@@ -2,7 +2,7 @@ from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
-from .standard_item_model import StandardItemModel
+from . import StandardItemModel
 
 
 class TreeView(QTreeView):

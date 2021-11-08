@@ -1,9 +1,6 @@
 from uuid import UUID
 
-from .folder import Folder
-from .diagram import Diagram
-from .project import Project
-from .project_storage import ProjectStorage
+from . import ProjectStorage, Project, Folder, Diagram
 
 
 class ProjectLogic:
