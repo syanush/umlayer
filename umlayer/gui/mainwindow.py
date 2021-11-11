@@ -8,6 +8,7 @@ from .. import model
 from ..model import constants, utils
 
 from . import (
+    GraphicsScene,
     GraphicsView,
     UserElement,
     LineElement,
@@ -20,8 +21,8 @@ class MainWindow(QMainWindow):
     """Main window of the UMLayer application
     """
 
-    def __init__(self, project_logic):
-        super().__init__()
+    def __init__(self, project_logic, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
         self.project_logic = project_logic
         self.readSettings()
@@ -133,7 +134,7 @@ class MainWindow(QMainWindow):
     def createCentralWidget(self):
         self.centralWidget = QWidget()
 
-        self.scene = QGraphicsScene()  # 0, 0, 400, 200
+        self.scene: GraphicsScene = GraphicsScene()  # 0, 0, 400, 200
         # self.createScene()
 
         self.sceneView = GraphicsView(self.scene)
@@ -504,9 +505,21 @@ class MainWindow(QMainWindow):
 
         menu.exec(self.treeView.viewport().mapToGlobal(point))
 
+    def elementFromItem(self, item):
+        element_id = item.data(Qt.UserRole)
+        return self.project.get(element_id)
+
+    def on_selection_changed(self, selected: QItemSelection, deselected:QItemSelection):
+        # if selected.length() != 1:
+        #     return
+        item = self.treeView.getSelectedItem()
+        if item is None:
+            return
+        self.on_element_selection(self.elementFromItem(item))
+
     def createProjectTree(self):
         treeWindow = QDockWidget('Project', self)
-        self.treeView = TreeView(self, self.project_logic)
+        self.treeView = TreeView(self.project_logic, self)
         self.treeView.customContextMenuRequested.connect(self.onTreeViewCustomContextMenuRequested)
         self.treeView.itemDelegate().closeEditor.connect(self.treeView.onCloseEditor)
 
@@ -516,6 +529,8 @@ class MainWindow(QMainWindow):
         self.sti = StandardItemModel()
         self.treeView.setModel(self.sti)
         self.treeView.updateTreeDataModel()
+
+        self.treeView.selectionModel().selectionChanged.connect(self.on_selection_changed)
 
         shortcut = QShortcut(QKeySequence.Delete,
                              self.treeView,
@@ -543,3 +558,6 @@ class MainWindow(QMainWindow):
     def printStats(self):
         print('number of elements', self.project.count())
         print('number of items', self.sti.count())
+
+    def on_element_selection(self, element):
+        print(element.id)

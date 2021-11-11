@@ -1,3 +1,4 @@
+from .graphics_scene import GraphicsScene
 from .graphics_view import GraphicsView
 from .user_element import UserElement
 from .line_element import LineElement

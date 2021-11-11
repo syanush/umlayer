@@ -1,4 +1,5 @@
-"""GraphicsView
+"""Scene Editor
+
 """
 
 from PySide6.QtCore import *

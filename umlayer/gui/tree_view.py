@@ -6,9 +6,9 @@ from . import StandardItemModel
 
 
 class TreeView(QTreeView):
-    def __init__(self, parent, project_logic):
+    def __init__(self, project_logic, *args, **kwargs):
         self.project_logic = project_logic
-        super().__init__(parent)
+        super().__init__(*args, **kwargs)
         self.setHeaderHidden(True)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.setSelectionMode(QAbstractItemView.SingleSelection)  # disable light blue selection
@@ -75,8 +75,7 @@ class TreeView(QTreeView):
 
     def elementFromItem(self, item):
         element_id = item.data(Qt.UserRole)
-        element = self.project.get(element_id)
-        return element
+        return self.project.get(element_id)
 
     def onCloseEditor(self, editor: QAbstractItemDelegate, hint):
         """Set element name after editing"""
