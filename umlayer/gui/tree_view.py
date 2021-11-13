@@ -17,6 +17,8 @@ class TreeView(QTreeView):
         self.setSortingEnabled(True)
         # self.setStyleSheet("""""")
 
+        self.itemDelegate().closeEditor.connect(self.onCloseEditor)
+
     @property
     def sti(self):
         return self.model()

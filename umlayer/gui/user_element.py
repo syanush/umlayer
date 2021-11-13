@@ -1,6 +1,9 @@
 """User element of the Use Case diagram"""
 
+from PySide6.QtCore import QPointF
 from PySide6.QtWidgets import *
+
+from .. import model
 
 
 class UserElement(QGraphicsItemGroup):
@@ -17,3 +20,10 @@ class UserElement(QGraphicsItemGroup):
 
         for item in items:
             self.addToGroup(item)
+
+    def getDataAsDto(self):
+        self.flags()
+        return model.UserElementModel(x=self.pos().x(), y=self.pos().y())
+
+    def setDataFromDto(self, dto: model.UserElementModel):
+        self.setPos(QPointF(dto.x, dto.y))

@@ -37,7 +37,7 @@ class Project:
         self.elements[element.id] = element
 
     def get(self, element_id: UUID) -> Element:
-        return self.elements[element_id]
+        return self.elements.get(element_id)
 
     def children(self, parent_id: UUID) -> set[Element]:
         return set(element for element in self.elements.values() if element.parent_id == parent_id)

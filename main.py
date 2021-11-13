@@ -21,6 +21,7 @@ def run_application():
     project_logic = model.ProjectLogic(store)
     main_window = gui.MainWindow(project_logic)
     app.setActiveWindow(main_window)
+    main_window.show()
 
     # Pretend that a file download is in progress
     QCoreApplication.processEvents()
@@ -49,9 +50,10 @@ def main():
         errcode = run_application()
     except SystemExit:
         errcode = 0
-    except Exception:
+    except Exception as ex:
         logging.exception(traceback.format_exc())
         errcode = 1
+        raise ex  # TODO: comment it in release version
 
     sys.exit(errcode)
 
