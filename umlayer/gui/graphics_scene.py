@@ -3,7 +3,16 @@ import logging
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
-from . import UserElement, LineElement
+from . import (
+    UserElement,
+    SimpleClassElement,
+    Resizer,
+    SimpleRectElement,
+    UseCaseElement,
+    PackageElement,
+    diagram_pen,
+    diagram_brush
+)
 
 
 class GraphicsScene(QGraphicsScene):
@@ -12,34 +21,38 @@ class GraphicsScene(QGraphicsScene):
 
     def addUserElement(self, x: float, y: float):
         logging.info('Add user element')
-        element = UserElement()
-        element.setPos(x, y)
-        element.setFlags(QGraphicsItem.ItemIsMovable | QGraphicsItem.ItemIsSelectable)
-        self.addItem(element)
+        item = UserElement()
+        item.setPos(x, y)
+        self.addItem(item)
 
-    def addLineElement(self):
-        logging.info('Add line element')
-        element = LineElement()
-        element.setPos(50, 50)
-        element.setFlags(QGraphicsItem.ItemIsMovable | QGraphicsItem.ItemIsSelectable)
-        self.addItem(element)
+    def addSimpleClass(self, x1: float, y1: float, x2: float, y2: float):
+        logging.info('Add Simple Class')
+        self.addItem(SimpleClassElement(x1, y1, x2, y2))
 
-    def addRectangle(self):
-        logging.info('Add rectangle')
+    def addResizer(self):
+        r = Resizer(parent=self)
+        self.addItem(r)
+        r.setPos(20, 20)
 
-        rect = QGraphicsRectItem(0, 0, 200, 50)
+    def addUseCase(self):
+        # pen = QPen()
+        #
+        # color = QColor(15, 100, 29, 255)
+        # bg_color = Qt.white
+        # pen.setStyle(Qt.SolidLine)
+        # pen.setColor(color)
+        #
+        # brush = QBrush()
+        # brush.setColor(bg_color)
+        #
+        # painter.setPen(pen)
 
-        # Set the origin (position) of the rectangle in the scene.
-        rect.setPos(50, 20)
+        item = UseCaseElement(20, 20, 100, 50)
+        self.addItem(item)
 
-        # Define the brush (fill).
-        brush = QBrush(Qt.red)
-        rect.setBrush(brush)
-
-        # Define the pen (line)
-        pen = QPen(Qt.cyan)
-        pen.setWidth(10)
-        rect.setPen(pen)
-
-        rect.setFlags(QGraphicsItem.ItemIsMovable | QGraphicsItem.ItemIsSelectable)
-        self.addItem(rect)
+    def addPackageElement(self, x: float, y: float):
+        item = PackageElement()
+        item.setPen(diagram_pen)
+        item.setBrush(diagram_brush)
+        item.setPos(x, y)
+        self.addItem(item)

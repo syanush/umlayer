@@ -176,10 +176,10 @@ class GuiLogic:
         self.window.scene.clear()
 
     def do_action2(self):
-        self.window.scene.addRect()
+        self.window.scene.addUserElement(50, 50)
 
     def do_action3(self):
-        print('action 3')
+        self.window.scene.addPackageElement(-20, -20)
 
     def _printStats(self):
         print('number of elements', self.project.count())
@@ -187,9 +187,6 @@ class GuiLogic:
 
     def printElements(self):
         self.project.printElements()
-
-    def addLineElement(self):
-        self.window.scene.addLineElement()
 
     def addRectangle(self):
         self.window.scene.addRectangle()

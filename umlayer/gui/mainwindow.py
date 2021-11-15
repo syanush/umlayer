@@ -76,7 +76,6 @@ class MainWindow(QMainWindow):
         self.aToolBar.addAction(self.actions.pasteAction)
         self.aToolBar.addAction(self.actions.addRectangleAction)
         self.aToolBar.addAction(self.actions.addUserElementAction)
-        self.aToolBar.addAction(self.actions.addLineElementAction)
         self.aToolBar.addAction(self.actions.printElementsAction)
         self.aToolBar.addAction(self.actions.sceneAction1)
         self.aToolBar.addAction(self.actions.sceneAction2)
@@ -90,24 +89,8 @@ class MainWindow(QMainWindow):
 
         self.aStatusLabel = QLabel(self.aStatusBar)
 
-        self.aProgressBar = QProgressBar(self.aStatusBar)
-        self.aProgressBar.setMinimum(0)
-        self.aProgressBar.setMaximum(100)
-
         self.aStatusBar.addWidget(self.aStatusLabel, 3)
-        self.aStatusBar.addWidget(self.aProgressBar, 1)
         self.setStatusBar(self.aStatusBar)
-
-    def showProgress(self, progress):
-        """ Function to show progress
-        """
-
-        self.aProgressBar.setValue(progress)
-        if progress == 100:
-            self.aStatusLabel.setText('Ready')
-        else:
-            self.aStatusLabel.setText('Loading...')
-        return
 
     def createElementsWindow(self):
         # create elements

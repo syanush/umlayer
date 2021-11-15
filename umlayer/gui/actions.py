@@ -71,11 +71,6 @@ class Actions:
             statusTip='Add user element',
             triggered=self.logic.addUserElement)
 
-        self.addLineElementAction = QAction(
-            QIcon('resources/icons/line_element.png'), '&Line element', self.window,
-            statusTip='Add line element',
-            triggered=self.logic.addLineElement)
-
         self.printElementsAction = QAction(
             QIcon('resources/icons/cache.png'), 'Print', self.window,
             statusTip='print',

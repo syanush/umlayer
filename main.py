@@ -23,16 +23,6 @@ def run_application():
     app.setActiveWindow(main_window)
     main_window.show()
 
-    # Pretend that a file download is in progress
-    QCoreApplication.processEvents()
-    filedownload = 0
-    while (filedownload <= 100):
-        main_window.showProgress(filedownload)
-        QCoreApplication.processEvents()
-        filedownload = filedownload + 20
-        time.sleep(0.2)
-    QCoreApplication.processEvents()
-
     result_code = app.exec()
     main_window = None
     app = None
