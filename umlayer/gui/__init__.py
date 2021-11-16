@@ -16,7 +16,6 @@ highlight_pen = QPen(Qt.black, 3, Qt.DotLine)
 highlight_brush = QBrush(QColor(0, 0, 0, 0))
 
 from .user_element import UserElement
-from .simple_class_element import SimpleClassElement, Resizer, SimpleRectElement
 from .line_element import LineElement
 from .use_case_element import UseCaseElement
 from .text_element import TextElement
