@@ -7,11 +7,9 @@ from . import (
     UserElement,
     SimpleClassElement,
     Resizer,
-    SimpleRectElement,
     UseCaseElement,
     PackageElement,
-    diagram_pen,
-    diagram_brush
+    EllipseElement,
 )
 
 
@@ -52,7 +50,10 @@ class GraphicsScene(QGraphicsScene):
 
     def addPackageElement(self, x: float, y: float):
         item = PackageElement()
-        item.setPen(diagram_pen)
-        item.setBrush(diagram_brush)
+        item.setPos(x, y)
+        self.addItem(item)
+
+    def addEllipseElement(self, x: float, y: float):
+        item = EllipseElement()
         item.setPos(x, y)
         self.addItem(item)

@@ -102,7 +102,12 @@ class Actions:
             statusTip='Action2',
             triggered=self.logic.do_action2)
 
-        self.sceneAction3 = QAction(
-            QIcon('resources/icons/miscellaneous.png'), 'Action3', self.window,
-            statusTip='Action3',
-            triggered=self.logic.do_action3)
+        self.addPackageElementAction = QAction(
+            QIcon('resources/icons/package.png'), 'Package element', self.window,
+            statusTip='Add package element',
+            triggered=self.logic.addPackageElement)
+
+        self.addEllipseElementAction = QAction(
+            QIcon('resources/icons/ellipse.png'), 'Ellipse element', self.window,
+            statusTip='Add ellipse element',
+            triggered=self.logic.addEllipseElement)

@@ -178,8 +178,11 @@ class GuiLogic:
     def do_action2(self):
         self.window.scene.addUserElement(50, 50)
 
-    def do_action3(self):
+    def addPackageElement(self):
         self.window.scene.addPackageElement(-20, -20)
+
+    def addEllipseElement(self):
+        self.window.scene.addEllipseElement(0, 0)
 
     def _printStats(self):
         print('number of elements', self.project.count())

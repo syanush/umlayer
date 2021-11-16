@@ -6,9 +6,6 @@ from . import *
 
 
 class PackageElement(QAbstractGraphicsShapeItem):
-    item_brush = QBrush(Qt.white)  # QColor(254, 255, 165, 255)
-    item_pen = QPen(Qt.black, 1, Qt.SolidLine)  # QColor(222, 110, 75, 255)
-
     padding = 5
     min2 = 20
 
@@ -26,14 +23,6 @@ class PackageElement(QAbstractGraphicsShapeItem):
         self._dy = 0
         # end of serializable data
 
-        self._rect_item1 = QGraphicsRectItem(self)
-        # self._rect_item1.setBrush(self.item_brush)
-        # self._rect_item1.setPen(self.item_pen)
-
-        self._rect_item2 = QGraphicsRectItem(self)
-        # self._rect_item2.setBrush(self.item_brush)
-        # self._rect_item2.setPen(self.item_pen)
-
         self._text_item1 = QGraphicsTextItem(self)
         self._text_item1.setFont(diagram_font)
         self._text_item1.setDefaultTextColor(Qt.black)
@@ -46,8 +35,6 @@ class PackageElement(QAbstractGraphicsShapeItem):
         self._recalculate()
 
     def _recalculate(self):
-        #self.prepareGeometryChange()
-
         self._text_item1.setPlainText(self._text1)
         self._text_item2.setPlainText(self._text2)
         br1 = self._text_item1.boundingRect()
@@ -62,14 +49,8 @@ class PackageElement(QAbstractGraphicsShapeItem):
         width = max(size1_x, size2_x)
         height = size1_y + size2_y
         self._bounding_rect = QRectF(0, 0, width, height)
-
         self._rect1 = QRectF(0, 0, size1_x, size1_y)
         self._rect2 = QRectF(0, size1_y, size2_x, size2_y)
-
-        # self._rect_item1.setRect(self._rect1)
-        # self._rect_item2.setRect(self._rect2)
-
-        #self.update()
 
     def boundingRect(self) -> QRectF:
         return self._bounding_rect
@@ -90,18 +71,19 @@ class PackageElement(QAbstractGraphicsShapeItem):
         return path
 
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
-        painter.setPen(self.item_pen)
-        painter.setBrush(self.item_brush)
+        painter.setRenderHint(QPainter.Antialiasing)
+
+        painter.setPen(item_pen)
+        painter.setBrush(item_brush)
         painter.drawRect(self._rect1)
         painter.drawRect(self._rect2)
 
         if option.state & QStyle.State_Selected:
-            # painter.setRenderHint(QPainter.Antialiasing)
             painter.setPen(highlight_pen)
             painter.setBrush(highlight_brush)
-            # br = QPainterPath()
-            # br.addRect(self._bounding_rect)
-            # painter.fillPath(br, highlight_brush)
+            br = QPainterPath()
+            br.addRect(self._bounding_rect)
+            painter.fillPath(br, highlight_brush)
             painter.drawPath(self.shape())
 
     def itemChange(self, change, value):

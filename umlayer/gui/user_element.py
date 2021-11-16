@@ -18,7 +18,7 @@ class UserElement(QGraphicsItemGroup):
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
 
         # serializable data
-        self._text = 'Actor'
+        self._text = 'User'
         # end of serializable data
         
         self.items = (
@@ -53,13 +53,14 @@ class UserElement(QGraphicsItemGroup):
 
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
         if option.state & QStyle.State_Selected:
-            # painter.setRenderHint(QPainter.Antialiasing)
+            painter.setRenderHint(QPainter.Antialiasing)
+
             painter.setPen(highlight_pen)
             painter.setBrush(highlight_brush)
 
-            # br = QPainterPath()
-            # br.addRect(self._selection_rect)
-            # painter.fillPath(br, highlight_brush)
+            br = QPainterPath()
+            br.addRect(self._bounding_rect)
+            painter.fillPath(br, highlight_brush)
 
             painter.drawPath(self.shape())
 

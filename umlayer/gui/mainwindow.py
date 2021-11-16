@@ -69,17 +69,20 @@ class MainWindow(QMainWindow):
         logging.info('GUI initialization finished')
 
     def createToolBar(self):
-        self.aToolBar = self.addToolBar('Main')
+        self.aToolBar: QToolBar = self.addToolBar('Main')
         self.aToolBar.addAction(self.actions.newAction)
         self.aToolBar.addSeparator()
         self.aToolBar.addAction(self.actions.copyAction)
         self.aToolBar.addAction(self.actions.pasteAction)
+        self.aToolBar.addSeparator()
         self.aToolBar.addAction(self.actions.addRectangleAction)
-        self.aToolBar.addAction(self.actions.addUserElementAction)
         self.aToolBar.addAction(self.actions.printElementsAction)
         self.aToolBar.addAction(self.actions.sceneAction1)
         self.aToolBar.addAction(self.actions.sceneAction2)
-        self.aToolBar.addAction(self.actions.sceneAction3)
+        self.aToolBar.addSeparator()
+        self.aToolBar.addAction(self.actions.addUserElementAction)
+        self.aToolBar.addAction(self.actions.addPackageElementAction)
+        self.aToolBar.addAction(self.actions.addEllipseElementAction)
 
     def createStatusBar(self):
         """Create Status Bar
