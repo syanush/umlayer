@@ -61,16 +61,6 @@ class Actions:
             statusTip='Displays info about the app',
             triggered=self.logic.aboutHelp)
 
-        self.addRectangleAction = QAction(
-            QIcon('resources/icons/rectangle.png'), '&Rectangle', self.window,
-            statusTip='Add rectangle',
-            triggered=self.logic.addRectangle)
-
-        self.addUserElementAction = QAction(
-            QIcon('resources/icons/user_element.svg'), '&User element', self.window,
-            statusTip='Add user element',
-            triggered=self.logic.addUserElement)
-
         self.printElementsAction = QAction(
             QIcon('resources/icons/cache.png'), 'Print', self.window,
             statusTip='print',
@@ -92,15 +82,10 @@ class Actions:
             statusTip='Delete element',
             triggered=self.logic.deleteElement)
 
-        self.sceneAction1 = QAction(
-            QIcon('resources/icons/miscellaneous.png'), 'Action1', self.window,
-            statusTip='Action1',
-            triggered=self.logic.do_action1)
-
-        self.sceneAction2 = QAction(
-            QIcon('resources/icons/miscellaneous.png'), 'Action2', self.window,
-            statusTip='Action2',
-            triggered=self.logic.do_action2)
+        self.addUserElementAction = QAction(
+            QIcon('resources/icons/user_element.svg'), '&User element', self.window,
+            statusTip='Add user element',
+            triggered=self.logic.addUserElement)
 
         self.addPackageElementAction = QAction(
             QIcon('resources/icons/package.png'), 'Package element', self.window,

@@ -172,10 +172,7 @@ class GuiLogic:
         self.window.updateTitle()
         self._printStats()
 
-    def do_action1(self):
-        self.window.scene.clear()
-
-    def do_action2(self):
+    def addUserElement(self):
         self.window.scene.addUserElement(50, 50)
 
     def addPackageElement(self):
@@ -199,12 +196,6 @@ class GuiLogic:
 
     def printElements(self):
         self.project.printElements()
-
-    def addRectangle(self):
-        self.window.scene.addRectangle()
-
-    def addUserElement(self):
-        self.window.scene.addUserElement(50, 50)
 
     def on_element_selection_changed(self, selected_elements, deselected_elements):
         if deselected_elements:
