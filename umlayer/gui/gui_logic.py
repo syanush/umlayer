@@ -184,6 +184,15 @@ class GuiLogic:
     def addEllipseElement(self):
         self.window.scene.addEllipseElement(0, 0)
 
+    def addNoteElement(self):
+        self.window.scene.addNoteElement(0, 0)
+
+    def addTextElement(self):
+        self.window.scene.addTextElement(0, 0)
+
+    def addCenteredTextElement(self):
+        self.window.scene.addCenteredTextElement(0, 0)
+
     def _printStats(self):
         print('number of elements', self.project.count())
         print('number of items', self.window.sti.count())

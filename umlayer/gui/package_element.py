@@ -19,8 +19,8 @@ class PackageElement(QAbstractGraphicsShapeItem):
         # serializable data
         self._text1 = 'Package 1'
         self._text2 = '-Content 1\n+Content 2'
-        self._dx = 0  # must be non-negative
-        self._dy = 0
+        self._dx = dx  # must be non-negative
+        self._dy = dy
         # end of serializable data
 
         self._text_item1 = QGraphicsTextItem(self)
@@ -81,9 +81,11 @@ class PackageElement(QAbstractGraphicsShapeItem):
         if option.state & QStyle.State_Selected:
             painter.setPen(highlight_pen)
             painter.setBrush(highlight_brush)
-            br = QPainterPath()
-            br.addRect(self._bounding_rect)
-            painter.fillPath(br, highlight_brush)
+
+            # br = QPainterPath()
+            # br.addRect(self._bounding_rect)
+            # painter.fillPath(br, highlight_brush)
+
             painter.drawPath(self.shape())
 
     def itemChange(self, change, value):

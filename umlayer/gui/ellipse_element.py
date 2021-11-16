@@ -14,44 +14,19 @@ class EllipseElement(QGraphicsItem):
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
 
         # serializable data
-        self._text = 'Use case'
+        self._text = 'Use case 1'
         self._width = 150  # must be >= 10
         self._height = 50  # must be >= 10
         # end of serializable data
 
-        self._lines = 'Use case 1'.split('\n')
-        self._text_items = []
-        for _ in self._lines:
-            text_item = QGraphicsTextItem(self)
-            text_item.setFont(diagram_font)
-            text_item.setDefaultTextColor(item_color)
-            self._text_items.append(text_item)
-
         self._recalculate()
 
     def _recalculate(self):
-        text_width = 0.0
-        text_height = 0.0
-        n = len(self._lines)
-
-        if n > 0:
-            for i in range(n):
-                line = self._lines[i]
-                text_item = self._text_items[i]
-                text_item.setPlainText(line)
-                br = text_item.boundingRect()
-                text_width = max(text_width, br.width())
-                text_height += br.height()
-
-            line_height = text_height / n
-
-            for i in range(n):
-                text_item = self._text_items[i]
-                br = text_item.boundingRect()
-                x = (self._width - br.width()) / 2
-                y = (self._height - text_height) / 2 + line_height * i
-                text_item.setPos(x, y)
-
+        self._text_lines = TextElement(self._text, center=True, parent=self)
+        br = self._text_lines.boundingRect()
+        x = (self._width - br.width()) / 2
+        y = (self._height - br.height()) / 2
+        self._text_lines.setPos(x, y)
         self._bounding_rect = QRectF(0, 0, self._width, self._height)
 
     def boundingRect(self) -> QRectF:

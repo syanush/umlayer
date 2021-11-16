@@ -10,6 +10,8 @@ from . import (
     UseCaseElement,
     PackageElement,
     EllipseElement,
+    NoteElement,
+    TextElement,
 )
 
 
@@ -55,5 +57,32 @@ class GraphicsScene(QGraphicsScene):
 
     def addEllipseElement(self, x: float, y: float):
         item = EllipseElement()
+        item.setPos(x, y)
+        self.addItem(item)
+
+    def addNoteElement(self, x: float, y: float):
+        item = NoteElement('Note..')
+        # item = NoteElement('Hello\nWorld\na;ldkfjalsdjflajsd;lfas;djf;laskjd;flajsd;lfja')
+        # item = TextLines('Hello\nWorld\na;ldkfjalsdjflajsd;lfas;djf;laskjd;flajsd;lfja')
+        item.setPos(x, y)
+        self.addItem(item)
+
+    def addNoteElement(self, x: float, y: float):
+        item = NoteElement('Note..')
+        # item = NoteElement('Hello\nWorld\na;ldkfjalsdjflajsd;lfas;djf;laskjd;flajsd;lfja')
+        item.setPos(x, y)
+        self.addItem(item)
+
+    def addTextElement(self, x: float, y: float):
+        item = TextElement('Left-aligned\ntext')
+        item.setFlag(QGraphicsItem.ItemIsSelectable, True)
+        item.setFlag(QGraphicsItem.ItemIsMovable, True)
+        item.setPos(x, y)
+        self.addItem(item)
+
+    def addCenteredTextElement(self, x: float, y: float):
+        item = TextElement('Centered\ntext', center=True)
+        item.setFlag(QGraphicsItem.ItemIsSelectable, True)
+        item.setFlag(QGraphicsItem.ItemIsMovable, True)
         item.setPos(x, y)
         self.addItem(item)

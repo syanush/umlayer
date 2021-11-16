@@ -83,6 +83,9 @@ class MainWindow(QMainWindow):
         self.aToolBar.addAction(self.actions.addUserElementAction)
         self.aToolBar.addAction(self.actions.addPackageElementAction)
         self.aToolBar.addAction(self.actions.addEllipseElementAction)
+        self.aToolBar.addAction(self.actions.addNoteElementAction)
+        self.aToolBar.addAction(self.actions.addTextElementAction)
+        self.aToolBar.addAction(self.actions.addCenteredTextElementAction)
 
     def createStatusBar(self):
         """Create Status Bar

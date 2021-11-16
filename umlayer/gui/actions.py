@@ -111,3 +111,18 @@ class Actions:
             QIcon('resources/icons/ellipse.png'), 'Ellipse element', self.window,
             statusTip='Add ellipse element',
             triggered=self.logic.addEllipseElement)
+
+        self.addNoteElementAction = QAction(
+            QIcon('resources/icons/note.png'), 'Note element', self.window,
+            statusTip='Add note element',
+            triggered=self.logic.addNoteElement)
+
+        self.addTextElementAction = QAction(
+            QIcon('resources/icons/miscellaneous.png'), 'Text element', self.window,
+            statusTip='Add text element',
+            triggered=self.logic.addTextElement)
+
+        self.addCenteredTextElementAction = QAction(
+            QIcon('resources/icons/miscellaneous.png'), 'Centered text element', self.window,
+            statusTip='Add centered text element',
+            triggered=self.logic.addCenteredTextElement)
