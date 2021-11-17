@@ -84,6 +84,7 @@ class MainWindow(QMainWindow):
         self.aToolBar.addAction(self.actions.addTextElementAction)
         self.aToolBar.addAction(self.actions.addCenteredTextElementAction)
         self.aToolBar.addAction(self.actions.addLineElementAction)
+        self.aToolBar.addAction(self.actions.addHandleElementAction)
         self.aToolBar.addAction(self.actions.addSimpleClassElementAction)
         self.aToolBar.addAction(self.actions.addFatClassElementAction)
 

@@ -22,6 +22,7 @@ from .package_element import PackageElement
 from .ellipse_element import EllipseElement
 from .note_element import NoteElement
 from .class_element import ClassElement
+from .handle_element import HandleElement
 from .line_element import LineElement
 
 from .graphics_scene import GraphicsScene

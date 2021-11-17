@@ -10,6 +10,7 @@ from . import (
     NoteElement,
     TextElement,
     ClassElement,
+    HandleElement,
     LineElement,
 )
 
@@ -43,12 +44,6 @@ class GraphicsScene(QGraphicsScene):
         item.setPos(x, y)
         self.addItem(item)
 
-    def addNoteElement(self, x: float, y: float):
-        item = NoteElement('Note..')
-        # item = NoteElement('Hello\nWorld\na;ldkfjalsdjflajsd;lfas;djf;laskjd;flajsd;lfja')
-        item.setPos(x, y)
-        self.addItem(item)
-
     def addTextElement(self, x: float, y: float):
         item = TextElement('Left-aligned\ntext')
         item.setFlag(QGraphicsItem.ItemIsSelectable, True)
@@ -79,5 +74,10 @@ class GraphicsScene(QGraphicsScene):
 
     def addLineElement(self, x: float, y: float):
         item = LineElement()
+        item.setPos(x, y)
+        self.addItem(item)
+
+    def addHandleElement(self, x: float, y: float):
+        item = HandleElement()
         item.setPos(x, y)
         self.addItem(item)

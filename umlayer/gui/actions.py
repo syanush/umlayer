@@ -117,6 +117,11 @@ class Actions:
             statusTip='Add line element',
             triggered=self.logic.addLineElement)
 
+        self.addHandleElementAction = QAction(
+            QIcon('resources/icons/miscellaneous.png'), 'Hadle element', self.window,
+            statusTip='Add handle element',
+            triggered=self.logic.addHandleElement)
+
         self.addSimpleClassElementAction = QAction(
             QIcon('resources/icons/miscellaneous.png'), 'Simple class element', self.window,
             statusTip='Add simple class element',
