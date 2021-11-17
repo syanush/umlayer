@@ -190,6 +190,15 @@ class GuiLogic:
     def addCenteredTextElement(self):
         self.window.scene.addCenteredTextElement(0, 0)
 
+    def addSimpleClassElement(self):
+        self.window.scene.addSimpleClassElement(0, 0)
+
+    def addFatClassElement(self):
+        self.window.scene.addFatClassElement(0, 0)
+
+    def addLineElement(self):
+        self.window.scene.addLineElement(0, 0)
+
     def _printStats(self):
         print('number of elements', self.project.count())
         print('number of items', self.window.sti.count())

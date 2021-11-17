@@ -111,3 +111,18 @@ class Actions:
             QIcon('resources/icons/miscellaneous.png'), 'Centered text element', self.window,
             statusTip='Add centered text element',
             triggered=self.logic.addCenteredTextElement)
+
+        self.addLineElementAction = QAction(
+            QIcon('resources/icons/line_element.png'), 'Line element', self.window,
+            statusTip='Add line element',
+            triggered=self.logic.addLineElement)
+
+        self.addSimpleClassElementAction = QAction(
+            QIcon('resources/icons/miscellaneous.png'), 'Simple class element', self.window,
+            statusTip='Add simple class element',
+            triggered=self.logic.addSimpleClassElement)
+
+        self.addFatClassElementAction = QAction(
+            QIcon('resources/icons/miscellaneous.png'), 'Fat class element', self.window,
+            statusTip='Add fat class element',
+            triggered=self.logic.addFatClassElement)

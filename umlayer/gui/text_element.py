@@ -28,6 +28,7 @@ class TextElement(QGraphicsItem):
     def _recalculate(self):
         for item in self._text_items:
             if item.scene():
+                item.setParent(None)
                 item.scene().removeItem(item)
 
         self._lines = self._text.split('\n')

@@ -9,6 +9,8 @@ from . import (
     EllipseElement,
     NoteElement,
     TextElement,
+    ClassElement,
+    LineElement,
 )
 
 
@@ -38,8 +40,6 @@ class GraphicsScene(QGraphicsScene):
 
     def addNoteElement(self, x: float, y: float):
         item = NoteElement('Note..')
-        # item = NoteElement('Hello\nWorld\na;ldkfjalsdjflajsd;lfas;djf;laskjd;flajsd;lfja')
-        # item = TextLines('Hello\nWorld\na;ldkfjalsdjflajsd;lfas;djf;laskjd;flajsd;lfja')
         item.setPos(x, y)
         self.addItem(item)
 
@@ -60,5 +60,24 @@ class GraphicsScene(QGraphicsScene):
         item = TextElement('Centered\ntext', center=True)
         item.setFlag(QGraphicsItem.ItemIsSelectable, True)
         item.setFlag(QGraphicsItem.ItemIsMovable, True)
+        item.setPos(x, y)
+        self.addItem(item)
+
+    def addSimpleClassElement(self, x: float, y: float):
+        item = ClassElement(['SimpleClass'], 100, 50)
+        item.setPos(x, y)
+        self.addItem(item)
+
+    def addFatClassElement(self, x: float, y: float):
+        item = ClassElement([
+            'FatClass',
+            '-task_name',
+            '+set_task_name(name: string)\n+run_asynchronously(monitor: Monitor)'
+        ], 100, 50)
+        item.setPos(x, y)
+        self.addItem(item)
+
+    def addLineElement(self, x: float, y: float):
+        item = LineElement()
         item.setPos(x, y)
         self.addItem(item)

@@ -8,8 +8,5 @@ class LineElement(QGraphicsItemGroup):
         super().__init__(parent)
 
         self.items = [
-            QGraphicsLineItem(0, 0, 50, 0)
+            QGraphicsLineItem(-100, 100, 100, -100)
         ]
-
-        for item in self.items:
-            self.addToGroup(item)

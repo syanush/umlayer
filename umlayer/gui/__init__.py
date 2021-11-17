@@ -16,12 +16,13 @@ highlight_pen = QPen(Qt.black, 3, Qt.DotLine)
 highlight_brush = QBrush(QColor(0, 0, 0, 0))
 
 from .user_element import UserElement
-from .line_element import LineElement
 from .use_case_element import UseCaseElement
 from .text_element import TextElement
 from .package_element import PackageElement
 from .ellipse_element import EllipseElement
 from .note_element import NoteElement
+from .class_element import ClassElement
+from .line_element import LineElement
 
 from .graphics_scene import GraphicsScene
 from .graphics_view import GraphicsView

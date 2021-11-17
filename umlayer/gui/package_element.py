@@ -24,19 +24,20 @@ class PackageElement(QAbstractGraphicsShapeItem):
         # end of serializable data
 
         self._text_item1 = QGraphicsTextItem(self)
-        self._text_item1.setFont(diagram_font)
-        self._text_item1.setDefaultTextColor(Qt.black)
-        self._text_item1.setPos(self.padding, self.padding)
-
         self._text_item2 = QGraphicsTextItem(self)
-        self._text_item2.setFont(diagram_font)
-        self._text_item2.setDefaultTextColor(Qt.black)
 
         self._recalculate()
 
     def _recalculate(self):
+        self._text_item1.setFont(diagram_font)
+        self._text_item1.setDefaultTextColor(Qt.black)
+        self._text_item2.setFont(diagram_font)
+        self._text_item2.setDefaultTextColor(Qt.black)
+
         self._text_item1.setPlainText(self._text1)
         self._text_item2.setPlainText(self._text2)
+
+        self._text_item1.setPos(self.padding, self.padding)
         br1 = self._text_item1.boundingRect()
         size1_x = br1.width() + 2 * self.padding
         size1_y = br1.height() + 2 * self.padding
