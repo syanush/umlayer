@@ -83,51 +83,51 @@ class Actions:
             triggered=self.logic.deleteElement)
 
         self.addUserElementAction = QAction(
-            QIcon('resources/icons/user_element.svg'), '&User element', self.window,
-            statusTip='Add user element',
+            QIcon('resources/icons/user_element.svg'), 'Actor', self.window,
+            statusTip='Add actor',
             triggered=self.logic.addUserElement)
 
-        self.addPackageElementAction = QAction(
-            QIcon('resources/icons/package.png'), 'Package element', self.window,
-            statusTip='Add package element',
-            triggered=self.logic.addPackageElement)
-
         self.addEllipseElementAction = QAction(
-            QIcon('resources/icons/ellipse.png'), 'Ellipse element', self.window,
-            statusTip='Add ellipse element',
+            QIcon('resources/icons/ellipse.png'), 'Ellipse', self.window,
+            statusTip='Add ellipse',
             triggered=self.logic.addEllipseElement)
 
-        self.addNoteElementAction = QAction(
-            QIcon('resources/icons/note.png'), 'Note element', self.window,
-            statusTip='Add note element',
-            triggered=self.logic.addNoteElement)
+        self.addLineElementAction = QAction(
+            QIcon('resources/icons/simple_line.png'), 'Line', self.window,
+            statusTip='Add line',
+            triggered=self.logic.addLineElement)
+
+        self.addRelationshipElementAction = QAction(
+            QIcon('resources/icons/arrow_triangle.png'), 'Relationship', self.window,
+            statusTip='Add relationship',
+            triggered=self.logic.addLineElement)
 
         self.addTextElementAction = QAction(
-            QIcon('resources/icons/miscellaneous.png'), 'Text element', self.window,
-            statusTip='Add text element',
+            QIcon('resources/icons/left_text.png'), 'Text', self.window,
+            statusTip='Add text',
             triggered=self.logic.addTextElement)
 
         self.addCenteredTextElementAction = QAction(
-            QIcon('resources/icons/miscellaneous.png'), 'Centered text element', self.window,
-            statusTip='Add centered text element',
+            QIcon('resources/icons/center_text.png'), 'Centered text', self.window,
+            statusTip='Add centered text',
             triggered=self.logic.addCenteredTextElement)
 
-        self.addLineElementAction = QAction(
-            QIcon('resources/icons/line_element.png'), 'Line element', self.window,
-            statusTip='Add line element',
-            triggered=self.logic.addLineElement)
+        self.addNoteElementAction = QAction(
+            QIcon('resources/icons/note.png'), 'Note', self.window,
+            statusTip='Add note',
+            triggered=self.logic.addNoteElement)
 
-        self.addHandleElementAction = QAction(
-            QIcon('resources/icons/miscellaneous.png'), 'Hadle element', self.window,
-            statusTip='Add handle element',
-            triggered=self.logic.addHandleElement)
+        self.addPackageElementAction = QAction(
+            QIcon('resources/icons/package.png'), 'Package', self.window,
+            statusTip='Add package',
+            triggered=self.logic.addPackageElement)
 
         self.addSimpleClassElementAction = QAction(
-            QIcon('resources/icons/miscellaneous.png'), 'Simple class element', self.window,
-            statusTip='Add simple class element',
+            QIcon('resources/icons/simple_class.png'), 'Simple class', self.window,
+            statusTip='Add simple class',
             triggered=self.logic.addSimpleClassElement)
 
         self.addFatClassElementAction = QAction(
-            QIcon('resources/icons/miscellaneous.png'), 'Fat class element', self.window,
-            statusTip='Add fat class element',
+            QIcon('resources/icons/class_icon.png'), 'Fat class', self.window,
+            statusTip='Add class',
             triggered=self.logic.addFatClassElement)
