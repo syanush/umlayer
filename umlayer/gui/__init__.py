@@ -1,6 +1,8 @@
 from PySide6.QtGui import *
 
-diagram_font = QFont('Monospace')
+#diagram_font = QFont('Monospace', 9, 500)
+#diagram_font = QFont('Serif', 9)
+diagram_font = QFont('SansSerif', 9, 500)
 diagram_font.setStyleHint(QFont.TypeWriter)
 # diagram_color = QColor(195, 210, 213, 255)
 # diagram_pen = QPen(diagram_color, 1, Qt.SolidLine)
@@ -15,6 +17,7 @@ highlight_color = QColor(12, 27, 51, 0)
 highlight_pen = QPen(Qt.black, 3, Qt.DotLine)
 highlight_brush = QBrush(QColor(0, 0, 0, 0))
 
+from .base_element import BaseElement, Abilities
 from .user_element import UserElement
 from .use_case_element import UseCaseElement
 from .text_element import TextElement

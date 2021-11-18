@@ -5,15 +5,7 @@ from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
 from .. import model
-
-from . import (
-    GraphicsScene,
-    GraphicsView,
-    StandardItemModel,
-    TreeView,
-    GuiLogic,
-    Actions
-)
+from . import *
 
 
 class MainWindow(QMainWindow):
@@ -27,6 +19,8 @@ class MainWindow(QMainWindow):
         self.readSettings()
         self.setDefaultFileName()
         self.initGUI()
+
+        self.element_with_text = None
 
     @property
     def project(self):
@@ -93,9 +87,7 @@ class MainWindow(QMainWindow):
         """
 
         self.aStatusBar = QStatusBar(self)
-
         self.aStatusLabel = QLabel(self.aStatusBar)
-
         self.aStatusBar.addWidget(self.aStatusLabel, 3)
         self.setStatusBar(self.aStatusBar)
 
@@ -107,17 +99,43 @@ class MainWindow(QMainWindow):
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, elementsWindow)
 
     def createPropertyEditor(self):
-        # create property editor
         propertyWindow = QDockWidget('Property editor', self)
-        self.propertyView = QTextEdit()
+        self.propertyView = QPlainTextEdit()
+        self.propertyView.textChanged.connect(self.on_text_changed)
+        self.propertyView.setFont(diagram_font)
+        self.propertyView.setWordWrapMode(QTextOption.NoWrap)
+        self.propertyView.setEnabled(False)
+
+        # lineSpacing = 20
+        # bf: QTextBlockFormat = self.propertyView.textCursor().blockFormat()
+        # bf.setLineHeight(lineSpacing, QTextBlockFormat.LineDistanceHeight)
+        # self.propertyView.textCursor().setBlockFormat(bf)
+
         propertyWindow.setWidget(self.propertyView)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, propertyWindow)
 
-    def createCentralWidget(self):
-        self.centralWidget = QWidget()
+    def on_text_changed(self):
+        if self.element_with_text is None:
+            return
+        text = self.propertyView.toPlainText()
+        self.element_with_text.setText(text)
 
+    def on_scene_selection_changed(self):
+        elements_with_text = [item for item in self.scene.selectedItems()
+                             if isinstance(item, BaseElement) and
+                             Abilities.EDITABLE_TEXT in item.getAbilities()]
+        if len(elements_with_text) == 1:
+            self.element_with_text = elements_with_text[0]
+            self.propertyView.setPlainText(self.element_with_text.text())
+            self.propertyView.setEnabled(True)
+        else:
+            self.element_with_text = None
+            self.propertyView.setPlainText(None)
+            self.propertyView.setEnabled(False)
+
+    def createCentralWidget(self):
         self.scene: GraphicsScene = GraphicsScene()  # 0, 0, 400, 200
-        # self.createScene()
+        self.scene.selectionChanged.connect(self.on_scene_selection_changed)
 
         self.sceneView = GraphicsView(self.scene)
         self.sceneView.setRenderHints(
@@ -129,8 +147,9 @@ class MainWindow(QMainWindow):
 
         vbox = QVBoxLayout()
         vbox.addWidget(self.sceneView)
-        self.centralWidget.setLayout(vbox)
 
+        self.centralWidget = QWidget()
+        self.centralWidget.setLayout(vbox)
         self.setCentralWidget(self.centralWidget)
 
     def setupComponents(self):

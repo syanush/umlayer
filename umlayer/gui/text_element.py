@@ -5,9 +5,11 @@ from PySide6.QtWidgets import *
 from . import *
 
 
-class TextElement(QGraphicsItem):
+class TextElement(QGraphicsItem, BaseElement):
     def __init__(self, text, center: bool = False, parent=None) -> None:
         super().__init__(parent)
+        super(BaseElement, self).__init__()
+        self._abilities = set([Abilities.EDITABLE_TEXT])
 
         # serializable data
         self._text = text
@@ -16,6 +18,9 @@ class TextElement(QGraphicsItem):
 
         self._text_items = []
         self._recalculate()
+
+    def text(self):
+        return self._text
 
     def setText(self, text: str):
         self._text = text
@@ -26,6 +31,7 @@ class TextElement(QGraphicsItem):
         self._recalculate()
 
     def _recalculate(self):
+        self.prepareGeometryChange()
         for item in self._text_items:
             if item.scene():
                 item.setParent(None)
@@ -66,6 +72,7 @@ class TextElement(QGraphicsItem):
                 text_item.setPos(x, y)
 
         self._bounding_rect = QRectF(0, 0, text_width, text_height)
+        self.update()
 
     def boundingRect(self) -> QRectF:
         return self._bounding_rect
