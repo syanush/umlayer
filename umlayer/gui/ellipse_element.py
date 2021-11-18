@@ -21,7 +21,7 @@ class EllipseElement(QGraphicsItem, BaseElement):
         self._height = 50  # must be >= 10
         # end of serializable data
 
-        self._text_lines = TextElement(self._text, center=True, parent=self)
+        self._text_lines = TextItem(self._text, center=True, parent=self)
 
         self._recalculate()
 
@@ -34,7 +34,6 @@ class EllipseElement(QGraphicsItem, BaseElement):
 
     def _recalculate(self):
         self.prepareGeometryChange()
-
         br = self._text_lines.boundingRect()
         x = (self._width - br.width()) / 2
         y = (self._height - br.height()) / 2

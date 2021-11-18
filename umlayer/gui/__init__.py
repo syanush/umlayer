@@ -20,6 +20,7 @@ highlight_brush = QBrush(QColor(0, 0, 0, 0))
 from .base_element import BaseElement, Abilities
 from .user_element import UserElement
 from .use_case_element import UseCaseElement
+from .text_item import TextItem
 from .text_element import TextElement
 from .package_element import PackageElement
 from .ellipse_element import EllipseElement

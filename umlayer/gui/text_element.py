@@ -1,5 +1,4 @@
 from PySide6.QtCore import *
-from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
 from . import *
@@ -16,14 +15,14 @@ class TextElement(QGraphicsItem, BaseElement):
         self._center = center
         # end of serializable data
 
-        self._text_items = []
+        self._text_item = TextItem(text, parent=self)
         self._recalculate()
 
     def text(self):
-        return self._text
+        return self._text_item.text()
 
     def setText(self, text: str):
-        self._text = text
+        self._text_item.setText(text)
         self._recalculate()
 
     def setCenter(self, center: bool):
@@ -32,46 +31,7 @@ class TextElement(QGraphicsItem, BaseElement):
 
     def _recalculate(self):
         self.prepareGeometryChange()
-        for item in self._text_items:
-            if item.scene():
-                item.setParent(None)
-                item.scene().removeItem(item)
-
-        self._lines = self._text.split('\n')
-        self._text_items = []
-
-        for _ in self._lines:
-            text_item = QGraphicsTextItem(self)
-            text_item.setFont(diagram_font)
-            text_item.setDefaultTextColor(item_color)
-            self._text_items.append(text_item)
-
-        text_width = 0.0
-        text_height = 0.0
-        n = len(self._lines)
-
-        if n > 0:
-            for i in range(n):
-                line = self._lines[i]
-                text_item = self._text_items[i]
-                text_item.setPlainText(line)
-                br = text_item.boundingRect()
-                text_width = max(text_width, br.width())
-                text_height += br.height()
-
-            line_height = text_height / n
-
-            for i in range(n):
-                text_item = self._text_items[i]
-                br = text_item.boundingRect()
-                if self._center:
-                    x = (text_width - br.width()) / 2
-                else:
-                    x = 0
-                y = line_height * i
-                text_item.setPos(x, y)
-
-        self._bounding_rect = QRectF(0, 0, text_width, text_height)
+        self._bounding_rect = self._text_item.boundingRect()
         self.update()
 
     def boundingRect(self) -> QRectF:

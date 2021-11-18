@@ -2,17 +2,7 @@ import logging
 
 from PySide6.QtWidgets import *
 
-from . import (
-    UserElement,
-    UseCaseElement,
-    PackageElement,
-    EllipseElement,
-    NoteElement,
-    TextElement,
-    ClassElement,
-    HandleElement,
-    LineElement,
-)
+from . import *
 
 
 class GraphicsScene(QGraphicsScene):
@@ -52,7 +42,7 @@ class GraphicsScene(QGraphicsScene):
         self.addItem(item)
 
     def addCenteredTextElement(self, x: float, y: float):
-        item = TextElement('Centered\ntext', center=True)
+        item = TextItem('Centered\ntext', center=True)
         item.setFlag(QGraphicsItem.ItemIsSelectable, True)
         item.setFlag(QGraphicsItem.ItemIsMovable, True)
         item.setPos(x, y)
