@@ -43,13 +43,14 @@ class ActorElement(QGraphicsItemGroup, BaseElement):
     def _recalculate(self):
         self.prepareGeometryChange()
 
-        self._text_item.setText(self._text)
+        self._text_item.setText(self._text or '')
 
         br = self._text_item.boundingRect()
         text_width = br.width()
         # text_height = br.height()
 
-        text_x = (self.actor_width - text_width) / 2
+        # see TextItem
+        text_x = (self.actor_width - text_width * TextItem.correction_factor) / 2
         text_y = self.actor_height + self.padding
         self._text_item.setPos(text_x, text_y)
 

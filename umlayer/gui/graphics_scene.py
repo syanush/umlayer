@@ -13,12 +13,12 @@ class GraphicsScene(QGraphicsScene):
         self.addItem(item)
 
     def addPackageElement(self, x: float, y: float):
-        item = PackageElement()
+        item = PackageElement('Package 1\n--\nFunctional\nPerformant')
         item.setPos(x, y)
         self.addItem(item)
 
     def addEllipseElement(self, x: float, y: float):
-        item = EllipseElement()
+        item = EllipseElement('Use Case 1')
         item.setPos(x, y)
         self.addItem(item)
 

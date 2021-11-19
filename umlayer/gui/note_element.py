@@ -8,7 +8,7 @@ class NoteElement(QAbstractGraphicsShapeItem, BaseElement):
     padding = 5
     delta = 15
 
-    def __init__(self, text: str, center=False, dx: float = 50, dy: float = 30, parent=None) -> None:
+    def __init__(self, text: str = None, center=False, dx: float = 50, dy: float = 30, parent=None) -> None:
         super().__init__(parent)
         super(BaseElement, self).__init__()
         self._abilities = set([Abilities.EDITABLE_TEXT])
@@ -17,29 +17,31 @@ class NoteElement(QAbstractGraphicsShapeItem, BaseElement):
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
 
         # serializable data
-        self._text_lines = TextItem(text, center=center, parent=self)
+        self._text = text
         self._center = center
         self._dx = dx  # must be non-negative
         self._dy = dy
         # end of serializable data
 
-
+        self._text_item = TextItem(center=center, parent=self)
         self._recalculate()
 
     def text(self):
-        return self._text_lines.text()
+        return self._text
 
     def setText(self, text):
-        self._text_lines.setText(text)
+        self._text = text
         self._recalculate()
 
     def _recalculate(self):
         self.prepareGeometryChange()
-        br = self._text_lines.boundingRect()
+        text = self._text or ''
+        self._text_item.setText(text)
+        br = self._text_item.boundingRect()
         width = 2 * self.padding + br.width() + self._dx + self.delta
         height = 2 * self.padding + br.height() + self._dy
         self._bounding_rect = QRectF(0, 0, width, height)
-        self._text_lines.setPos(self.padding, self.padding)
+        self._text_item.setPos(self.padding, self.padding)
         self.update()
 
     def boundingRect(self) -> QRectF:

@@ -5,15 +5,15 @@ from . import *
 
 
 class TextItem(QGraphicsItem):
-    def __init__(self, text, center: bool = False, parent=None) -> None:
+    correction_factor = 0.925
+
+    def __init__(self, text: str = None, center: bool = False, parent=None) -> None:
         super().__init__(parent)
 
         # serializable data
         self._text = text
         self._center = center
         # end of serializable data
-
-        self._text_item = QGraphicsTextItem()
 
         self._recalculate()
 
@@ -49,6 +49,7 @@ class TextItem(QGraphicsItem):
         Hack #1: Use painting device in the constructor of QFontMetrics
         and improve bounding rect evaluation
         https://stackoverflow.com/questions/27336001/qfontmetrics-returns-inaccurate-results
+
         Hack #2: Apply empirical correction factor. It is specific for the improved rect.
         Please check if it is different for various fonts and platforms.
         """
@@ -59,17 +60,14 @@ class TextItem(QGraphicsItem):
         improved_rect = fm.boundingRect(rect, 0, text)
         width = improved_rect.width()
         height = improved_rect.height()
-        correction_factor = 0.925
-        width *= correction_factor
+        # width *= self.correction_factor
         return width, height
 
     def _recalculate(self):
         self.prepareGeometryChange()
 
-        self._text_item.setFont(element_font)
-        self._text_item.setPlainText(self._text)
-
-        self._lines = [' ' if line == '' else line for line in self._text.split('\n')]
+        text = self._text or ''
+        self._lines = [' ' if line == '' else line for line in text.split('\n')]
         width = 0.0
         height = 0.0
         n = len(self._lines)
@@ -102,4 +100,5 @@ class TextItem(QGraphicsItem):
                 else:
                     x = 0
                 y = avg_line_height * i
-                painter.drawText(QRect(x, y, line_width, line_height), line)
+                line_rect = QRect(x, y, line_width, line_height)
+                painter.drawText(line_rect, line)

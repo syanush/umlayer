@@ -21,15 +21,8 @@ class ClassElement(QAbstractGraphicsShapeItem):
         self._dy = dy
         # end of serializable data
 
-        self._text_items = []
+        self._text_items = [TextItem(parent=self) for _ in range(3)]
         self._recalculate()
-
-    def _make_text_item(self, text) -> QGraphicsTextItem:
-        text_item = QGraphicsTextItem(self)
-        text_item.setFont(element_font)
-        text_item.setDefaultTextColor(Qt.black)
-        text_item.setPlainText(text)
-        return text_item
 
     def _make_rect(self, text_item) -> QRectF:
         br = text_item.boundingRect()
@@ -39,43 +32,39 @@ class ClassElement(QAbstractGraphicsShapeItem):
         return rect
 
     def _recalculate(self):
-        for item in self._text_items:
-            if item.scene():
-                item.setParent(None)
-                item.scene().removeItem(item)
-
-        self._text_items = []
-        rects = []
-
         if len(self._texts) > 3:
             raise ValueError('len(self._texts) > 3')
 
-        for text in self._texts:
-            text_item = self._make_text_item(text)
-            self._text_items.append(text_item)
+        for text_item in self._text_items:
+            text_item.setText('')
+            text_item.setPos(0, 0)
+
+        rects = []
+        for text, text_item in zip(self._texts, self._text_items):
+            text_item.setText(text)
             rect = self._make_rect(text_item)
             rects.append(rect)
 
         width = 2.0 * self.padding
         height = 2.0 * self.padding
-        self._rects = []
+        self._compartments = []
 
         if len(self._texts) > 0:
-            width = max(r.width() for r in rects) + self._dx
-            heights = [r.height() for r in rects]
-            self._rects.append(QRectF(0, 0, width, heights[0]))
+            width = max(compartment.width() for compartment in rects) + self._dx
+            heights = [compartment.height() for compartment in rects]
+            self._compartments.append(QRectF(0, 0, width, heights[0]))
         if len(self._texts) > 1:
-            self._rects.append(QRectF(0, heights[0], width, heights[1]))
+            self._compartments.append(QRectF(0, heights[0], width, heights[1]))
         if len(self._texts) > 2:
-            self._rects.append(QRectF(0, heights[0] + heights[1], width, heights[2]))
+            self._compartments.append(QRectF(0, heights[0] + heights[1], width, heights[2]))
 
         if len(self._texts) > 0:
-            self._rects[-1].adjust(0, 0, 0, self._dy)
-            height = sum(rect.height() for rect in self._rects)
+            self._compartments[-1].adjust(0, 0, 0, self._dy)
+            height = sum(rect.height() for rect in self._compartments)
 
         self._bounding_rect = QRectF(0, 0, width, height)
 
-        for item, r in zip(self._text_items, self._rects):
+        for r, item in zip(self._compartments, self._text_items):
             item.setPos(r.x() + self.padding, r.y() + self.padding)
 
         self.update()
@@ -86,8 +75,8 @@ class ClassElement(QAbstractGraphicsShapeItem):
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
         painter.setPen(element_pen)
         painter.setBrush(element_brush)
-        for rect in self._rects:
-            painter.drawRect(rect)
+        for compartment in self._compartments:
+            painter.drawRect(compartment)
 
         if option.state & QStyle.State_Selected:
             painter.setPen(highlight_pen)

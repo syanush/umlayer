@@ -8,32 +8,33 @@ class PackageElement(QAbstractGraphicsShapeItem):
     padding = 5
     min2 = 20
 
-    def __init__(self, dx: float = 0, dy: float = 0, parent=None) -> None:
+    def __init__(self, text: str = None, dx: float = 0, dy: float = 0, parent=None) -> None:
         super().__init__(parent)
 
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
 
         # serializable data
-        self._text1 = 'Package 1'
-        self._text2 = '-Content 1\n+Content 2'
+        self._text = text
         self._dx = dx  # must be non-negative
         self._dy = dy
         # end of serializable data
 
-        self._text_item1 = QGraphicsTextItem(self)
-        self._text_item2 = QGraphicsTextItem(self)
+        self._text_item1 = TextItem(parent=self)
+        self._text_item2 = TextItem(parent=self)
         self._recalculate()
 
     def _recalculate(self):
-        self._text_item1.setFont(element_font)
-        self._text_item1.setDefaultTextColor(Qt.black)
-        self._text_item2.setFont(element_font)
-        self._text_item2.setDefaultTextColor(Qt.black)
+        self.prepareGeometryChange()
 
-        self._text_item1.setPlainText(self._text1)
-        self._text_item2.setPlainText(self._text2)
+        # TODO: improve parsing
+        self._text = self._text or ''
+        splitted = self._text.split('--\n')
+        self._text1 = splitted[0].strip('\n') if len(splitted) > 0 else ''
+        self._text2 = splitted[1].strip('\n') if len(splitted) > 1 else ''
 
+        self._text_item1.setText(self._text1)
+        self._text_item2.setText(self._text2)
         self._text_item1.setPos(self.padding, self.padding)
         br1 = self._text_item1.boundingRect()
         size1_x = br1.width() + 2 * self.padding
@@ -49,6 +50,7 @@ class PackageElement(QAbstractGraphicsShapeItem):
         self._bounding_rect = QRectF(0, 0, width, height)
         self._rect1 = QRectF(0, 0, size1_x, size1_y)
         self._rect2 = QRectF(0, size1_y, size2_x, size2_y)
+        self.update()
 
     def boundingRect(self) -> QRectF:
         return self._bounding_rect
