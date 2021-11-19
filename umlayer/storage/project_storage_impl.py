@@ -17,7 +17,6 @@ class ProjectStorageImpl(model.ProjectStorage):
         dirname = os.path.dirname(filepath)
         os.makedirs(dirname, exist_ok=True)
 
-        # engine = create_engine("sqlite+pysqlite:///:memory:", echo=True, future=True)
         engine = create_engine("sqlite+pysqlite:///" + filepath, echo=True, future=True)
 
         with engine.begin() as conn:
@@ -29,7 +28,6 @@ class ProjectStorageImpl(model.ProjectStorage):
                 conn.execute(text(sql))
 
     def load(self, filepath: str = None) -> list[model.Element]:
-        # engine = create_engine("sqlite+pysqlite:///:memory:", echo=True, future=True)
         engine = create_engine("sqlite+pysqlite:///" + filepath, echo=True, future=True)
 
         with engine.begin() as conn:

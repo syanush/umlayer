@@ -1,7 +1,6 @@
 import logging
 
 from PySide6.QtCore import *
-from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
 from .. import model
@@ -65,11 +64,9 @@ class MainWindow(QMainWindow):
     def createToolBar(self):
         self.aToolBar: QToolBar = self.addToolBar('Main')
         self.aToolBar.addAction(self.actions.newAction)
-        self.aToolBar.addSeparator()
-        self.aToolBar.addAction(self.actions.copyAction)
-        self.aToolBar.addAction(self.actions.pasteAction)
-        self.aToolBar.addSeparator()
-        self.aToolBar.addAction(self.actions.printElementsAction)
+        # self.aToolBar.addSeparator()
+        # self.aToolBar.addAction(self.actions.copyAction)
+        # self.aToolBar.addAction(self.actions.pasteAction)
         self.aToolBar.addSeparator()
         self.aToolBar.addAction(self.actions.addUserElementAction)
         self.aToolBar.addAction(self.actions.addEllipseElementAction)
@@ -92,7 +89,6 @@ class MainWindow(QMainWindow):
         self.setStatusBar(self.aStatusBar)
 
     def createElementsWindow(self):
-        # create elements
         elementsWindow = QDockWidget('Elements', self)
         self.elementsView = QTextEdit()
         elementsWindow.setWidget(self.elementsView)
@@ -105,12 +101,6 @@ class MainWindow(QMainWindow):
         self.propertyView.setFont(diagram_font)
         self.propertyView.setWordWrapMode(QTextOption.NoWrap)
         self.propertyView.setEnabled(False)
-
-        # lineSpacing = 20
-        # bf: QTextBlockFormat = self.propertyView.textCursor().blockFormat()
-        # bf.setLineHeight(lineSpacing, QTextBlockFormat.LineDistanceHeight)
-        # self.propertyView.textCursor().setBlockFormat(bf)
-
         propertyWindow.setWidget(self.propertyView)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, propertyWindow)
 

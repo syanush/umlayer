@@ -12,10 +12,7 @@ class ProjectLogic:
         self.project = Project()
         root = Folder("Root")
         self.project.setRoot(root)
-
-        self.project.add(Folder("1"), root.id)
-        self.project.add(Folder("2"), root.id)
-        self.project.add(Diagram("3"), root.id)
+        self.project.add(Diagram("Diagram 1"), root.id)
         self.project.is_dirty = False
 
     def clear_project(self):

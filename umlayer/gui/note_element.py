@@ -1,5 +1,4 @@
 from PySide6.QtCore import *
-from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
 from . import *
@@ -16,7 +15,6 @@ class NoteElement(QAbstractGraphicsShapeItem, BaseElement):
 
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
-        # self.setFlag(QGraphicsItem.ItemSendsGeometryChanges, True)
 
         # serializable data
         self._text = text
@@ -26,7 +24,6 @@ class NoteElement(QAbstractGraphicsShapeItem, BaseElement):
         # end of serializable data
 
         self._text_lines = TextItem(self._text, center=center, parent=self)
-
         self._recalculate()
 
     def text(self):

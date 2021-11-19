@@ -1,4 +1,3 @@
-"""Line element of the Use Case diagram"""
 from PySide6.QtCore import *
 from PySide6.QtWidgets import *
 

@@ -1,7 +1,4 @@
-"""User element of the Use Case diagram"""
-
 from PySide6.QtCore import *
-from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
 from . import *
@@ -35,18 +32,15 @@ class UserElement(QGraphicsItemGroup):
         self._text_item = QGraphicsTextItem(self)
         self._text_item.setFont(diagram_font)
         self._text_item.setDefaultTextColor(Qt.black)
-
         self._recalculate()
 
     def _recalculate(self):
         actor_height = 65
         self._text_item.setPlainText(self._text)
         text_width = self._text_item.boundingRect().width()
-        # text_height = self._text_item.boundingRect().height()
         text_x = 15 - text_width / 2 + 1
         text_y = actor_height
         self._text_item.setPos(text_x, text_y)
-        # self._selection_rect = QRectF(min(text_x, 0), 0,  max(30, text_width), text_y + text_height)
 
     def boundingRect(self) -> QRectF:
         return self._bounding_rect
@@ -69,18 +63,6 @@ class UserElement(QGraphicsItemGroup):
         path = QPainterPath()
         path.addRect(br)
         return path
-
-        # path.moveTo(0, 65)
-        # path.lineTo(0, 0)
-        # path.lineTo(30, 0)
-        # path.lineTo(30, 65)
-        # path.lineTo(15 + w / 2, 65)
-        # path.lineTo(15 + w / 2, 65 + h)
-        # path.lineTo(15 - w / 2, 65 + h)
-        # path.lineTo(15 - w / 2, 65)
-        # path.lineTo(0, 65)
-        #
-        # return path
 
     def getDataAsDto(self):
         self.flags()

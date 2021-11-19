@@ -1,5 +1,4 @@
 from PySide6.QtCore import *
-from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
 from . import *
@@ -14,7 +13,6 @@ class PackageElement(QAbstractGraphicsShapeItem):
 
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
-        # self.setFlag(QGraphicsItem.ItemSendsGeometryChanges, True)
 
         # serializable data
         self._text1 = 'Package 1'
@@ -25,7 +23,6 @@ class PackageElement(QAbstractGraphicsShapeItem):
 
         self._text_item1 = QGraphicsTextItem(self)
         self._text_item2 = QGraphicsTextItem(self)
-
         self._recalculate()
 
     def _recalculate(self):

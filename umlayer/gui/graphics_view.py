@@ -27,7 +27,3 @@ class GraphicsView(QGraphicsView):
             # main_window.sceneView.setDragMode(QGraphicsView.ScrollHandDrag)
 
         super().mouseMoveEvent(e)
-
-        #print(e.pos())
-        #message = f'sceneRect={self.scene.sceneRect()}'
-        #self.aStatusBar.showMessage(message)

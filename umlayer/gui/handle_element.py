@@ -1,4 +1,3 @@
-"""Line element of the Use Case diagram"""
 from PySide6.QtCore import *
 from PySide6.QtWidgets import *
 
@@ -15,14 +14,11 @@ class HandleElement(QGraphicsObject):
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges, True)
-
         self._bounding_rect = QRectF(-self.size, -self.size, 2 * self.size, 2 * self.size)
-
         self._is_live = False
 
     def setLive(self, is_live):
         self._is_live = is_live
-        print('handle is live:', is_live)
         self.update()
 
     def boundingRect(self) -> QRectF:
@@ -48,18 +44,9 @@ class HandleElement(QGraphicsObject):
         painter.drawEllipse(self._bounding_rect)
 
     def itemChange(self, change, value):
-        if change == QGraphicsItem.GraphicsItemChange.ItemVisibleHasChanged:
-            print('Handle visibility has changed', bool(value))
-        if change == QGraphicsItem.GraphicsItemChange.ItemSelectedChange:
-            is_selected = bool(value)
-            # print('Handle selection change', is_selected)
-            # self.selection_changed_signal.emit(is_selected)
         if change == QGraphicsItem.GraphicsItemChange.ItemSelectedHasChanged:
             is_selected = bool(value)
-            print('Handle selection has changed', is_selected)
             self.selection_changed_signal.emit(is_selected)
         if change == QGraphicsItem.ItemPositionHasChanged:
             self.position_changed_signal.emit(value)
         return super().itemChange(change, value)
-
-

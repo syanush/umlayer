@@ -1,6 +1,3 @@
-"""User case element of the Use Case diagram"""
-from typing import Optional
-
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
@@ -32,10 +29,8 @@ class Resizer(QGraphicsObject):
 
     def itemChange(self, change, value):
         if change == QGraphicsItem.ItemPositionChange:
-            # print(change)
             if self.isSelected():
                 data = value - self.pos()
-                
                 self.resizeSignal.emit(data)
         return value
 
@@ -44,15 +39,11 @@ class UseCaseElement(QGraphicsObject):
 
     def __init__(self, x, y, w, h, parent=None) -> None:
         super().__init__(parent)
-
         self._border = QGraphicsRectItem(x, y, w, h, parent=self)
         self._border.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self._border.setFlag(QGraphicsItem.ItemIsMovable, True)
-
         self._grip = Resizer(x + w - 10, y + h - 10, 20, self._border)
-
         self._grip.resizeSignal.connect(self.myResize)
-
 
     def boundingRect(self) -> QRectF:
         return self._border.boundingRect()

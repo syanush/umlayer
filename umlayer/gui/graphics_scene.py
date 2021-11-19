@@ -1,5 +1,3 @@
-import logging
-
 from PySide6.QtWidgets import *
 
 from . import *
@@ -10,13 +8,8 @@ class GraphicsScene(QGraphicsScene):
         super().__init__(*args, **kwargs)
 
     def addUserElement(self, x: float, y: float):
-        logging.info('Add user element')
         item = UserElement()
         item.setPos(x, y)
-        self.addItem(item)
-
-    def addUseCase(self):
-        item = UseCaseElement(20, 20, 100, 50)
         self.addItem(item)
 
     def addPackageElement(self, x: float, y: float):

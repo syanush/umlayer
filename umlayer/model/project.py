@@ -1,5 +1,3 @@
-"""Diagrams belong to a project"""
-
 from uuid import UUID
 
 from . import Element

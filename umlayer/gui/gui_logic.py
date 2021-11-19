@@ -4,7 +4,7 @@ from PySide6.QtCore import *
 from PySide6.QtWidgets import *
 
 from .. import model
-from . import UserElement
+from . import *
 
 
 class GuiLogic:
@@ -13,15 +13,12 @@ class GuiLogic:
         self.project = window.project
         self.project_logic = window.project_logic
 
-    # Slots called when the menu actions are triggered
     def newProject(self):
         logging.info('Action: New')
         if not self.closeProject():
             return
         self.project_logic.new_project()
-
         self.window.treeView.updateTreeDataModel()
-
         self.window.filename = model.constants.DEFAULT_FILENAME
         self.window.updateTitle()
 
