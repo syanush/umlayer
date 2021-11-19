@@ -41,7 +41,7 @@ class TextElement(QGraphicsItem, BaseElement):
         return self._bounding_rect
 
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
-        if option.state & QStyle.State_Selected:
+        if self.isSelected():
             painter.setPen(highlight_pen)
             painter.setBrush(highlight_brush)
 

@@ -80,7 +80,7 @@ class PackageElement(QAbstractGraphicsShapeItem):
         painter.drawRect(self._rect1)
         painter.drawRect(self._rect2)
 
-        if option.state & QStyle.State_Selected:
+        if self.isSelected():
             painter.setPen(highlight_pen)
             painter.setBrush(highlight_brush)
 

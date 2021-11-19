@@ -78,8 +78,7 @@ class LineElement(QGraphicsItem):
 
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
         painter.setRenderHint(QPainter.Antialiasing)
-        is_selected = option.state & QStyle.State_Selected
-        pen = self.selected_pen if is_selected else self.normal_pen
+        pen = self.selected_pen if self.isSelected() else self.normal_pen
         painter.setPen(pen)
         point1 = self._point1
         point2 = self._point2

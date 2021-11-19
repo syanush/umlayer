@@ -80,7 +80,7 @@ class NoteElement(QAbstractGraphicsShapeItem, BaseElement):
         painter.setBrush(element_brush)
         painter.drawPath(self._border_path)
 
-        if option.state & QStyle.State_Selected:
+        if self.isSelected():
             painter.setPen(highlight_pen)
             painter.setBrush(highlight_brush)
 

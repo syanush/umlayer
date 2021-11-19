@@ -86,7 +86,7 @@ class TextItem(QGraphicsItem):
         painter.setFont(element_font)
         painter.setPen(element_pen)
         painter.setBrush(element_brush)
-        # painter.drawRect(self._bounding_rect)  # for debugging
+        painter.drawRect(self._bounding_rect)  # for debugging
         n = len(self._lines)
         if n > 0:
             avg_line_height = self._bounding_rect.height() / n

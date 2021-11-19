@@ -42,16 +42,18 @@ class GraphicsScene(QGraphicsScene):
         self.addItem(item)
 
     def addSimpleClassElement(self, x: float, y: float):
-        item = ClassElement(['SimpleClass'], 100, 50)
+        item = ClassElement('SimpleClass')
         item.setPos(x, y)
         self.addItem(item)
 
     def addFatClassElement(self, x: float, y: float):
-        item = ClassElement([
-            'FatClass',
-            '-task_name',
-            '+set_task_name(name: string)\n+run_asynchronously(monitor: Monitor)'
-        ], 100, 50)
+        text = '''FatClass
+--
+-task_name
+--
++set_task_name(name: string)\n+run_asynchronously(monitor: Monitor)'''
+
+        item = ClassElement(text)
         item.setPos(x, y)
         self.addItem(item)
 

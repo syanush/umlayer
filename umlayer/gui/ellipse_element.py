@@ -57,7 +57,7 @@ class EllipseElement(QGraphicsItem, BaseElement):
         painter.setBrush(element_brush)
         painter.drawEllipse(0, 0, self._width, self._height)
 
-        if option.state & QStyle.State_Selected:
+        if self.isSelected():
             painter.setPen(highlight_pen)
             painter.setBrush(highlight_brush)
             br = QPainterPath()

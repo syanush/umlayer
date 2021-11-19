@@ -47,15 +47,13 @@ class ActorElement(QGraphicsItemGroup, BaseElement):
 
         br = self._text_item.boundingRect()
         text_width = br.width()
-        # text_height = br.height()
 
         # see TextItem
-        text_x = (self.actor_width - text_width * TextItem.correction_factor) / 2
+        text_x = (self.actor_width - text_width) / 2
         text_y = self.actor_height + self.padding
         self._text_item.setPos(text_x, text_y)
 
         self._bounding_rect = QRectF(0, 0, self.actor_width, self.actor_height)
-        # self._text_bounding_rect = QRectF(text_x, text_y, text_width, text_height)
 
         self.update()
 
@@ -65,7 +63,6 @@ class ActorElement(QGraphicsItemGroup, BaseElement):
     def shape(self) -> QPainterPath:
         path = QPainterPath()
         path.addRect(self.boundingRect())
-        # path.addRect(self._text_bounding_rect)
         return path
 
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:

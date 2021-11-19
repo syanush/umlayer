@@ -37,7 +37,7 @@ class HandleItem(QGraphicsObject):
         if not self._is_live:
             return
         painter.setRenderHint(QPainter.Antialiasing)
-        is_selected = self.isSelected() # option.state & QStyle.State_Selected
+        is_selected = self.isSelected()
         pen = self.selected_pen if is_selected else self.normal_pen
         painter.setPen(pen)
         brush = highlight_brush if is_selected else element_brush
