@@ -5,7 +5,7 @@ from . import *
 
 
 class TextItem(QGraphicsItem):
-    correction_factor = 0.925
+    _correction_factor = 0.925
 
     def __init__(self, text: str = None, center: bool = False, parent=None) -> None:
         super().__init__(parent)
@@ -42,10 +42,11 @@ class TextItem(QGraphicsItem):
         Returns the size (dx,dy) of the specified text string (using the
         current control font).
 
-        TODO: possible bug when the font changes at runtime
+        TODO: Fix possible bug when the font changes at runtime
 
         The width of the bounding box is mysteriously larger than the width of the displayed text.
-        Two ugly hacks try to address this problem.
+        Two ugly hacks are implemented in order to address this problem.
+
         Hack #1: Use painting device in the constructor of QFontMetrics
         and improve bounding rect evaluation
         https://stackoverflow.com/questions/27336001/qfontmetrics-returns-inaccurate-results
@@ -60,7 +61,6 @@ class TextItem(QGraphicsItem):
         improved_rect = fm.boundingRect(rect, 0, text)
         width = improved_rect.width()
         height = improved_rect.height()
-        # width *= self.correction_factor
         return width, height
 
     def _recalculate(self):
@@ -76,7 +76,7 @@ class TextItem(QGraphicsItem):
             width = max(w for w, h in txt_sizes)
             height = sum(h for w, h in txt_sizes)
 
-        self._bounding_rect = QRectF(0, 0, width, height)
+        self._bounding_rect = QRectF(0, 0, width * self._correction_factor, height)
         self.update()
 
     def boundingRect(self) -> QRectF:
@@ -86,7 +86,7 @@ class TextItem(QGraphicsItem):
         painter.setFont(element_font)
         painter.setPen(element_pen)
         painter.setBrush(element_brush)
-        painter.drawRect(self._bounding_rect)  # for debugging
+        # painter.drawRect(self._bounding_rect)  # for debugging
         n = len(self._lines)
         if n > 0:
             avg_line_height = self._bounding_rect.height() / n
@@ -96,7 +96,7 @@ class TextItem(QGraphicsItem):
                 line = self._lines[i]
                 line_width, line_height = self.text_size(line)
                 if self._center:
-                    x = (text_width - line_width) / 2
+                    x = (text_width - line_width * self._correction_factor) / 2
                 else:
                     x = 0
                 y = avg_line_height * i

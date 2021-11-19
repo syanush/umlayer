@@ -84,10 +84,12 @@ class ClassElement(QAbstractGraphicsShapeItem):
         for i in range(n):
             item: TextItem = self._text_items[i]
             compartment: QRectF = self._compartments[i]
-            x = compartment.x() + self.padding
             if i == 0:
-                # center first text item
-                x += (compartment.width() - item.boundingRect().width()) / 2
+                # Center first text item. The padding is already included in compartment.width().
+                x = compartment.x() + (compartment.width() - item.boundingRect().width()) / 2
+            else:
+                # Left-align other items
+                x = compartment.x() + self.padding
             y = compartment.y() + self.padding
             item.setPos(x, y)
 
