@@ -13,4 +13,4 @@ from .diagram import Diagram
 from .project import Project
 from .project_storage import ProjectStorage
 from .project_logic import ProjectLogic
-from .user_element_model import UserElementModel
+from .user_element_model import ActorElementModel

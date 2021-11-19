@@ -15,13 +15,13 @@ class LineElement(QGraphicsItem):
         self._point1 = QPointF(0, 0)
         self._point2 = QPointF(100, 100)
 
-        self._handle1 = HandleElement(parent=self)
+        self._handle1 = HandleItem(parent=self)
         self._handle1.setPos(self._point1)
         self._handle1.position_changed_signal.connect(self._handle1_position_changed)
         self._handle1.selection_changed_signal.connect(self._handle_selection_changed)
         self._handle1.setSelected(False)
 
-        self._handle2 = HandleElement(parent=self)
+        self._handle2 = HandleItem(parent=self)
         self._handle2.setPos(self._point2)
         self._handle2.position_changed_signal.connect(self._handle2_position_changed)
         self._handle2.selection_changed_signal.connect(self._handle_selection_changed)

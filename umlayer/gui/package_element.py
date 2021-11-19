@@ -26,9 +26,9 @@ class PackageElement(QAbstractGraphicsShapeItem):
         self._recalculate()
 
     def _recalculate(self):
-        self._text_item1.setFont(diagram_font)
+        self._text_item1.setFont(element_font)
         self._text_item1.setDefaultTextColor(Qt.black)
-        self._text_item2.setFont(diagram_font)
+        self._text_item2.setFont(element_font)
         self._text_item2.setDefaultTextColor(Qt.black)
 
         self._text_item1.setPlainText(self._text1)
@@ -71,8 +71,8 @@ class PackageElement(QAbstractGraphicsShapeItem):
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
         painter.setRenderHint(QPainter.Antialiasing)
 
-        painter.setPen(item_pen)
-        painter.setBrush(item_brush)
+        painter.setPen(element_pen)
+        painter.setBrush(element_brush)
         painter.drawRect(self._rect1)
         painter.drawRect(self._rect2)
 

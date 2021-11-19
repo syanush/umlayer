@@ -7,8 +7,8 @@ class GraphicsScene(QGraphicsScene):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def addUserElement(self, x: float, y: float):
-        item = UserElement()
+    def addActorElement(self, x: float, y: float):
+        item = ActorElement('Actor')
         item.setPos(x, y)
         self.addItem(item)
 
@@ -35,7 +35,7 @@ class GraphicsScene(QGraphicsScene):
         self.addItem(item)
 
     def addCenteredTextElement(self, x: float, y: float):
-        item = TextItem('Centered\ntext', center=True)
+        item = TextElement('Centered\ntext', center=True)
         item.setFlag(QGraphicsItem.ItemIsSelectable, True)
         item.setFlag(QGraphicsItem.ItemIsMovable, True)
         item.setPos(x, y)
@@ -61,6 +61,6 @@ class GraphicsScene(QGraphicsScene):
         self.addItem(item)
 
     def addHandleElement(self, x: float, y: float):
-        item = HandleElement()
+        item = HandleItem()
         item.setPos(x, y)
         self.addItem(item)

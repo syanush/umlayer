@@ -4,7 +4,7 @@ from PySide6.QtWidgets import *
 from . import *
 
 
-class HandleElement(QGraphicsObject):
+class HandleItem(QGraphicsObject):
     size = 10
     position_changed_signal = Signal(QPointF)
     selection_changed_signal = Signal(bool)
@@ -39,7 +39,7 @@ class HandleElement(QGraphicsObject):
         is_selected = self.isSelected() # option.state & QStyle.State_Selected
         pen = self.selected_pen if is_selected else self.normal_pen
         painter.setPen(pen)
-        brush = highlight_brush if is_selected else item_brush
+        brush = highlight_brush if is_selected else element_brush
         painter.setBrush(brush)
         painter.drawEllipse(self._bounding_rect)
 

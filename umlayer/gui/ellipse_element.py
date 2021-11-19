@@ -51,8 +51,8 @@ class EllipseElement(QGraphicsItem, BaseElement):
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
         painter.setRenderHint(QPainter.Antialiasing)
 
-        painter.setPen(item_pen)
-        painter.setBrush(item_brush)
+        painter.setPen(element_pen)
+        painter.setBrush(element_brush)
         painter.drawEllipse(0, 0, self._width, self._height)
 
         if option.state & QStyle.State_Selected:

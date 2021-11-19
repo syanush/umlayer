@@ -26,7 +26,7 @@ class ClassElement(QAbstractGraphicsShapeItem):
 
     def _make_text_item(self, text) -> QGraphicsTextItem:
         text_item = QGraphicsTextItem(self)
-        text_item.setFont(diagram_font)
+        text_item.setFont(element_font)
         text_item.setDefaultTextColor(Qt.black)
         text_item.setPlainText(text)
         return text_item
@@ -84,8 +84,8 @@ class ClassElement(QAbstractGraphicsShapeItem):
         return self._bounding_rect
 
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
-        painter.setPen(item_pen)
-        painter.setBrush(item_brush)
+        painter.setPen(element_pen)
+        painter.setBrush(element_brush)
         for rect in self._rects:
             painter.drawRect(rect)
 

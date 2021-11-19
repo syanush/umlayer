@@ -17,13 +17,13 @@ class NoteElement(QAbstractGraphicsShapeItem, BaseElement):
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
 
         # serializable data
-        self._text = text
+        self._text_lines = TextItem(text, center=center, parent=self)
         self._center = center
         self._dx = dx  # must be non-negative
         self._dy = dy
         # end of serializable data
 
-        self._text_lines = TextItem(self._text, center=center, parent=self)
+
         self._recalculate()
 
     def text(self):
@@ -61,8 +61,8 @@ class NoteElement(QAbstractGraphicsShapeItem, BaseElement):
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
         painter.setRenderHint(QPainter.Antialiasing)
 
-        painter.setPen(item_pen)
-        painter.setBrush(item_brush)
+        painter.setPen(element_pen)
+        painter.setBrush(element_brush)
 
         br = self._bounding_rect
         x = br.width()

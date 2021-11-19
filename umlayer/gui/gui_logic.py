@@ -169,8 +169,8 @@ class GuiLogic:
         self.window.updateTitle()
         self._printStats()
 
-    def addUserElement(self):
-        self.window.scene.addUserElement(50, 50)
+    def addActorElement(self):
+        self.window.scene.addActorElement(50, 50)
 
     def addPackageElement(self):
         self.window.scene.addPackageElement(-20, -20)
@@ -223,7 +223,7 @@ class GuiLogic:
     def storeSceneTo(self, element):
         element.dtos.clear()
         for item in self.window.scene.items():
-            if isinstance(item, UserElement):
+            if isinstance(item, ActorElement):
                 dto = item.getDataAsDto()
                 element.dtos.append(dto)
 
@@ -237,7 +237,7 @@ class GuiLogic:
             print(element)
 
     def userElementFromDto(self, dto):
-        element = UserElement()
+        element = ActorElement()
         element.setDataFromDto(dto)
         element.setFlags(QGraphicsItem.ItemIsMovable | QGraphicsItem.ItemIsSelectable)
         return element

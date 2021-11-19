@@ -82,10 +82,10 @@ class Actions:
             statusTip='Delete element',
             triggered=self.logic.deleteElement)
 
-        self.addUserElementAction = QAction(
+        self.addActorElementAction = QAction(
             QIcon('resources/icons/user_element.svg'), 'Actor', self.window,
             statusTip='Add actor',
-            triggered=self.logic.addUserElement)
+            triggered=self.logic.addActorElement)
 
         self.addEllipseElementAction = QAction(
             QIcon('resources/icons/ellipse.png'), 'Ellipse', self.window,
