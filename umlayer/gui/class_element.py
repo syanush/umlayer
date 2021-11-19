@@ -1,16 +1,16 @@
-import re
-
 from PySide6.QtCore import *
 from PySide6.QtWidgets import *
 
 from . import *
 
 
-class ClassElement(QAbstractGraphicsShapeItem):
+class ClassElement(QAbstractGraphicsShapeItem, BaseElement):
     padding = 5
 
     def __init__(self, text: str = '', dx: float = 0, dy: float = 0, parent=None) -> None:
         super().__init__(parent)
+        super(BaseElement, self).__init__()
+        self._abilities = set([Abilities.EDITABLE_TEXT])
 
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
@@ -24,6 +24,74 @@ class ClassElement(QAbstractGraphicsShapeItem):
         self._text_items = []
         self._recalculate()
 
+    def text(self):
+        return self._text
+
+    def setText(self, text):
+        self._text = text
+        self._recalculate()
+
+    def boundingRect(self) -> QRectF:
+        return self._bounding_rect
+
+    def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
+        painter.setPen(element_pen)
+        painter.setBrush(element_brush)
+        for compartment in self._compartments:
+            painter.drawRect(compartment)
+
+        if self.isSelected():
+            painter.setPen(highlight_pen)
+            painter.setBrush(highlight_brush)
+
+            br = QPainterPath()
+            br.addRect(self._bounding_rect)
+            painter.fillPath(br, highlight_brush)
+
+            painter.drawPath(self.shape())
+
+    def _recalculate(self):
+        self.prepareGeometryChange()
+
+        self._texts = ClassElement._parseText(self._text)
+
+        self._deleteTextItems()
+        self._text_items = self._createTextItems()
+        width = self._getMaxWidth()
+        self._compartments = self._createCompartments(width)
+        self._positionTextItems()
+        height = self._getMaxHeight()
+
+        self._bounding_rect = QRectF(0, 0, width, height)
+
+        self.update()
+
+    @staticmethod
+    def _parseText(text) -> list[str]:
+        """"Return the list of text sections.
+
+        The separator of the sections is '--\n' line in the original text
+        """
+        lines = text.split('\n')
+        sections = []
+        section_lines = []
+        for line in lines:
+            if line == '--':
+                section = '\n'.join(section_lines)
+                sections.append(section)
+                section_lines.clear()
+            else:
+                section_lines.append(line)
+        section = '\n'.join(section_lines)
+        sections.append(section)
+        section_lines.clear()
+        return sections
+
+        # print(ClassElement._parseText('--')) # 2
+        # print(ClassElement._parseText('--\n')) # 2
+        # print(ClassElement._parseText('--\n--')) # 3
+        # print(ClassElement._parseText('--\n--\n')) # 3
+
     def _get_rect(self, item: TextItem) -> QRectF:
         br = item.boundingRect()
         width = br.width() + 2.0 * self.padding
@@ -35,7 +103,6 @@ class ClassElement(QAbstractGraphicsShapeItem):
         """Delete old text items"""
         for item in self._text_items:
             if item.scene():
-                item.setParent(None)
                 item.scene().removeItem(item)
         self._text_items = []
 
@@ -99,38 +166,3 @@ class ClassElement(QAbstractGraphicsShapeItem):
         height = 2.0 * self.padding if n == 0 else \
             sum(compartment.height() for compartment in self._compartments)
         return height
-
-    def _recalculate(self):
-        self.prepareGeometryChange()
-
-        self._texts = re.split('\n--\n', self._text)
-
-        self._deleteTextItems()
-        self._text_items = self._createTextItems()
-        width = self._getMaxWidth()
-        self._compartments = self._createCompartments(width)
-        self._positionTextItems()
-        height = self._getMaxHeight()
-
-        self._bounding_rect = QRectF(0, 0, width, height)
-
-        self.update()
-
-    def boundingRect(self) -> QRectF:
-        return self._bounding_rect
-
-    def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
-        painter.setPen(element_pen)
-        painter.setBrush(element_brush)
-        for compartment in self._compartments:
-            painter.drawRect(compartment)
-
-        if self.isSelected():
-            painter.setPen(highlight_pen)
-            painter.setBrush(highlight_brush)
-
-            br = QPainterPath()
-            br.addRect(self._bounding_rect)
-            painter.fillPath(br, highlight_brush)
-
-            painter.drawPath(self.shape())
