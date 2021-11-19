@@ -6,7 +6,7 @@ from . import *
 
 class EllipseElement(QGraphicsItem, BaseElement):
 
-    def __init__(self, text=None, parent=None) -> None:
+    def __init__(self, width: int, height:int, text: str = None, parent=None) -> None:
         super().__init__(parent)
         super(BaseElement, self).__init__()
         self._abilities = set([Abilities.EDITABLE_TEXT])
@@ -15,9 +15,9 @@ class EllipseElement(QGraphicsItem, BaseElement):
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
 
         # serializable data
-        self._text = text
-        self._width = 150  # must be >= 10
-        self._height = 50  # must be >= 10
+        self._text = text or ''
+        self._width = max(width, 10)
+        self._height = max(height, 10)  # must be >= 10
         # end of serializable data
 
         self._text_item = TextItem(center=True, parent=self)
@@ -39,15 +39,16 @@ class EllipseElement(QGraphicsItem, BaseElement):
         y = (self._height - br.height()) / 2
         self._text_item.setPos(x, y)
         self._bounding_rect = QRectF(0, 0, self._width, self._height)
+        path = QPainterPath()
+        path.addEllipse(self._bounding_rect)
+        self._shape_path = path
         self.update()
 
     def boundingRect(self) -> QRectF:
         return self._bounding_rect
 
     def shape(self) -> QPainterPath:
-        path = QPainterPath()
-        path.addEllipse(self._bounding_rect)
-        return path
+        return self._shape_path
 
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
         painter.setRenderHint(QPainter.Antialiasing)

@@ -15,7 +15,7 @@ class PackageElement(QAbstractGraphicsShapeItem):
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
 
         # serializable data
-        self._text = text
+        self._text = text or ''
         self._dx = dx  # must be non-negative
         self._dy = dy
         # end of serializable data
@@ -50,12 +50,7 @@ class PackageElement(QAbstractGraphicsShapeItem):
         self._bounding_rect = QRectF(0, 0, width, height)
         self._rect1 = QRectF(0, 0, size1_x, size1_y)
         self._rect2 = QRectF(0, size1_y, size2_x, size2_y)
-        self.update()
 
-    def boundingRect(self) -> QRectF:
-        return self._bounding_rect
-
-    def shape(self) -> QPainterPath:
         x1 = self._size1.x()
         y1 = self._size1.y()
         x2 = self._size2.x()
@@ -68,11 +63,18 @@ class PackageElement(QAbstractGraphicsShapeItem):
         path.lineTo(x1, y1)
         path.lineTo(x1, 0)
         path.lineTo(0, 0)
-        return path
+        self._shape_path = path
+
+        self.update()
+
+    def boundingRect(self) -> QRectF:
+        return self._bounding_rect
+
+    def shape(self) -> QPainterPath:
+        return self._shape_path
 
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
         painter.setRenderHint(QPainter.Antialiasing)
-
         painter.setPen(element_pen)
         painter.setBrush(element_brush)
         painter.drawRect(self._rect1)

@@ -11,7 +11,7 @@ class TextItem(QGraphicsItem):
         super().__init__(parent)
 
         # serializable data
-        self._text = text
+        self._text = text or ''
         self._center = center
         # end of serializable data
 

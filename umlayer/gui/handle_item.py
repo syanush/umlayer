@@ -5,16 +5,19 @@ from . import *
 
 
 class HandleItem(QGraphicsObject):
-    size = 10
     position_changed_signal = Signal(QPointF)
     selection_changed_signal = Signal(bool)
 
-    def __init__(self, parent=None):
+    def __init__(self, size: int, parent=None):
         super().__init__(parent)
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges, True)
+        self.size = size
         self._bounding_rect = QRectF(-self.size, -self.size, 2 * self.size, 2 * self.size)
+        path = QPainterPath()
+        path.addEllipse(self._bounding_rect)
+        self._shape_path = path
         self._is_live = False
 
     def setLive(self, is_live):
@@ -25,9 +28,7 @@ class HandleItem(QGraphicsObject):
         return self._bounding_rect
 
     def shape(self) -> QPainterPath:
-        path = QPainterPath()
-        path.addEllipse(self._bounding_rect)
-        return path
+        return self._shape_path
 
     normal_pen = QPen(Qt.black, 1)
     selected_pen = QPen(Qt.blue, 1)

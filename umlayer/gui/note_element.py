@@ -8,7 +8,7 @@ class NoteElement(QAbstractGraphicsShapeItem, BaseElement):
     padding = 5
     delta = 15
 
-    def __init__(self, text: str = None, center=False, dx: float = 50, dy: float = 30, parent=None) -> None:
+    def __init__(self, text: str = None, center=False, dx: float = 0, dy: float = 0, parent=None) -> None:
         super().__init__(parent)
         super(BaseElement, self).__init__()
         self._abilities = set([Abilities.EDITABLE_TEXT])
@@ -37,17 +37,12 @@ class NoteElement(QAbstractGraphicsShapeItem, BaseElement):
         self.prepareGeometryChange()
         text = self._text or ''
         self._text_item.setText(text)
+        self._text_item.setPos(self.padding, self.padding)
         br = self._text_item.boundingRect()
         width = 2 * self.padding + br.width() + self._dx + self.delta
         height = 2 * self.padding + br.height() + self._dy
         self._bounding_rect = QRectF(0, 0, width, height)
-        self._text_item.setPos(self.padding, self.padding)
-        self.update()
 
-    def boundingRect(self) -> QRectF:
-        return self._bounding_rect
-
-    def shape(self) -> QPainterPath:
         br = self._bounding_rect
         x = br.width()
         y = br.height()
@@ -58,17 +53,8 @@ class NoteElement(QAbstractGraphicsShapeItem, BaseElement):
         path.lineTo(x, y)
         path.lineTo(x, self.delta)
         path.lineTo(x - self.delta, 0)
-        return path
+        self._shape_path = path
 
-    def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
-        painter.setRenderHint(QPainter.Antialiasing)
-
-        painter.setPen(element_pen)
-        painter.setBrush(element_brush)
-
-        br = self._bounding_rect
-        x = br.width()
-        y = br.height()
         path = QPainterPath()
         path.moveTo(x - self.delta, 0)
         path.lineTo(0, 0)
@@ -78,7 +64,21 @@ class NoteElement(QAbstractGraphicsShapeItem, BaseElement):
         path.lineTo(x - self.delta, self.delta)
         path.lineTo(x - self.delta, 0)
         path.lineTo(x, self.delta)
-        painter.drawPath(path)
+        self._border_path = path
+
+        self.update()
+
+    def boundingRect(self) -> QRectF:
+        return self._bounding_rect
+
+    def shape(self) -> QPainterPath:
+        return self._shape_path
+
+    def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
+        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setPen(element_pen)
+        painter.setBrush(element_brush)
+        painter.drawPath(self._border_path)
 
         if option.state & QStyle.State_Selected:
             painter.setPen(highlight_pen)

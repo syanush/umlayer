@@ -18,7 +18,7 @@ class GraphicsScene(QGraphicsScene):
         self.addItem(item)
 
     def addEllipseElement(self, x: float, y: float):
-        item = EllipseElement('Use Case 1')
+        item = EllipseElement(150, 50, 'Use Case 1')
         item.setPos(x, y)
         self.addItem(item)
 

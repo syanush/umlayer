@@ -11,7 +11,7 @@ class TextElement(QGraphicsItem, BaseElement):
         self._abilities = set([Abilities.EDITABLE_TEXT])
 
         # serializable data
-        self._text = text
+        self._text = text or ''
         self._center = center
         # end of serializable data
 
