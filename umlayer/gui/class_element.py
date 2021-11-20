@@ -2,6 +2,7 @@ from PySide6.QtCore import *
 from PySide6.QtWidgets import *
 
 from . import *
+from . import gui_utils
 
 
 class ClassElement(QAbstractGraphicsShapeItem, BaseElement):
@@ -53,7 +54,7 @@ class ClassElement(QAbstractGraphicsShapeItem, BaseElement):
     def _recalculate(self):
         self.prepareGeometryChange()
 
-        self._texts = ClassElement._parseText(self._text)
+        self._texts = gui_utils.split_to_sections(self._text)
 
         self._deleteTextItems()
         self._text_items = self._createTextItems()
@@ -65,32 +66,6 @@ class ClassElement(QAbstractGraphicsShapeItem, BaseElement):
         self._bounding_rect = QRectF(0, 0, width, height)
 
         self.update()
-
-    @staticmethod
-    def _parseText(text) -> list[str]:
-        """"Return the list of text sections.
-
-        The separator of the sections is '--\n' line in the original text
-        """
-        lines = text.split('\n')
-        sections = []
-        section_lines = []
-        for line in lines:
-            if line == '--':
-                section = '\n'.join(section_lines)
-                sections.append(section)
-                section_lines.clear()
-            else:
-                section_lines.append(line)
-        section = '\n'.join(section_lines)
-        sections.append(section)
-        section_lines.clear()
-        return sections
-
-        # print(ClassElement._parseText('--')) # 2
-        # print(ClassElement._parseText('--\n')) # 2
-        # print(ClassElement._parseText('--\n--')) # 3
-        # print(ClassElement._parseText('--\n--\n')) # 3
 
     def _get_rect(self, item: TextItem) -> QRectF:
         br = item.boundingRect()

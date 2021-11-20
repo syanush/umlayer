@@ -2,14 +2,17 @@ from PySide6.QtCore import *
 from PySide6.QtWidgets import *
 
 from . import *
+from . import gui_utils
 
 
-class PackageElement(QAbstractGraphicsShapeItem):
+class PackageElement(QAbstractGraphicsShapeItem, BaseElement):
     padding = 5
     min2 = 20
 
     def __init__(self, text: str = None, dx: float = 0, dy: float = 0, parent=None) -> None:
         super().__init__(parent)
+        super(BaseElement, self).__init__()
+        self._abilities = set([Abilities.EDITABLE_TEXT])
 
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
@@ -24,14 +27,47 @@ class PackageElement(QAbstractGraphicsShapeItem):
         self._text_item2 = TextItem(parent=self)
         self._recalculate()
 
+    def text(self):
+        return self._text
+
+    def setText(self, text):
+        self._text = text
+        self._recalculate()
+
+    def boundingRect(self) -> QRectF:
+        return self._bounding_rect
+
+    def shape(self) -> QPainterPath:
+        return self._shape_path
+
+    def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
+        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setPen(element_pen)
+        painter.setBrush(element_brush)
+        painter.drawRect(self._rect1)
+        painter.drawRect(self._rect2)
+
+        if self.isSelected():
+            painter.setPen(highlight_pen)
+            painter.setBrush(highlight_brush)
+
+            # br = QPainterPath()
+            # br.addRect(self._bounding_rect)
+            # painter.fillPath(br, highlight_brush)
+
+            painter.drawPath(self.shape())
+
+    def itemChange(self, change, value):
+        if change == QGraphicsItem.GraphicsItemChange.ItemSelectedChange:
+            print('selection', value)
+        return super().itemChange(change, value)
+
     def _recalculate(self):
         self.prepareGeometryChange()
 
         # TODO: improve parsing
         self._text = self._text or ''
-        splitted = self._text.split('--\n')
-        self._text1 = splitted[0].strip('\n') if len(splitted) > 0 else ''
-        self._text2 = splitted[1].strip('\n') if len(splitted) > 1 else ''
+        self._text1, self._text2 = gui_utils.split_to_two_sections(self._text)
 
         self._text_item1.setText(self._text1)
         self._text_item2.setText(self._text2)
@@ -66,31 +102,3 @@ class PackageElement(QAbstractGraphicsShapeItem):
         self._shape_path = path
 
         self.update()
-
-    def boundingRect(self) -> QRectF:
-        return self._bounding_rect
-
-    def shape(self) -> QPainterPath:
-        return self._shape_path
-
-    def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
-        painter.setRenderHint(QPainter.Antialiasing)
-        painter.setPen(element_pen)
-        painter.setBrush(element_brush)
-        painter.drawRect(self._rect1)
-        painter.drawRect(self._rect2)
-
-        if self.isSelected():
-            painter.setPen(highlight_pen)
-            painter.setBrush(highlight_brush)
-
-            # br = QPainterPath()
-            # br.addRect(self._bounding_rect)
-            # painter.fillPath(br, highlight_brush)
-
-            painter.drawPath(self.shape())
-
-    def itemChange(self, change, value):
-        if change == QGraphicsItem.GraphicsItemChange.ItemSelectedChange:
-            print('selection', value)
-        return super().itemChange(change, value)
