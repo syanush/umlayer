@@ -10,20 +10,41 @@ from PySide6.QtWidgets import *
 class GraphicsView(QGraphicsView):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.setSceneRect(-1000, -1000, 2000, 2000)
-        # self.setDragMode(QGraphicsView.DragMode.ScrollHandDrag)
-        # self.setDragMode(QGraphicsView.DragMode.NoDrag)
-        self.setRubberBandSelectionMode(Qt.ItemSelectionMode.ContainsItemBoundingRect)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
+        self.setRubberBandSelection()
 
     def getMainWindow(self):
+        # TODO: simpler method?
         return self.parent().parent()
 
-    def mouseMoveEvent(self, e: QMouseEvent):
-        if e.buttons() & Qt.LeftButton:
-            self.setDragMode(QGraphicsView.RubberBandDrag)
-            self.setRubberBandSelectionMode(Qt.ContainsItemBoundingRect)
-        elif e.buttons() & Qt.RightButton:
-            pass
-            # main_window.sceneView.setDragMode(QGraphicsView.ScrollHandDrag)
+    def setPanning(self):
+        self.setDragMode(QGraphicsView.ScrollHandDrag)
+        self.setInteractive(False)
+        # self.setCursor(Qt.ClosedHandCursor)
 
-        super().mouseMoveEvent(e)
+    def setRubberBandSelection(self):
+        self.setDragMode(QGraphicsView.RubberBandDrag)
+        self.setRubberBandSelectionMode(Qt.ItemSelectionMode.ContainsItemBoundingRect)
+        self.setInteractive(True)
+        # self.setCursor(Qt.ArrowCursor)
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.MiddleButton:
+            # Must precede fake event handling
+            self.setPanning()
+            fake = QMouseEvent(event.type(), event.pos(), Qt.LeftButton, event.buttons(), event.modifiers())
+            super().mousePressEvent(fake)
+            # print('middle button pressed', self.isInteractive(), self.dragMode())
+            return
+        super().mousePressEvent(event)
+
+    def mouseReleaseEvent(self, event):
+        if event.button() == Qt.MiddleButton:
+            fake = QMouseEvent(event.type(), event.pos(), Qt.LeftButton, event.buttons(), event.modifiers())
+            super().mouseReleaseEvent(fake)
+            # Must follow fake event handling
+            self.setRubberBandSelection()
+            # print('middle button released', self.isInteractive(), self.dragMode())
+            return
+        super().mouseReleaseEvent(event)
