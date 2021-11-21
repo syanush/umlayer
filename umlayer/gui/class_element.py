@@ -67,6 +67,8 @@ class ClassElement(QAbstractGraphicsShapeItem, BaseElement):
         self._deleteTextItems()
         self._text_items = self._createTextItems()
         width = self._getMaxWidth()
+        width = snap_up(width)
+
         self._compartments = self._createCompartments(width)
         self._positionTextItems()
         height = self._getMaxHeight()
@@ -146,6 +148,10 @@ class ClassElement(QAbstractGraphicsShapeItem, BaseElement):
     def _getMaxHeight(self) -> float:
         """Return the total height of all compartments"""
         n = len(self._texts)
-        height = 2.0 * Settings.ELEMENT_PADDING if n == 0 else \
-            sum(compartment.height() for compartment in self._compartments)
+        height = 2.0 * Settings.ELEMENT_PADDING
+        if n > 0:
+            height = sum(compartment.height() for compartment in self._compartments)
+            height1 = snap_up(height)
+            self._compartments[-1].adjust(0, 0, 0, height1 - height)
+            height = height1
         return height

@@ -1,6 +1,6 @@
 # order is important
 from .settings import Settings
-from .gui_utils import snap
+from .gui_utils import snap, snap_up
 from .base_element import BaseElement, Abilities
 from .text_item import TextItem
 from .text_element import TextElement

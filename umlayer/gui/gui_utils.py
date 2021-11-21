@@ -1,8 +1,13 @@
+import math
 from . import *
 
 
-def snap(x, block_size=10):
-    return round(x / Settings.BLOCK_SIZE) * Settings.BLOCK_SIZE
+def snap(x: float) -> float:
+    return math.floor(x / Settings.BLOCK_SIZE) * Settings.BLOCK_SIZE
+
+
+def snap_up(x: float) -> float:
+    return math.ceil(x / Settings.BLOCK_SIZE) * Settings.BLOCK_SIZE
 
 
 def split_to_sections(text) -> list[str]:

@@ -75,11 +75,17 @@ class PackageElement(QAbstractGraphicsShapeItem, BaseElement):
         br1 = self._text_item1.boundingRect()
         size1_x = br1.width() + 2 * Settings.ELEMENT_PADDING
         size1_y = br1.height() + 2 * Settings.ELEMENT_PADDING
+        size1_x = snap_up(size1_x)
+        size1_y = snap_up(size1_y)
+
         self._size1 = QPointF(size1_x, size1_y)
         self._text_item2.setPos(Settings.ELEMENT_PADDING, Settings.ELEMENT_PADDING + size1_y)
         br2 = self._text_item2.boundingRect()
         size2_x = max(br2.width() + 2 * Settings.ELEMENT_PADDING + self._dx, size1_x + Settings.HANDLE_MIN2 + self._dx)
         size2_y = br2.height() + 2 * Settings.ELEMENT_PADDING + self._dy
+        size2_x = snap_up(size2_x)
+        size2_y = snap_up(size2_y)
+
         self._size2 = QPointF(size2_x, size2_y)
         width = max(size1_x, size2_x)
         height = size1_y + size2_y

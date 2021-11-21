@@ -69,6 +69,8 @@ class NoteElement(QAbstractGraphicsShapeItem, BaseElement):
         br = self._text_item.boundingRect()
         width = 2 * Settings.ELEMENT_PADDING + br.width() + self._dx + Settings.NOTE_DELTA
         height = 2 * Settings.ELEMENT_PADDING + br.height() + self._dy
+        width = snap_up(width)
+        height = snap_up(height)
         self._bounding_rect = QRectF(0, 0, width, height)
 
         br = self._bounding_rect
