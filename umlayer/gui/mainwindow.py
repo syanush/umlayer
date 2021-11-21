@@ -78,6 +78,7 @@ class MainWindow(QMainWindow):
         self.aToolBar.addAction(self.actions.addSimpleClassElementAction)
         self.aToolBar.addAction(self.actions.addFatClassElementAction)
         self.aToolBar.addAction(self.actions.addPackageElementAction)
+        # self.aToolBar.addAction(self.actions.addHandleItemAction)
 
     def createStatusBar(self):
         """Create Status Bar
@@ -124,7 +125,10 @@ class MainWindow(QMainWindow):
             self.propertyView.setEnabled(False)
 
     def createCentralWidget(self):
-        self.scene: GraphicsScene = GraphicsScene()  # 0, 0, 400, 200
+        scene_size = 2000
+        self.scene: GraphicsScene = \
+            GraphicsScene(-scene_size//2, -scene_size//2, scene_size, scene_size)
+
         self.scene.selectionChanged.connect(self.on_scene_selection_changed)
 
         self.sceneView = GraphicsView(self.scene)

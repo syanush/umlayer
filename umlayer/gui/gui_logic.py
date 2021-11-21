@@ -193,11 +193,11 @@ class GuiLogic:
     def addFatClassElement(self):
         self.window.scene.addFatClassElement(0, 0)
 
-    def addHandleElement(self):
-        self.window.scene.addHandleElement(-50, -50)
+    def addHandleItem(self):
+        self.window.scene.addHandleItem(50, 50)
 
     def addLineElement(self):
-        self.window.scene.addLineElement(-100, -100)
+        self.window.scene.addLineElement(0, 0)
 
     def _printStats(self):
         print('number of elements', self.project.count())

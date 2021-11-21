@@ -6,11 +6,14 @@ from . import *
 
 class LineElement(QGraphicsItem):
     diameter = 40
+    normal_pen = QPen(Qt.black, 1)
+    selected_pen = QPen(Qt.blue, 1)
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
+        self.setFlag(QGraphicsItem.ItemSendsGeometryChanges, True)
 
         self._point1 = QPointF(0, 0)
         self._point2 = QPointF(100, 100)
@@ -31,6 +34,42 @@ class LineElement(QGraphicsItem):
         self.stroker.setWidth(15)
 
         self.setLive(False)
+        self._recalculate()
+
+    def boundingRect(self) -> QRectF:
+        return self._bounding_rect
+
+    def shape(self) -> QPainterPath:
+        return self._shape_path
+
+    def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
+        painter.setRenderHint(QPainter.Antialiasing)
+        pen = self.selected_pen if self.isSelected() else self.normal_pen
+        painter.setPen(pen)
+        point1 = self._point1
+        point2 = self._point2
+        x1 = point1.x()
+        y1 = point1.y()
+        x2 = point2.x()
+        y2 = point2.y()
+        painter.drawLine(x1, y1, x2, y2)
+        # painter.drawPath(self.shape())
+
+    def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
+        if self.scene() and \
+                change == QGraphicsItem.ItemPositionChange and \
+                QApplication.mouseButtons() == Qt.LeftButton:
+            return QPointF(gui_utils.snap(value.x()), gui_utils.snap(value.y()))
+        if change == QGraphicsItem.GraphicsItemChange.ItemSelectedHasChanged:
+            is_selected = bool(value)
+            self.prepareGeometryChange()
+            self.setLive(is_selected)
+        return super().itemChange(change, value)
+
+    def setLive(self, is_live):
+        self._is_live = is_live
+        self._handle1.setLive(is_live)
+        self._handle2.setLive(is_live)
         self._recalculate()
 
     def _handle_selection_changed(self, is_selected):
@@ -66,39 +105,3 @@ class LineElement(QGraphicsItem):
         self._shape_path = self.stroker.createStroke(path)
 
         self.update()
-
-    def boundingRect(self) -> QRectF:
-        return self._bounding_rect
-
-    def shape(self) -> QPainterPath:
-        return self._shape_path
-
-    normal_pen = QPen(Qt.black, 1.2)
-    selected_pen = QPen(Qt.blue, 1.2)
-
-    def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
-        painter.setRenderHint(QPainter.Antialiasing)
-        pen = self.selected_pen if self.isSelected() else self.normal_pen
-        painter.setPen(pen)
-        point1 = self._point1
-        point2 = self._point2
-        x1 = point1.x()
-        y1 = point1.y()
-        x2 = point2.x()
-        y2 = point2.y()
-        painter.drawLine(x1, y1, x2, y2)
-        # painter.drawPath(self.shape())
-
-    def setLive(self, is_live):
-        self._is_live = is_live
-        self._handle1.setLive(is_live)
-        self._handle2.setLive(is_live)
-        self._recalculate()
-
-    def itemChange(self, change, value):
-        if change == QGraphicsItem.GraphicsItemChange.ItemSelectedHasChanged:
-            is_selected = bool(value)
-            print('Line selection', is_selected)
-            self.prepareGeometryChange()
-            self.setLive(is_selected)
-        return super().itemChange(change, value)

@@ -16,6 +16,7 @@ class ActorElement(QGraphicsItemGroup, BaseElement):
         self._abilities = set([Abilities.EDITABLE_TEXT])
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
+        self.setFlag(QGraphicsItem.ItemSendsGeometryChanges, True)
 
         # serializable data
         self._text = text
@@ -40,6 +41,34 @@ class ActorElement(QGraphicsItemGroup, BaseElement):
         self._text = text
         self._recalculate()
 
+    def boundingRect(self) -> QRectF:
+        return self._bounding_rect
+
+    def shape(self) -> QPainterPath:
+        path = QPainterPath()
+        path.addRect(self.boundingRect())
+        return path
+
+    def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
+        is_selected = option.state & QStyle.State_Selected
+        pen = highlight_pen if is_selected else QPen(QColor(255, 255, 255, 255), 3)
+        painter.setPen(pen)
+        painter.drawPath(self.shape())
+
+    def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
+        if self.scene() and \
+                change == QGraphicsItem.ItemPositionChange and \
+                QApplication.mouseButtons() == Qt.LeftButton:
+            return QPointF(gui_utils.snap(value.x()), gui_utils.snap(value.y()))
+        return super().itemChange(change, value)
+
+    def getDataAsDto(self):
+        self.flags()
+        return model.ActorElementModel(x=self.pos().x(), y=self.pos().y())
+
+    def setDataFromDto(self, dto: model.ActorElementModel):
+        self.setPos(QPointF(dto.x, dto.y))
+
     def _recalculate(self):
         self.prepareGeometryChange()
 
@@ -55,24 +84,3 @@ class ActorElement(QGraphicsItemGroup, BaseElement):
         self._bounding_rect = QRectF(0, 0, self.actor_width, self.actor_height)
 
         self.update()
-
-    def boundingRect(self) -> QRectF:
-        return self._bounding_rect
-
-    def shape(self) -> QPainterPath:
-        path = QPainterPath()
-        path.addRect(self.boundingRect())
-        return path
-
-    def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
-        is_selected = option.state & QStyle.State_Selected
-        pen = highlight_pen if is_selected else QPen(QColor(255, 255, 255, 255), 3)
-        painter.setPen(pen)
-        painter.drawPath(self.shape())
-
-    def getDataAsDto(self):
-        self.flags()
-        return model.ActorElementModel(x=self.pos().x(), y=self.pos().y())
-
-    def setDataFromDto(self, dto: model.ActorElementModel):
-        self.setPos(QPointF(dto.x, dto.y))

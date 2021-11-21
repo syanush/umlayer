@@ -13,6 +13,7 @@ class EllipseElement(QGraphicsItem, BaseElement):
 
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
+        self.setFlag(QGraphicsItem.ItemSendsGeometryChanges, True)
 
         # serializable data
         self._text = text or ''
@@ -29,20 +30,6 @@ class EllipseElement(QGraphicsItem, BaseElement):
     def setText(self, text):
         self._text = text
         self._recalculate()
-
-    def _recalculate(self):
-        self.prepareGeometryChange()
-        text = self._text or ''
-        self._text_item.setText(text)
-        br = self._text_item.boundingRect()
-        x = (self._width - br.width()) / 2
-        y = (self._height - br.height()) / 2
-        self._text_item.setPos(x, y)
-        self._bounding_rect = QRectF(0, 0, self._width, self._height)
-        path = QPainterPath()
-        path.addEllipse(self._bounding_rect)
-        self._shape_path = path
-        self.update()
 
     def boundingRect(self) -> QRectF:
         return self._bounding_rect
@@ -64,3 +51,24 @@ class EllipseElement(QGraphicsItem, BaseElement):
             br.addRect(self._bounding_rect)
             painter.fillPath(br, highlight_brush)
             painter.drawPath(self.shape())
+
+    def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
+        if self.scene() and \
+                change == QGraphicsItem.ItemPositionChange and \
+                QApplication.mouseButtons() == Qt.LeftButton:
+            return QPointF(gui_utils.snap(value.x()), gui_utils.snap(value.y()))
+        return super().itemChange(change, value)
+
+    def _recalculate(self):
+        self.prepareGeometryChange()
+        text = self._text or ''
+        self._text_item.setText(text)
+        br = self._text_item.boundingRect()
+        x = (self._width - br.width()) / 2
+        y = (self._height - br.height()) / 2
+        self._text_item.setPos(x, y)
+        self._bounding_rect = QRectF(0, 0, self._width, self._height)
+        path = QPainterPath()
+        path.addEllipse(self._bounding_rect)
+        self._shape_path = path
+        self.update()

@@ -2,7 +2,6 @@ from PySide6.QtCore import *
 from PySide6.QtWidgets import *
 
 from . import *
-from . import gui_utils
 
 
 class PackageElement(QAbstractGraphicsShapeItem, BaseElement):
@@ -16,6 +15,7 @@ class PackageElement(QAbstractGraphicsShapeItem, BaseElement):
 
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
+        self.setFlag(QGraphicsItem.ItemSendsGeometryChanges, True)
 
         # serializable data
         self._text = text or ''
@@ -57,9 +57,11 @@ class PackageElement(QAbstractGraphicsShapeItem, BaseElement):
 
             painter.drawPath(self.shape())
 
-    def itemChange(self, change, value):
-        if change == QGraphicsItem.GraphicsItemChange.ItemSelectedChange:
-            print('selection', value)
+    def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
+        if self.scene() and \
+                change == QGraphicsItem.ItemPositionChange and \
+                QApplication.mouseButtons() == Qt.LeftButton:
+            return QPointF(gui_utils.snap(value.x()), gui_utils.snap(value.y()))
         return super().itemChange(change, value)
 
     def _recalculate(self):

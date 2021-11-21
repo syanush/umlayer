@@ -1,3 +1,7 @@
+def snap(x, block_size=10):
+    return round(x / block_size) * block_size
+
+
 def split_to_sections(text) -> list[str]:
     """"Return the list of text sections.
 

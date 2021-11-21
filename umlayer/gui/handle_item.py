@@ -45,9 +45,13 @@ class HandleItem(QGraphicsObject):
         painter.drawEllipse(self._bounding_rect)
 
     def itemChange(self, change, value):
+        if self.scene() and \
+                change == QGraphicsItem.ItemPositionChange and \
+                QApplication.mouseButtons() == Qt.LeftButton:
+            return QPointF(gui_utils.snap(value.x()), gui_utils.snap(value.y()))
+        if change == QGraphicsItem.ItemPositionHasChanged:
+            self.position_changed_signal.emit(value)
         if change == QGraphicsItem.GraphicsItemChange.ItemSelectedHasChanged:
             is_selected = bool(value)
             self.selection_changed_signal.emit(is_selected)
-        if change == QGraphicsItem.ItemPositionHasChanged:
-            self.position_changed_signal.emit(value)
         return super().itemChange(change, value)

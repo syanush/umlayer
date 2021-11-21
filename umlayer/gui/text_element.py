@@ -10,6 +10,10 @@ class TextElement(QGraphicsItem, BaseElement):
         super(BaseElement, self).__init__()
         self._abilities = set([Abilities.EDITABLE_TEXT])
 
+        self.setFlag(QGraphicsItem.ItemIsSelectable, True)
+        self.setFlag(QGraphicsItem.ItemIsMovable, True)
+        self.setFlag(QGraphicsItem.ItemSendsGeometryChanges, True)
+
         # serializable data
         self._text = text or ''
         self._center = center
@@ -50,3 +54,10 @@ class TextElement(QGraphicsItem, BaseElement):
             painter.fillPath(br, highlight_brush)
 
             painter.drawPath(self.shape())
+
+    def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
+        if self.scene() and \
+                change == QGraphicsItem.ItemPositionChange and \
+                QApplication.mouseButtons() == Qt.LeftButton:
+            return QPointF(gui_utils.snap(value.x()), gui_utils.snap(value.y()))
+        return super().itemChange(change, value)

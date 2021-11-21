@@ -15,6 +15,7 @@ class ClassElement(QAbstractGraphicsShapeItem, BaseElement):
 
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
+        self.setFlag(QGraphicsItem.ItemSendsGeometryChanges, True)
 
         # serializable data
         self._text = text or ''
@@ -50,6 +51,14 @@ class ClassElement(QAbstractGraphicsShapeItem, BaseElement):
             painter.fillPath(br, highlight_brush)
 
             painter.drawPath(self.shape())
+
+    def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
+        if self.scene() and \
+                change == QGraphicsItem.ItemPositionChange and \
+                QApplication.mouseButtons() == Qt.LeftButton:
+            return QPointF(gui_utils.snap(value.x()), gui_utils.snap(value.y()))
+
+        return super().itemChange(change, value)
 
     def _recalculate(self):
         self.prepareGeometryChange()

@@ -15,6 +15,7 @@ class NoteElement(QAbstractGraphicsShapeItem, BaseElement):
 
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
+        self.setFlag(QGraphicsItem.ItemSendsGeometryChanges, True)
 
         # serializable data
         self._text = text
@@ -32,6 +33,35 @@ class NoteElement(QAbstractGraphicsShapeItem, BaseElement):
     def setText(self, text):
         self._text = text
         self._recalculate()
+
+    def boundingRect(self) -> QRectF:
+        return self._bounding_rect
+
+    def shape(self) -> QPainterPath:
+        return self._shape_path
+
+    def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
+        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setPen(element_pen)
+        painter.setBrush(element_brush)
+        painter.drawPath(self._border_path)
+
+        if self.isSelected():
+            painter.setPen(highlight_pen)
+            painter.setBrush(highlight_brush)
+
+            path = QPainterPath()
+            path.addRect(self._bounding_rect)
+            painter.fillPath(path, highlight_brush)
+
+            painter.drawPath(self.shape())
+
+    def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
+        if self.scene() and \
+                change == QGraphicsItem.ItemPositionChange and \
+                QApplication.mouseButtons() == Qt.LeftButton:
+            return QPointF(gui_utils.snap(value.x()), gui_utils.snap(value.y()))
+        return super().itemChange(change, value)
 
     def _recalculate(self):
         self.prepareGeometryChange()
@@ -67,25 +97,3 @@ class NoteElement(QAbstractGraphicsShapeItem, BaseElement):
         self._border_path = path
 
         self.update()
-
-    def boundingRect(self) -> QRectF:
-        return self._bounding_rect
-
-    def shape(self) -> QPainterPath:
-        return self._shape_path
-
-    def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
-        painter.setRenderHint(QPainter.Antialiasing)
-        painter.setPen(element_pen)
-        painter.setBrush(element_brush)
-        painter.drawPath(self._border_path)
-
-        if self.isSelected():
-            painter.setPen(highlight_pen)
-            painter.setBrush(highlight_brush)
-
-            path = QPainterPath()
-            path.addRect(self._bounding_rect)
-            painter.fillPath(path, highlight_brush)
-
-            painter.drawPath(self.shape())

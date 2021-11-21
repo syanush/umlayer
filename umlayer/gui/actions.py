@@ -9,7 +9,9 @@ class Actions:
 
     def createActions(self):
         self.newAction = QAction(
-            QIcon('resources/icons/new.png'), '&New', self.window,
+            icon=QIcon('resources/icons/new.png'),
+            text='&New',
+            parent=self.window,
             shortcut=QKeySequence.New,
             statusTip='Create a New Project',
             triggered=self.logic.newProject)
@@ -131,3 +133,8 @@ class Actions:
             QIcon('resources/icons/class_icon.png'), 'Fat class', self.window,
             statusTip='Add class',
             triggered=self.logic.addFatClassElement)
+
+        self.addHandleItemAction = QAction(
+            QIcon('resources/icons/miscellaneous.png'), '', self.window,
+            statusTip='Add handle',
+            triggered=self.logic.addHandleItem)

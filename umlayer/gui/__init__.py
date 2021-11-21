@@ -15,6 +15,7 @@ highlight_pen = QPen(Qt.black, 3, Qt.DotLine)
 highlight_brush = QBrush(QColor(0, 0, 0, 0))
 
 # order is important
+from .gui_utils import snap
 from .base_element import BaseElement, Abilities
 from .text_item import TextItem
 from .text_element import TextElement
