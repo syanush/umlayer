@@ -1,4 +1,5 @@
 from PySide6.QtCore import *
+from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
 from . import *
@@ -30,17 +31,14 @@ class HandleItem(QGraphicsObject):
     def shape(self) -> QPainterPath:
         return self._shape_path
 
-    normal_pen = QPen(Qt.black, 1)
-    selected_pen = QPen(Qt.blue, 1)
-
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
         if not self._is_live:
             return
         painter.setRenderHint(QPainter.Antialiasing)
         is_selected = self.isSelected()
-        pen = self.selected_pen if is_selected else self.normal_pen
+        pen = Settings.HANDLE_SELECTED_PEN if is_selected else Settings.HANDLE_NORMAL_PEN
         painter.setPen(pen)
-        brush = highlight_brush if is_selected else element_brush
+        brush = Settings.highlight_brush if is_selected else Settings.element_brush
         painter.setBrush(brush)
         painter.drawEllipse(self._bounding_rect)
 

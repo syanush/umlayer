@@ -1,13 +1,11 @@
 from PySide6.QtCore import *
+from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
 from . import *
 
 
 class NoteElement(QAbstractGraphicsShapeItem, BaseElement):
-    padding = 5
-    delta = 15
-
     def __init__(self, text: str = None, center=False, dx: float = 0, dy: float = 0, parent=None) -> None:
         super().__init__(parent)
         super(BaseElement, self).__init__()
@@ -42,17 +40,17 @@ class NoteElement(QAbstractGraphicsShapeItem, BaseElement):
 
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
         painter.setRenderHint(QPainter.Antialiasing)
-        painter.setPen(element_pen)
-        painter.setBrush(element_brush)
+        painter.setPen(Settings.element_pen)
+        painter.setBrush(Settings.element_brush)
         painter.drawPath(self._border_path)
 
         if self.isSelected():
-            painter.setPen(highlight_pen)
-            painter.setBrush(highlight_brush)
+            painter.setPen(Settings.highlight_pen)
+            painter.setBrush(Settings.highlight_brush)
 
             path = QPainterPath()
             path.addRect(self._bounding_rect)
-            painter.fillPath(path, highlight_brush)
+            painter.fillPath(path, Settings.highlight_brush)
 
             painter.drawPath(self.shape())
 
@@ -67,33 +65,33 @@ class NoteElement(QAbstractGraphicsShapeItem, BaseElement):
         self.prepareGeometryChange()
         text = self._text or ''
         self._text_item.setText(text)
-        self._text_item.setPos(self.padding, self.padding)
+        self._text_item.setPos(Settings.ELEMENT_PADDING, Settings.ELEMENT_PADDING)
         br = self._text_item.boundingRect()
-        width = 2 * self.padding + br.width() + self._dx + self.delta
-        height = 2 * self.padding + br.height() + self._dy
+        width = 2 * Settings.ELEMENT_PADDING + br.width() + self._dx + Settings.NOTE_DELTA
+        height = 2 * Settings.ELEMENT_PADDING + br.height() + self._dy
         self._bounding_rect = QRectF(0, 0, width, height)
 
         br = self._bounding_rect
         x = br.width()
         y = br.height()
         path = QPainterPath()
-        path.moveTo(x - self.delta, 0)
+        path.moveTo(x - Settings.NOTE_DELTA, 0)
         path.lineTo(0, 0)
         path.lineTo(0, y)
         path.lineTo(x, y)
-        path.lineTo(x, self.delta)
-        path.lineTo(x - self.delta, 0)
+        path.lineTo(x, Settings.NOTE_DELTA)
+        path.lineTo(x - Settings.NOTE_DELTA, 0)
         self._shape_path = path
 
         path = QPainterPath()
-        path.moveTo(x - self.delta, 0)
+        path.moveTo(x - Settings.NOTE_DELTA, 0)
         path.lineTo(0, 0)
         path.lineTo(0, y)
         path.lineTo(x, y)
-        path.lineTo(x, self.delta)
-        path.lineTo(x - self.delta, self.delta)
-        path.lineTo(x - self.delta, 0)
-        path.lineTo(x, self.delta)
+        path.lineTo(x, Settings.NOTE_DELTA)
+        path.lineTo(x - Settings.NOTE_DELTA, Settings.NOTE_DELTA)
+        path.lineTo(x - Settings.NOTE_DELTA, 0)
+        path.lineTo(x, Settings.NOTE_DELTA)
         self._border_path = path
 
         self.update()

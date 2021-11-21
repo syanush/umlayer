@@ -1,4 +1,5 @@
 from PySide6.QtCore import *
+from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
 from . import *
@@ -56,7 +57,7 @@ class TextItem(QGraphicsItem):
         """
 
         pd = self.get_painting_device()
-        fm = QFontMetrics(element_font, pd=pd)
+        fm = QFontMetrics(Settings.element_font, pd=pd)
         rect = fm.boundingRect(text)
         improved_rect = fm.boundingRect(rect, 0, text)
         width = improved_rect.width()
@@ -83,9 +84,9 @@ class TextItem(QGraphicsItem):
         return self._bounding_rect
 
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
-        painter.setFont(element_font)
-        painter.setPen(element_pen)
-        painter.setBrush(element_brush)
+        painter.setFont(Settings.element_font)
+        painter.setPen(Settings.element_pen)
+        painter.setBrush(Settings.element_brush)
         # painter.drawRect(self._bounding_rect)  # for debugging
         n = len(self._lines)
         if n > 0:

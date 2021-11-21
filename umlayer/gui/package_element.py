@@ -1,13 +1,11 @@
 from PySide6.QtCore import *
+from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
 from . import *
 
 
 class PackageElement(QAbstractGraphicsShapeItem, BaseElement):
-    padding = 5
-    min2 = 20
-
     def __init__(self, text: str = None, dx: float = 0, dy: float = 0, parent=None) -> None:
         super().__init__(parent)
         super(BaseElement, self).__init__()
@@ -42,14 +40,14 @@ class PackageElement(QAbstractGraphicsShapeItem, BaseElement):
 
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
         painter.setRenderHint(QPainter.Antialiasing)
-        painter.setPen(element_pen)
-        painter.setBrush(element_brush)
+        painter.setPen(Settings.element_pen)
+        painter.setBrush(Settings.element_brush)
         painter.drawRect(self._rect1)
         painter.drawRect(self._rect2)
 
         if self.isSelected():
-            painter.setPen(highlight_pen)
-            painter.setBrush(highlight_brush)
+            painter.setPen(Settings.highlight_pen)
+            painter.setBrush(Settings.highlight_brush)
 
             # br = QPainterPath()
             # br.addRect(self._bounding_rect)
@@ -73,15 +71,15 @@ class PackageElement(QAbstractGraphicsShapeItem, BaseElement):
 
         self._text_item1.setText(self._text1)
         self._text_item2.setText(self._text2)
-        self._text_item1.setPos(self.padding, self.padding)
+        self._text_item1.setPos(Settings.ELEMENT_PADDING, Settings.ELEMENT_PADDING)
         br1 = self._text_item1.boundingRect()
-        size1_x = br1.width() + 2 * self.padding
-        size1_y = br1.height() + 2 * self.padding
+        size1_x = br1.width() + 2 * Settings.ELEMENT_PADDING
+        size1_y = br1.height() + 2 * Settings.ELEMENT_PADDING
         self._size1 = QPointF(size1_x, size1_y)
-        self._text_item2.setPos(self.padding, self.padding + size1_y)
+        self._text_item2.setPos(Settings.ELEMENT_PADDING, Settings.ELEMENT_PADDING + size1_y)
         br2 = self._text_item2.boundingRect()
-        size2_x = max(br2.width() + 2 * self.padding + self._dx, size1_x + self.min2 + self._dx)
-        size2_y = br2.height() + 2 * self.padding + self._dy
+        size2_x = max(br2.width() + 2 * Settings.ELEMENT_PADDING + self._dx, size1_x + Settings.HANDLE_MIN2 + self._dx)
+        size2_y = br2.height() + 2 * Settings.ELEMENT_PADDING + self._dy
         self._size2 = QPointF(size2_x, size2_y)
         width = max(size1_x, size2_x)
         height = size1_y + size2_y

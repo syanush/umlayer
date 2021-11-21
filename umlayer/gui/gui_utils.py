@@ -1,5 +1,8 @@
+from . import *
+
+
 def snap(x, block_size=10):
-    return round(x / block_size) * block_size
+    return round(x / Settings.BLOCK_SIZE) * Settings.BLOCK_SIZE
 
 
 def split_to_sections(text) -> list[str]:

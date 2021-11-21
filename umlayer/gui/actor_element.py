@@ -1,4 +1,5 @@
 from PySide6.QtCore import *
+from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
 from . import *
@@ -6,7 +7,6 @@ from .. import model
 
 
 class ActorElement(QGraphicsItemGroup, BaseElement):
-    padding = 5
     actor_width = 30
     actor_height = 65
 
@@ -51,7 +51,7 @@ class ActorElement(QGraphicsItemGroup, BaseElement):
 
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
         is_selected = option.state & QStyle.State_Selected
-        pen = highlight_pen if is_selected else QPen(QColor(255, 255, 255, 255), 3)
+        pen = Settings.highlight_pen if is_selected else Settings.ACTOR_ELEMENT_PEN
         painter.setPen(pen)
         painter.drawPath(self.shape())
 
@@ -78,7 +78,7 @@ class ActorElement(QGraphicsItemGroup, BaseElement):
         text_width = br.width()
 
         text_x = 1 + (self.actor_width - text_width) / 2
-        text_y = self.actor_height + self.padding
+        text_y = self.actor_height + Settings.ELEMENT_PADDING
         self._text_item.setPos(text_x, text_y)
 
         self._bounding_rect = QRectF(0, 0, self.actor_width, self.actor_height)

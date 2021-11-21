@@ -1,20 +1,5 @@
-from PySide6.QtGui import *
-
-element_font = QFont('Monospace', 9)
-#element_font = QFont('Serif', 9)
-#element_font = QFont('SansSerif', 9)
-element_font.setStyleHint(QFont.TypeWriter)
-
-element_color = Qt.black
-element_brush_color = Qt.white
-element_pen = QPen(element_color, 1, Qt.SolidLine)
-element_brush = QBrush(QColor(0, 0, 0, 0))
-
-highlight_color = QColor(12, 27, 51, 0)
-highlight_pen = QPen(Qt.black, 3, Qt.DotLine)
-highlight_brush = QBrush(QColor(0, 0, 0, 0))
-
 # order is important
+from .settings import Settings
 from .gui_utils import snap
 from .base_element import BaseElement, Abilities
 from .text_item import TextItem

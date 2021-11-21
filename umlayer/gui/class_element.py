@@ -1,4 +1,5 @@
 from PySide6.QtCore import *
+from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
 from . import *
@@ -6,8 +7,6 @@ from . import gui_utils
 
 
 class ClassElement(QAbstractGraphicsShapeItem, BaseElement):
-    padding = 5
-
     def __init__(self, text: str = '', dx: float = 0, dy: float = 0, parent=None) -> None:
         super().__init__(parent)
         super(BaseElement, self).__init__()
@@ -37,18 +36,18 @@ class ClassElement(QAbstractGraphicsShapeItem, BaseElement):
         return self._bounding_rect
 
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
-        painter.setPen(element_pen)
-        painter.setBrush(element_brush)
+        painter.setPen(Settings.element_pen)
+        painter.setBrush(Settings.element_brush)
         for compartment in self._compartments:
             painter.drawRect(compartment)
 
         if self.isSelected():
-            painter.setPen(highlight_pen)
-            painter.setBrush(highlight_brush)
+            painter.setPen(Settings.highlight_pen)
+            painter.setBrush(Settings.highlight_brush)
 
             br = QPainterPath()
             br.addRect(self._bounding_rect)
-            painter.fillPath(br, highlight_brush)
+            painter.fillPath(br, Settings.highlight_brush)
 
             painter.drawPath(self.shape())
 
@@ -78,8 +77,8 @@ class ClassElement(QAbstractGraphicsShapeItem, BaseElement):
 
     def _get_rect(self, item: TextItem) -> QRectF:
         br = item.boundingRect()
-        width = br.width() + 2.0 * self.padding
-        height = br.height() + 2.0 * self.padding
+        width = br.width() + 2.0 * Settings.ELEMENT_PADDING
+        height = br.height() + 2.0 * Settings.ELEMENT_PADDING
         rect = QRectF(0.0, 0.0, width, height)
         return rect
 
@@ -140,13 +139,13 @@ class ClassElement(QAbstractGraphicsShapeItem, BaseElement):
                 x = compartment.x() + (compartment.width() - item.boundingRect().width()) / 2
             else:
                 # Left-align other items
-                x = compartment.x() + self.padding
-            y = compartment.y() + self.padding
+                x = compartment.x() + Settings.ELEMENT_PADDING
+            y = compartment.y() + Settings.ELEMENT_PADDING
             item.setPos(x, y)
 
     def _getMaxHeight(self) -> float:
         """Return the total height of all compartments"""
         n = len(self._texts)
-        height = 2.0 * self.padding if n == 0 else \
+        height = 2.0 * Settings.ELEMENT_PADDING if n == 0 else \
             sum(compartment.height() for compartment in self._compartments)
         return height

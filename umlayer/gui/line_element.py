@@ -1,14 +1,11 @@
 from PySide6.QtCore import *
+from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
 from . import *
 
 
 class LineElement(QGraphicsItem):
-    diameter = 40
-    normal_pen = QPen(Qt.black, 1)
-    selected_pen = QPen(Qt.blue, 1)
-
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
@@ -44,7 +41,7 @@ class LineElement(QGraphicsItem):
 
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
         painter.setRenderHint(QPainter.Antialiasing)
-        pen = self.selected_pen if self.isSelected() else self.normal_pen
+        pen = Settings.LINE_SELECTED_PEN if self.isSelected() else Settings.LINE_NORMAL_PEN
         painter.setPen(pen)
         point1 = self._point1
         point2 = self._point2

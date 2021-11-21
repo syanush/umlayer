@@ -1,9 +1,6 @@
-from PySide6.QtCore import *
 from PySide6.QtWidgets import *
 
 from . import *
-
-BLOCK_SIZE = 10
 
 
 class GraphicsScene(QGraphicsScene):
@@ -21,18 +18,18 @@ class GraphicsScene(QGraphicsScene):
         Y = self.sceneRect().y()
         width = int(self.sceneRect().width())
         height = int(self.sceneRect().height())
-        num_blocks_x = int(width / BLOCK_SIZE)
-        num_blocks_y = int(height / BLOCK_SIZE)
+        num_blocks_x = int(width / Settings.BLOCK_SIZE)
+        num_blocks_y = int(height / Settings.BLOCK_SIZE)
         self.setItemIndexMethod(QGraphicsScene.NoIndex)  # Is it devastating for the app?
 
-        pen = QPen(Qt.gray, 1, Qt.SolidLine)
+        pen = Settings.GRID_PEN
 
         for x in range(0, num_blocks_x + 1):
-            xc = X + x * BLOCK_SIZE
+            xc = X + x * Settings.BLOCK_SIZE
             self.lines.append(self.addLine(xc, Y, xc, height, pen))
 
         for y in range(0, num_blocks_y + 1):
-            yc = Y + y * BLOCK_SIZE
+            yc = Y + y * Settings.BLOCK_SIZE
             self.lines.append(self.addLine(X, yc, width, yc, pen))
 
     def set_grid_visible(self, visible=True):

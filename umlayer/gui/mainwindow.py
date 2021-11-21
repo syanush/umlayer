@@ -1,6 +1,7 @@
 import logging
 
 from PySide6.QtCore import *
+from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
 from .. import model
@@ -99,7 +100,7 @@ class MainWindow(QMainWindow):
         propertyWindow = QDockWidget('Property editor', self)
         self.propertyView = QPlainTextEdit()
         self.propertyView.textChanged.connect(self.on_text_changed)
-        self.propertyView.setFont(element_font)
+        self.propertyView.setFont(Settings.element_font)
         self.propertyView.setWordWrapMode(QTextOption.NoWrap)
         self.propertyView.setEnabled(False)
         propertyWindow.setWidget(self.propertyView)

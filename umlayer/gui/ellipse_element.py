@@ -1,4 +1,5 @@
 from PySide6.QtCore import *
+from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
 from . import *
@@ -40,16 +41,16 @@ class EllipseElement(QGraphicsItem, BaseElement):
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
         painter.setRenderHint(QPainter.Antialiasing)
 
-        painter.setPen(element_pen)
-        painter.setBrush(element_brush)
+        painter.setPen(Settings.element_pen)
+        painter.setBrush(Settings.element_brush)
         painter.drawEllipse(0, 0, self._width, self._height)
 
         if self.isSelected():
-            painter.setPen(highlight_pen)
-            painter.setBrush(highlight_brush)
+            painter.setPen(Settings.highlight_pen)
+            painter.setBrush(Settings.highlight_brush)
             br = QPainterPath()
             br.addRect(self._bounding_rect)
-            painter.fillPath(br, highlight_brush)
+            painter.fillPath(br, Settings.highlight_brush)
             painter.drawPath(self.shape())
 
     def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
