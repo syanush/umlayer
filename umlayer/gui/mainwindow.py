@@ -1,4 +1,5 @@
 import logging
+import pprint
 
 from PySide6.QtCore import *
 from PySide6.QtGui import *
@@ -65,10 +66,11 @@ class MainWindow(QMainWindow):
     def createToolBar(self):
         self.aToolBar: QToolBar = self.addToolBar('Main')
         self.aToolBar.addAction(self.actions.newAction)
-        # self.aToolBar.addSeparator()
+        self.aToolBar.addSeparator()
+        # self.aToolBar.addAction(self.actions.cutAction)
         # self.aToolBar.addAction(self.actions.copyAction)
         # self.aToolBar.addAction(self.actions.pasteAction)
-        self.aToolBar.addSeparator()
+        # self.aToolBar.addSeparator()
         self.aToolBar.addAction(self.actions.addActorElementAction)
         self.aToolBar.addAction(self.actions.addEllipseElementAction)
         self.aToolBar.addAction(self.actions.addLineElementAction)
@@ -79,6 +81,7 @@ class MainWindow(QMainWindow):
         self.aToolBar.addAction(self.actions.addSimpleClassElementAction)
         self.aToolBar.addAction(self.actions.addFatClassElementAction)
         self.aToolBar.addAction(self.actions.addPackageElementAction)
+        self.aToolBar.addAction(self.actions.printSceneElementsAction)
         # self.aToolBar.addAction(self.actions.addHandleItemAction)
 
     def createStatusBar(self):
@@ -128,7 +131,7 @@ class MainWindow(QMainWindow):
     def createCentralWidget(self):
         scene_size = 2000
         self.scene: GraphicsScene = \
-            GraphicsScene(-scene_size//2, -scene_size//2, scene_size, scene_size)
+            GraphicsScene(-scene_size//2, -scene_size//2, scene_size, scene_size, parent=self)
 
         self.scene.selectionChanged.connect(self.on_scene_selection_changed)
 
@@ -175,9 +178,9 @@ class MainWindow(QMainWindow):
         self.fileMenu.addAction(self.actions.closeAction)
         self.fileMenu.addSeparator()
         self.fileMenu.addAction(self.actions.exitAction)
-        self.editMenu.addAction(self.actions.copyAction)
+        # self.editMenu.addAction(self.actions.copyAction)
         self.fileMenu.addSeparator()
-        self.editMenu.addAction(self.actions.pasteAction)
+        # self.editMenu.addAction(self.actions.pasteAction)
         self.helpMenu.addAction(self.actions.aboutAction)
 
     def center(self):

@@ -13,6 +13,12 @@ class GuiLogic:
         self.project = window.project
         self.project_logic = window.project_logic
 
+        self.temp_list = []
+
+    @property
+    def scene(self):
+        return self.window.scene
+
     def newProject(self):
         logging.info('Action: New')
         if not self.closeProject():
@@ -145,6 +151,12 @@ class GuiLogic:
     def exitApp(self):
         self.window.close()
 
+    def delete(self):
+        raise NotImplementedError
+
+    def cut(self):
+        raise NotImplementedError
+
     def copy(self):
         raise NotImplementedError
 
@@ -206,6 +218,9 @@ class GuiLogic:
     def printElements(self):
         self.project.printElements()
 
+    def printSceneElements(self):
+        self.window.scene.printItems()
+
     def on_element_selection_changed(self, selected_elements, deselected_elements):
         if deselected_elements:
             self.on_deselect_element(deselected_elements[0])
@@ -238,7 +253,7 @@ class GuiLogic:
 
     def userElementFromDto(self, dto):
         element = ActorElement()
-        element.setDataFromDto(dto)
+        element.setFromDto(dto)
         element.setFlags(QGraphicsItem.ItemIsMovable | QGraphicsItem.ItemIsSelectable)
         return element
 
@@ -256,7 +271,46 @@ class GuiLogic:
         item = self.window.treeView.getSelectedItem()
         if item is None:
             return
-        self.on_element_selection_changed(
-            self.elementsFromSelection(selected),
-            self.elementsFromSelection(deselected),
-        )
+        selected_elements = self.elementsFromSelection(selected)
+        deselected_elements = self.elementsFromSelection(deselected)
+        self.on_element_selection_changed(selected_elements, deselected_elements)
+
+    def copy_selected_elements(self):
+        elements = self.get_selected_elements()
+        self.store_elements_in_queue(elements)
+
+    def delete_selected_elements(self):
+        elements = self.get_selected_elements()
+        self._remove_elements(elements)
+
+    def cut_selected_elements(self):
+        elements = self.get_selected_elements()
+        self.store_elements_in_queue(elements)
+        self._remove_elements(elements)
+
+    def paste_elements(self):
+        self.scene.deselectAll()
+        elements = [BaseElement.fromJson(json_dto) for json_dto in self.temp_list]
+        for element in elements:
+            # TODO: reposition elements here
+            # element.setPos(QPointF(x, y))
+            self.scene.addItem(element)
+            element.setSelected(True)
+
+    def get_selected_elements(self):
+        return [item for item in self.scene.selectedItems()
+                if isinstance(item, BaseElement)]
+
+    def store_elements_in_queue(self, elements):
+        self.temp_list.clear()
+        # text = ''
+        for item in elements:
+            json_dto = item.toJson()
+            self.temp_list.append(json_dto)
+            # print(json_dto)
+            # text += json_dto + '\n'
+        # self.window.elementsView.setText(text)
+
+    def _remove_elements(self, elements):
+        for element in elements:
+            self.scene.removeItem(element)

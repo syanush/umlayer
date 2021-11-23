@@ -32,6 +32,15 @@ class NoteElement(QAbstractGraphicsShapeItem, BaseElement):
         self._text = text
         self._recalculate()
 
+    def toDto(self):
+        dto = super().toDto()
+        dto['text'] = self.text()
+        return dto
+
+    def setFromDto(self, dto: dict):
+        super().setFromDto(dto)
+        self.setText(dto['text'])
+
     def boundingRect(self) -> QRectF:
         return self._bounding_rect
 

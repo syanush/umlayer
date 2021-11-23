@@ -1,3 +1,4 @@
+from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
 from . import *
@@ -12,6 +13,14 @@ class GraphicsScene(QGraphicsScene):
         self.set_grid_opacity(0.2)
         # self.set_grid_visible(False)
         # self.delete_grid()
+
+    @property
+    def window(self):
+        return self.parent()
+
+    def deselectAll(self):
+        for item in self.selectedItems():
+            item.setSelected(False)
 
     def draw_grid(self):
         X = self.sceneRect().x()
@@ -31,6 +40,9 @@ class GraphicsScene(QGraphicsScene):
         for y in range(0, num_blocks_y + 1):
             yc = Y + y * Settings.BLOCK_SIZE
             self.lines.append(self.addLine(X, yc, width, yc, pen))
+
+        for line in self.lines:
+            line.setData(ITEM_TYPE, 'grid')
 
     def set_grid_visible(self, visible=True):
         for line in self.lines:
@@ -101,3 +113,20 @@ class GraphicsScene(QGraphicsScene):
         item.setLive(True)
         item.setPos(x, y)
         self.addItem(item)
+
+    def keyPressEvent(self, event: QKeyEvent):
+        super().keyPressEvent(event)
+        if event.key() == Qt.Key_Delete and event.modifiers() == Qt.NoModifier:
+            self.window.logic.delete_selected_elements()
+        elif event.key() == Qt.Key_X and event.modifiers() == Qt.ControlModifier:
+            self.window.logic.cut_selected_elements()
+        elif event.key() == Qt.Key_C and event.modifiers() == Qt.ControlModifier:
+            self.window.logic.copy_selected_elements()
+        elif event.key() == Qt.Key_V and event.modifiers() == Qt.ControlModifier:
+            self.window.logic.paste_elements()
+
+    def printItems(self):
+        items = [item for item in self.items()
+                 if item.data(ITEM_TYPE) != 'grid']
+        for i, item in enumerate(items):
+            print(i, item)

@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
 
-class ActorElementModel(BaseModel):
+class ActorModel(BaseModel):
     x: float
     y: float

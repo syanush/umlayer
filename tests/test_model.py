@@ -1,6 +1,23 @@
 import unittest
+import json
+import jsonpickle
 
-from umlayer import model, storage
+from marshmallow import Schema, fields
+from pprint import pprint
+
+from umlayer import gui, model, storage
+
+
+class TestFolder(unittest.TestCase):
+    def test_serialize_folder(self):
+        folder = model.Folder()
+        folder.name = 'Folder 1'
+        FolderSchema = Schema.from_dict({'name': fields.Str()})
+        schema = FolderSchema()
+        dto = schema.dump(folder)
+        print(json.dumps(dto))
+        print(jsonpickle.encode(dto))
+        print(jsonpickle.encode(folder))
 
 
 class TestDiagram(unittest.TestCase):

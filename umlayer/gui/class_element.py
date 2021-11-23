@@ -32,6 +32,20 @@ class ClassElement(QAbstractGraphicsShapeItem, BaseElement):
         self._text = text
         self._recalculate()
 
+    def toDto(self):
+        dto = super().toDto()
+        dto['text'] = self.text()
+        dto['dx'] = self._dx
+        dto['dy'] = self._dy
+        self._recalculate()
+        return dto
+
+    def setFromDto(self, dto: dict):
+        super().setFromDto(dto)
+        self.setText(dto['text'])
+        self._dx = dto['dx']
+        self._dy = dto['dy']
+
     def boundingRect(self) -> QRectF:
         return self._bounding_rect
 

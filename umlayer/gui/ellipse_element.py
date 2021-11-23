@@ -6,8 +6,7 @@ from . import *
 
 
 class EllipseElement(QGraphicsItem, BaseElement):
-
-    def __init__(self, width: int, height:int, text: str = None, parent=None) -> None:
+    def __init__(self, width: int = 10, height: int = 10, text: str = None, parent=None) -> None:
         super().__init__(parent)
         super(BaseElement, self).__init__()
         self._abilities = set([Abilities.EDITABLE_TEXT])
@@ -31,6 +30,33 @@ class EllipseElement(QGraphicsItem, BaseElement):
     def setText(self, text):
         self._text = text
         self._recalculate()
+
+    def width(self):
+        return self._width
+
+    def setWidth(self, width):
+        self._width = width
+        self._recalculate()
+
+    def height(self):
+        return self._height
+
+    def setHeight(self, height):
+        self._height = height
+        self._recalculate()
+
+    def toDto(self):
+        dto = super().toDto()
+        dto['text'] = self.text()
+        dto['width'] = self.width()
+        dto['height'] = self.height()
+        return dto
+
+    def setFromDto(self, dto: dict):
+        super().setFromDto(dto)
+        self.setText(dto['text'])
+        self.setWidth(dto['width'])
+        self.setHeight(dto['height'])
 
     def boundingRect(self) -> QRectF:
         return self._bounding_rect

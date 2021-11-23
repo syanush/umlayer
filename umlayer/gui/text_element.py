@@ -34,6 +34,17 @@ class TextElement(QGraphicsItem, BaseElement):
         self._center = center
         self._recalculate()
 
+    def toDto(self):
+        dto = super().toDto()
+        dto['text'] = self._text
+        dto['center'] = self._center
+        return dto
+
+    def setFromDto(self, dto: dict):
+        super().setFromDto(dto)
+        self.setText(dto['text'])
+        self.setCenter(dto['center'])
+
     def _recalculate(self):
         self.prepareGeometryChange()
         text = self._text or ''

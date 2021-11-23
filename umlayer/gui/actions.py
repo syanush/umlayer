@@ -46,16 +46,28 @@ class Actions:
             statusTip='Quit the Application',
             triggered=self.logic.exitApp)
 
+        self.deleteAction = QAction(
+            QIcon('resources/icons/delete.png'), '&Delete', self.window,
+            shortcut="Delete",
+            statusTip="Delete",
+            triggered=self.logic.delete)
+
+        self.cutAction = QAction(
+            QIcon('resources/icons/cut.png'), 'Cut', self.window,
+            shortcut='Ctrl+X',
+            statusTip='Cut (Ctrl-X)',
+            triggered=self.logic.cut)
+
         self.copyAction = QAction(
             QIcon('resources/icons/copy.png'), 'C&opy', self.window,
             shortcut='Ctrl+C',
-            statusTip='Copy',
+            statusTip='Copy (Ctrl-C)',
             triggered=self.logic.copy)
 
         self.pasteAction = QAction(
             QIcon('resources/icons/paste.png'), '&Paste', self.window,
             shortcut='Ctrl+V',
-            statusTip='Paste',
+            statusTip='Paste (Ctrl-V)',
             triggered=self.logic.paste)
 
         self.aboutAction = QAction(
@@ -67,6 +79,11 @@ class Actions:
             QIcon('resources/icons/cache.png'), 'Print', self.window,
             statusTip='print',
             triggered=self.logic.printElements)
+
+        self.printSceneElementsAction = QAction(
+            QIcon('resources/icons/cache.png'), 'Print', self.window,
+            statusTip='print scene elements',
+            triggered=self.logic.printSceneElements)
 
         self.createDiagramAction = QAction(
             QIcon('resources/icons/diagram.png'), 'Create diagram', self.window,

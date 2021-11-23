@@ -3,14 +3,13 @@ from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
 from . import *
-from .. import model
 
 
 class ActorElement(QGraphicsItemGroup, BaseElement):
     actor_width = 30
     actor_height = 65
 
-    def __init__(self, text: str, parent=None):
+    def __init__(self, text: str = '', parent=None):
         super().__init__(parent)
         super(BaseElement, self).__init__()
         self._abilities = set([Abilities.EDITABLE_TEXT])
@@ -19,7 +18,7 @@ class ActorElement(QGraphicsItemGroup, BaseElement):
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges, True)
 
         # serializable data
-        self._text = text
+        self._text = text or ''
         # end of serializable data
 
         self._text_item = TextItem(self._text, center=True, parent=self)
@@ -62,12 +61,14 @@ class ActorElement(QGraphicsItemGroup, BaseElement):
             return QPointF(gui_utils.snap(value.x()), gui_utils.snap(value.y()))
         return super().itemChange(change, value)
 
-    def getDataAsDto(self):
-        self.flags()
-        return model.ActorElementModel(x=self.pos().x(), y=self.pos().y())
+    def toDto(self):
+        dto = super().toDto()
+        dto['text'] = self._text
+        return dto
 
-    def setDataFromDto(self, dto: model.ActorElementModel):
-        self.setPos(QPointF(dto.x, dto.y))
+    def setFromDto(self, dto: dict):
+        super().setFromDto(dto)
+        self.setText(dto['text'])
 
     def _recalculate(self):
         self.prepareGeometryChange()

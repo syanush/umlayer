@@ -5,24 +5,24 @@ from PySide6.QtWidgets import *
 from . import *
 
 
-class LineElement(QGraphicsItem):
-    def __init__(self, parent=None):
+class LineElement(QGraphicsItem, BaseElement):
+    def __init__(self, x1: float = 0, y1: float = 0, x2: float = 100, y2: float = 100, parent=None):
         super().__init__(parent)
+        super(BaseElement, self).__init__()
+        self._abilities = set()
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges, True)
 
-        self._point1 = QPointF(0, 0)
-        self._point2 = QPointF(100, 100)
+        self._point1 = QPointF(x1, y1)
+        self._point2 = QPointF(x2, y2)
 
         self._handle1 = HandleItem(10, parent=self)
-        self._handle1.setPos(self._point1)
         self._handle1.position_changed_signal.connect(self._handle1_position_changed)
         self._handle1.selection_changed_signal.connect(self._handle_selection_changed)
         self._handle1.setSelected(False)
 
         self._handle2 = HandleItem(10, parent=self)
-        self._handle2.setPos(self._point2)
         self._handle2.position_changed_signal.connect(self._handle2_position_changed)
         self._handle2.selection_changed_signal.connect(self._handle_selection_changed)
         self._handle2.setSelected(False)
@@ -31,6 +31,20 @@ class LineElement(QGraphicsItem):
         self.stroker.setWidth(15)
 
         self.setLive(False)
+        self._recalculate()
+
+    def toDto(self):
+        dto = super().toDto()
+        dto['x1'] = self._point1.x()
+        dto['y1'] = self._point1.y()
+        dto['x2'] = self._point2.x()
+        dto['y2'] = self._point2.y()
+        return dto
+
+    def setFromDto(self, dto: dict):
+        super().setFromDto(dto)
+        self._point1 = QPointF(dto['x1'], dto['y1'])
+        self._point2 = QPointF(dto['x2'], dto['y2'])
         self._recalculate()
 
     def boundingRect(self) -> QRectF:
@@ -82,6 +96,8 @@ class LineElement(QGraphicsItem):
 
     def _recalculate(self):
         self.prepareGeometryChange()
+        self._handle1.setPos(self._point1)
+        self._handle2.setPos(self._point2)
 
         x1 = self._point1.x()
         y1 = self._point1.y()

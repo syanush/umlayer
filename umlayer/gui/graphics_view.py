@@ -15,7 +15,7 @@ class GraphicsView(QGraphicsView):
         self.setRubberBandSelection()
 
     def getMainWindow(self):
-        # TODO: simpler method?
+        # TODO: more robust method?
         return self.parent().parent()
 
     def setPanning(self):
