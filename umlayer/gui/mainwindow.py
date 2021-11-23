@@ -60,6 +60,7 @@ class MainWindow(QMainWindow):
     def initGUI(self):
         logging.info('GUI initialization started')
         self.setupComponents()
+        self.treeView.selectRoot()
         self.updateTitle()
         logging.info('GUI initialization finished')
 
@@ -81,7 +82,7 @@ class MainWindow(QMainWindow):
         self.aToolBar.addAction(self.actions.addSimpleClassElementAction)
         self.aToolBar.addAction(self.actions.addFatClassElementAction)
         self.aToolBar.addAction(self.actions.addPackageElementAction)
-        self.aToolBar.addAction(self.actions.printSceneElementsAction)
+        # self.aToolBar.addAction(self.actions.printSceneElementsAction)
         # self.aToolBar.addAction(self.actions.addHandleItemAction)
 
     def createStatusBar(self):
@@ -207,7 +208,7 @@ class MainWindow(QMainWindow):
         if item is None:
             return
 
-        element = self.treeView.elementFromItem(item)
+        element = self.treeView.projectItemFromItem(item)
 
         menu = QMenu(self.treeView)
 
@@ -235,11 +236,11 @@ class MainWindow(QMainWindow):
 
         self.sti = StandardItemModel()
         self.treeView.setModel(self.sti)
+        self.treeView.selectionModel().selectionChanged.connect(self.logic.on_selection_changed)
         self.treeView.updateTreeDataModel()
 
-        self.treeView.selectionModel().selectionChanged.connect(self.logic.on_selection_changed)
 
         shortcut = QShortcut(QKeySequence.Delete,
                              self.treeView,
                              context=Qt.WidgetShortcut,
-                             activated=self.logic.deleteElement)
+                             activated=self.logic.deleteProjectItem)

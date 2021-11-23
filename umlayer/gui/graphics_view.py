@@ -29,6 +29,21 @@ class GraphicsView(QGraphicsView):
         self.setInteractive(True)
         # self.setCursor(Qt.ArrowCursor)
 
+    def scrollData(self):
+        h: QScrollBar = self.horizontalScrollBar()
+        v: QScrollBar = self.verticalScrollBar()
+        return h.value(), h.minimum(), h.maximum(), v.value(), v.minimum(), v.maximum()
+
+    def setScrollData(self, hv, hmin, hmax, vv, vmin, vmax):
+        h: QScrollBar = self.horizontalScrollBar()
+        v: QScrollBar = self.verticalScrollBar()
+        h.setMinimum(hmin)
+        h.setMaximum(hmax)
+        h.setValue(hv)
+        v.setMinimum(vmin)
+        v.setMaximum(vmax)
+        v.setValue(vv)
+
     def mousePressEvent(self, event):
         if event.button() == Qt.MiddleButton:
             # Must precede fake event handling

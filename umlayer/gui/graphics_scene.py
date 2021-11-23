@@ -130,3 +130,17 @@ class GraphicsScene(QGraphicsScene):
                  if item.data(ITEM_TYPE) != 'grid']
         for i, item in enumerate(items):
             print(i, item)
+
+    def selectedElements(self):
+        return self._filter_elements(self.selectedItems())
+
+    def elements(self):
+        return self._filter_elements(self.items())
+
+    def _filter_elements(self, items):
+        return [item for item in items
+                if isinstance(item, BaseElement)]
+
+    def clearElements(self):
+        for element in self.elements():
+            self.removeItem(element)

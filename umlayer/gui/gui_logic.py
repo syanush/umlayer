@@ -167,17 +167,17 @@ class GuiLogic:
         QMessageBox.about(self.window, "About ...", "About window")
 
     def createDiagram(self):
-        self._createElement(self.project_logic.create_diagram)
+        self._createProjectItem(self.project_logic.create_diagram)
 
     def createFolder(self):
-        self._createElement(self.project_logic.create_folder)
+        self._createProjectItem(self.project_logic.create_folder)
 
-    def _createElement(self, create_method):
-        self.window.treeView.createElement(create_method)
+    def _createProjectItem(self, create_method):
+        self.window.treeView.createProjectItem(create_method)
         self.window.updateTitle()
 
-    def deleteElement(self):
-        self.window.treeView.deleteElement()
+    def deleteProjectItem(self):
+        self.window.treeView.deleteProjectItem()
         self.window.updateTitle()
         self._printStats()
 
@@ -215,77 +215,84 @@ class GuiLogic:
         print('number of elements', self.project.count())
         print('number of items', self.window.sti.count())
 
-    def printElements(self):
-        self.project.printElements()
+    def printProjectItems(self):
+        self.project.printProjectItems()
 
     def printSceneElements(self):
         self.window.scene.printItems()
 
-    def on_element_selection_changed(self, selected_elements, deselected_elements):
-        if deselected_elements:
-            self.on_deselect_element(deselected_elements[0])
-        if selected_elements:
-            self.on_select_element(selected_elements[0])
+    def on_project_item_selection_changed(self, selected_items, deselected_items):
+        if deselected_items:
+            self.on_deselect_project_item(deselected_items[0])
+        if selected_items:
+            self.on_select_project_item(selected_items[0])
 
-    def on_deselect_element(self, element):
-        if isinstance(element, model.Diagram):
-            self.storeSceneTo(element)
-            self.window.scene.clear()
+    def on_deselect_project_item(self, project_item):
+        if isinstance(project_item, model.Diagram):
+            self.storeSceneTo(project_item)
+            self.window.scene.clearElements()
 
-    def on_select_element(self, element):
-        self.buildSceneFrom(element)
+    def on_select_project_item(self, project_item):
+        if isinstance(project_item, model.Diagram):
+            self.enableScene()
+            self.buildSceneFrom(project_item)
+        elif isinstance(project_item, model.Folder):
+            self.disableScene()
+        else:
+            raise NotImplementedError
 
-    def storeSceneTo(self, element):
-        element.dtos.clear()
-        for item in self.window.scene.items():
-            if isinstance(item, ActorElement):
-                dto = item.getDataAsDto()
-                element.dtos.append(dto)
+    def disableScene(self):
+        self.window.actions.enableElementActions(False)
+        self.scene.set_grid_visible(False)
+        self.window.centralWidget.setEnabled(False)
 
-    def buildSceneFrom(self, element):
-        if not isinstance(element, model.Diagram):
-            return
-        for dto in element.dtos:
-            element = self.userElementFromDto(dto)
-            # TODO: see addUserElement
-            self.window.scene.addItem(element)
-            print(element)
+    def enableScene(self):
+        self.window.centralWidget.setEnabled(True)
+        self.scene.set_grid_visible(True)
+        self.window.actions.enableElementActions(True)
 
-    def userElementFromDto(self, dto):
-        element = ActorElement()
-        element.setFromDto(dto)
-        element.setFlags(QGraphicsItem.ItemIsMovable | QGraphicsItem.ItemIsSelectable)
-        return element
+    def storeSceneTo(self, project_item):
+        project_item.dtos.clear()
+        for item in self.window.scene.elements():
+            json_dto = item.toJson()
+            project_item.dtos.append(json_dto)
+        hv, hmin, hmax, vv, vmin, vmax = self.window.sceneView.scrollData()
+        project_item.scroll_data = [hv, hmin, hmax, vv, vmin, vmax]
 
-    def elementsFromSelection(self, selection):
+    def buildSceneFrom(self, project_item):
+        for json_dto in project_item.dtos:
+            element = BaseElement.fromJson(json_dto)
+            self.scene.addItem(element)
+        if project_item.scroll_data is not None:
+            hv, hmin, hmax, vv, vmin, vmax = project_item.scroll_data
+            self.window.sceneView.setScrollData(hv, hmin, hmax, vv, vmin, vmax)
+
+    def on_selection_changed(self, selected: QItemSelection, deselected: QItemSelection):
+        selected_project_items = self._elementsFromSelection(selected)
+        deselected_project_items = self._elementsFromSelection(deselected)
+        self.on_project_item_selection_changed(selected_project_items, deselected_project_items)
+
+    def _elementsFromSelection(self, selection):
         result = []
         for index in selection.indexes():
             item = self.window.sti.itemFromIndex(index)
             if item is None:
                 continue
-            element = self.window.treeView.elementFromItem(item)
+            element = self.window.treeView.projectItemFromItem(item)
             result.append(element)
         return tuple(result)
 
-    def on_selection_changed(self, selected: QItemSelection, deselected: QItemSelection):
-        item = self.window.treeView.getSelectedItem()
-        if item is None:
-            return
-        selected_elements = self.elementsFromSelection(selected)
-        deselected_elements = self.elementsFromSelection(deselected)
-        self.on_element_selection_changed(selected_elements, deselected_elements)
-
     def copy_selected_elements(self):
-        elements = self.get_selected_elements()
-        self.store_elements_in_queue(elements)
+        elements = self.scene.selectedElements()
+        self.serialize_elements_to_temp_storage(elements)
 
     def delete_selected_elements(self):
-        elements = self.get_selected_elements()
+        elements = self.scene.selectedElements()
         self._remove_elements(elements)
 
     def cut_selected_elements(self):
-        elements = self.get_selected_elements()
-        self.store_elements_in_queue(elements)
+        elements = self.scene.selectedElements()
+        self.serialize_elements_to_temp_storage(elements)
         self._remove_elements(elements)
 
     def paste_elements(self):
@@ -297,19 +304,11 @@ class GuiLogic:
             self.scene.addItem(element)
             element.setSelected(True)
 
-    def get_selected_elements(self):
-        return [item for item in self.scene.selectedItems()
-                if isinstance(item, BaseElement)]
-
-    def store_elements_in_queue(self, elements):
+    def serialize_elements_to_temp_storage(self, elements):
         self.temp_list.clear()
-        # text = ''
         for item in elements:
             json_dto = item.toJson()
             self.temp_list.append(json_dto)
-            # print(json_dto)
-            # text += json_dto + '\n'
-        # self.window.elementsView.setText(text)
 
     def _remove_elements(self, elements):
         for element in elements:

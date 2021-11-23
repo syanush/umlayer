@@ -78,7 +78,7 @@ class Actions:
         self.printElementsAction = QAction(
             QIcon('resources/icons/cache.png'), 'Print', self.window,
             statusTip='print',
-            triggered=self.logic.printElements)
+            triggered=self.logic.printProjectItems)
 
         self.printSceneElementsAction = QAction(
             QIcon('resources/icons/cache.png'), 'Print', self.window,
@@ -99,7 +99,7 @@ class Actions:
             QIcon('resources/icons/delete.png'), 'Delete element', self.window,
             shortcut=QKeySequence.Delete,
             statusTip='Delete element',
-            triggered=self.logic.deleteElement)
+            triggered=self.logic.deleteProjectItem)
 
         self.addActorElementAction = QAction(
             QIcon('resources/icons/user_element.svg'), 'Actor', self.window,
@@ -155,3 +155,15 @@ class Actions:
             QIcon('resources/icons/miscellaneous.png'), '', self.window,
             statusTip='Add handle',
             triggered=self.logic.addHandleItem)
+
+    def enableElementActions(self, enable):
+        self.addActorElementAction.setEnabled(enable)
+        self.addEllipseElementAction.setEnabled(enable)
+        self.addLineElementAction.setEnabled(enable)
+        self.addRelationshipElementAction.setEnabled(enable)
+        self.addTextElementAction.setEnabled(enable)
+        self.addCenteredTextElementAction.setEnabled(enable)
+        self.addNoteElementAction.setEnabled(enable)
+        self.addSimpleClassElementAction.setEnabled(enable)
+        self.addFatClassElementAction.setEnabled(enable)
+        self.addPackageElementAction.setEnabled(enable)
