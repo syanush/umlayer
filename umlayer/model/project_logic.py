@@ -14,11 +14,11 @@ class ProjectLogic:
         self.project.setRoot(root)
         self.project.add(Diagram("Diagram 1"), root.id)
         self.project.add(Diagram("Diagram 2"), root.id)
-        self.project.is_dirty = False
+        self.project.setDirty(False)
 
     def clear_project(self):
         self.project = Project()
-        self.project.is_dirty = False
+        self.project.setDirty(False)
 
     def get_project(self):
         return self.project
@@ -52,7 +52,7 @@ class ProjectLogic:
             raise ValueError('filename is None')
 
         self.storage.save(self.project.elements.values(), filename)
-        self.project.is_dirty = False
+        self.project.setDirty(False)
 
     def load(self, filename: str):
         """Loads project data and settings from a file
@@ -69,4 +69,4 @@ class ProjectLogic:
             if element.id != root.id:
                 self.project.add(element, element.parent_id)
 
-        self.project.is_dirty = False
+        self.project.setDirty(False)

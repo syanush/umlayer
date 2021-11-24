@@ -9,13 +9,17 @@ class StandardItemModel(QStandardItemModel):
         super().__init__()
         self.setHorizontalHeaderLabels([''])
         self.setSortRole(Qt.DisplayRole)
+        self._root_item = None
 
-    @property
     def root_item(self):
-        return self.item(0)
+        return self._root_item  # self.item(0)
+
+    def updateItemModel(self, project):
+        self._root_item = self.itemize(project.root, project)
+        self.appendRow([self._root_item])
 
     def count(self):
-        return 1 + self._countChildren(self.root_item.index())
+        return 1 + self._countChildren(self.root_item().index())
 
     def _countChildren(self, index) -> int:
         count = rowCount = self.rowCount(index)
@@ -24,16 +28,16 @@ class StandardItemModel(QStandardItemModel):
         return count
 
     @staticmethod
-    def makeItem(element):
-        element_type_to_icon_file = {
+    def makeItem(project_item: model.Element):
+        project_item_type_to_icon_file = {
             model.Folder: 'resources/icons/folder.png',
             model.Diagram: 'resources/icons/diagram.png'
         }
 
-        item = QStandardItem(element.name)
-        item.setData(element.id, Qt.UserRole)
-        element_type = type(element)
-        item.setIcon(QIcon(element_type_to_icon_file[element_type]))
+        item = QStandardItem(project_item.name())
+        item.setData(project_item.id, Qt.UserRole)
+        element_type = type(project_item)
+        item.setIcon(QIcon(project_item_type_to_icon_file[element_type]))
         return item
 
     @staticmethod

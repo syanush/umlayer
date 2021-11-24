@@ -7,7 +7,14 @@ class Project:
     def __init__(self):
         self.elements = {}
         self.root = None
-        self.is_dirty = False
+        self._is_dirty = False
+
+    def dirty(self):
+        return self._is_dirty
+
+    def setDirty(self, dirty):
+        # print(f'{self._is_dirty=}')
+        self._is_dirty = dirty
 
     def setRoot(self, root: Element):
         self._add(root)
@@ -17,7 +24,7 @@ class Project:
         if element_id not in self.elements.keys():
             raise AttributeError("element_id")
         self._remove(element_id)
-        self.is_dirty = True
+        self.setDirty(True)
 
     def _remove(self, element_id: UUID = None):
         for child in self.children(element_id):
@@ -28,7 +35,7 @@ class Project:
         if parent_id not in self.elements.keys():
             raise AttributeError("parent_id")
         self._add(element, parent_id)
-        self.is_dirty = True
+        self.setDirty(True)
 
     def _add(self, element: Element, parent_id: UUID = None):
         element.parent_id = parent_id

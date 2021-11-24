@@ -8,7 +8,7 @@ from . import *
 class LineElement(QGraphicsItem, BaseElement):
     def __init__(self, x1: float = 0, y1: float = 0, x2: float = 100, y2: float = 100, parent=None):
         super().__init__(parent)
-        super(BaseElement, self).__init__()
+        BaseElement.__init__(self)
         self._abilities = set()
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
@@ -67,6 +67,7 @@ class LineElement(QGraphicsItem, BaseElement):
         # painter.drawPath(self.shape())
 
     def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
+        self.positionNotify(change)
         if self.scene() and \
                 change == QGraphicsItem.ItemPositionChange and \
                 QApplication.mouseButtons() == Qt.LeftButton:
@@ -89,10 +90,12 @@ class LineElement(QGraphicsItem, BaseElement):
     def _handle1_position_changed(self, point):
         self._point1 = point
         self._recalculate()
+        self.notify()
 
     def _handle2_position_changed(self, point):
         self._point2 = point
         self._recalculate()
+        self.notify()
 
     def _recalculate(self):
         self.prepareGeometryChange()

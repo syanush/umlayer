@@ -57,42 +57,56 @@ class GraphicsScene(QGraphicsScene):
         for line in self.lines:
             line.setOpacity(opacity)
 
-    def addActorElement(self, x: float, y: float):
+    def addActorElement(self, x: float, y: float, notify):
         item = ActorElement('Actor')
+        item.setNotify(notify)
         item.setPos(x, y)
         self.addItem(item)
+        notify()
 
-    def addPackageElement(self, x: float, y: float):
+    def addPackageElement(self, x: float, y: float, notify):
         item = PackageElement('Package 1\n--\nFunctional\nPerformant')
+        item.setNotify(notify)
         item.setPos(x, y)
         self.addItem(item)
+        notify()
 
-    def addEllipseElement(self, x: float, y: float):
+    def addEllipseElement(self, x: float, y: float, notify):
         item = EllipseElement(150, 50, 'Use Case 1')
+        item.setNotify(notify)
         item.setPos(x, y)
         self.addItem(item)
+        notify()
 
-    def addNoteElement(self, x: float, y: float):
+    def addNoteElement(self, x: float, y: float, notify):
         item = NoteElement('Note..')
+        item.setNotify(notify)
         item.setPos(x, y)
         self.addItem(item)
+        notify()
 
-    def addTextElement(self, x: float, y: float):
+    def addTextElement(self, x: float, y: float, notify):
         item = TextElement('Left-aligned\ntext')
+        item.setNotify(notify)
         item.setPos(x, y)
         self.addItem(item)
+        notify()
 
-    def addCenteredTextElement(self, x: float, y: float):
+    def addCenteredTextElement(self, x: float, y: float, notify):
         item = TextElement('Centered\ntext', center=True)
+        item.setNotify(notify)
         item.setPos(x, y)
         self.addItem(item)
+        notify()
 
-    def addSimpleClassElement(self, x: float, y: float):
+    def addSimpleClassElement(self, x: float, y: float, notify):
         item = ClassElement('SimpleClass')
+        item.setNotify(notify)
         item.setPos(x, y)
         self.addItem(item)
+        notify()
 
-    def addFatClassElement(self, x: float, y: float):
+    def addFatClassElement(self, x: float, y: float, notify):
         text = '''FatClass
 --
 -task_name
@@ -100,13 +114,17 @@ class GraphicsScene(QGraphicsScene):
 +set_task_name(name: string)\n+run_asynchronously(monitor: Monitor)'''
 
         item = ClassElement(text)
+        item.setNotify(notify)
         item.setPos(x, y)
         self.addItem(item)
+        notify()
 
-    def addLineElement(self, x: float, y: float):
+    def addLineElement(self, x: float, y: float, notify):
         item = LineElement()
+        item.setNotify(notify)
         item.setPos(x, y)
         self.addItem(item)
+        notify()
 
     def addHandleItem(self, x: float, y: float):
         item = HandleItem(10)

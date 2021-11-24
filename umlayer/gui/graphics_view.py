@@ -14,7 +14,8 @@ class GraphicsView(QGraphicsView):
         self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
         self.setRubberBandSelection()
 
-    def getMainWindow(self):
+    @property
+    def window(self):
         # TODO: more robust method?
         return self.parent().parent()
 

@@ -1,6 +1,7 @@
 import logging
 
 from PySide6.QtCore import *
+from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
 from .. import model
@@ -8,12 +9,24 @@ from . import *
 
 
 class GuiLogic:
-    def __init__(self, window):
-        self.window = window
-        self.project = window.project
-        self.project_logic = window.project_logic
-
+    def __init__(self):
         self.temp_list = []
+
+    def _notify(self):
+        if not self.project.dirty():
+            self.project.setDirty(True)
+            self.window.updateTitle()
+
+    def setWindow(self, window):
+        self.window = window
+
+    @property
+    def project_logic(self):
+        return self.window.project_logic
+
+    @property
+    def project(self):
+        return self.window.project
 
     @property
     def scene(self):
@@ -24,9 +37,13 @@ class GuiLogic:
         if not self.closeProject():
             return
         self.project_logic.new_project()
-        self.window.treeView.updateTreeDataModel()
+        self.updateTreeDataModel(self.project)
         self.window.filename = model.constants.DEFAULT_FILENAME
         self.window.updateTitle()
+
+    def updateTreeDataModel(self, project):
+        self.window.sti.updateItemModel(project)
+        self.window.treeView.setInitialState()
 
     def openProject(self):
         logging.info('Action: Open')
@@ -71,7 +88,7 @@ class GuiLogic:
 
     def _doOpenProject(self, filename):
         self.project_logic.load(filename)
-        self.window.treeView.updateTreeDataModel()
+        self.updateTreeDataModel(self.project_logic.project)
 
     def saveProject(self):
         filename = self._getFileNameFromSaveDialog('Save') \
@@ -133,7 +150,7 @@ class GuiLogic:
         return True
 
     def saveFileIfNeeded(self) -> bool:
-        if not self.project.is_dirty:
+        if not self.project.dirty():
             return True
 
         reply = QMessageBox.question(
@@ -172,44 +189,81 @@ class GuiLogic:
     def createFolder(self):
         self._createProjectItem(self.project_logic.create_folder)
 
-    def _createProjectItem(self, create_method):
-        self.window.treeView.createProjectItem(create_method)
+    def _createProjectItem(self, project_item_creation_method):
+        parent_item: QStandardItem = self.window.treeView.getSelectedItem()
+        parent_index = parent_item.index()
+
+        self.window.treeView.expand(parent_index)
+
+        parent_id = parent_item.data(Qt.UserRole)
+        project_item = project_item_creation_method(parent_id)
+        item = StandardItemModel.makeItem(project_item)
+
+        parent_item.insertRow(0, [item])
+        self.window.treeView.startEditName(item)
         self.window.updateTitle()
 
-    def deleteProjectItem(self):
-        self.window.treeView.deleteProjectItem()
+    def deleteSelectedItem(self):
+        item: QStandardItem = self.window.treeView.getSelectedItem()
+        if item is None:
+            return
+        id = item.data(Qt.UserRole)
+        self.project_logic.delete_element(id)
+        index = item.index()
+        self.window.sti.removeRow(index.row(), index.parent())
         self.window.updateTitle()
-        self._printStats()
+
+    def finishNameEditing(self):
+        item: QStandardItem = self.window.treeView.getSelectedItem()
+        id = item.data(Qt.UserRole)
+        project_item = self.project.get(id)
+        if project_item.name != item.text():
+            project_item.name = item.text()
+            self.project.is_dirty = True
+        parent_item = item.parent()
+        parent_item.sortChildren(0, Qt.SortOrder.AscendingOrder)
+        self.window.treeView.scrollTo(item.index())
+
+    def _projectItemsFromSelection(self, selection):
+        result = []
+        for index in selection.indexes():
+            item = self.window.sti.itemFromIndex(index)
+            if item is None:
+                continue
+            id = item.data(Qt.UserRole)
+            project_item = self.project.get(id)
+            result.append(project_item)
+        return tuple(result)
 
     def addActorElement(self):
-        self.window.scene.addActorElement(50, 50)
+        self.window.scene.addActorElement(50, 50, self._notify)
 
     def addPackageElement(self):
-        self.window.scene.addPackageElement(-20, -20)
+        self.window.scene.addPackageElement(-20, -20, self._notify)
 
     def addEllipseElement(self):
-        self.window.scene.addEllipseElement(0, 0)
+        self.window.scene.addEllipseElement(0, 0, self._notify)
 
     def addNoteElement(self):
-        self.window.scene.addNoteElement(0, 0)
+        self.window.scene.addNoteElement(0, 0, self._notify)
 
     def addTextElement(self):
-        self.window.scene.addTextElement(0, 0)
+        self.window.scene.addTextElement(0, 0, self._notify)
 
     def addCenteredTextElement(self):
-        self.window.scene.addCenteredTextElement(0, 0)
+        self.window.scene.addCenteredTextElement(0, 0, self._notify)
 
     def addSimpleClassElement(self):
-        self.window.scene.addSimpleClassElement(0, 0)
+        self.window.scene.addSimpleClassElement(0, 0, self._notify)
 
     def addFatClassElement(self):
-        self.window.scene.addFatClassElement(0, 0)
+        self.window.scene.addFatClassElement(0, 0, self._notify)
 
     def addHandleItem(self):
         self.window.scene.addHandleItem(50, 50)
 
     def addLineElement(self):
-        self.window.scene.addLineElement(0, 0)
+        self.window.scene.addLineElement(0, 0, self._notify)
 
     def _printStats(self):
         print('number of elements', self.project.count())
@@ -236,20 +290,25 @@ class GuiLogic:
         if isinstance(project_item, model.Diagram):
             self.enableScene()
             self.buildSceneFrom(project_item)
+            # w: QWidget = self.window.centralWidget
+            #
+            # w.focusNextChild()
+            s: QGraphicsScene = self.scene
+            s.setFocus(Qt.FocusReason.ActiveWindowFocusReason)
         elif isinstance(project_item, model.Folder):
             self.disableScene()
         else:
             raise NotImplementedError
 
     def disableScene(self):
-        self.window.actions.enableElementActions(False)
+        self.window.app_actions.enableElementActions(False)
         self.scene.set_grid_visible(False)
         self.window.centralWidget.setEnabled(False)
 
     def enableScene(self):
         self.window.centralWidget.setEnabled(True)
         self.scene.set_grid_visible(True)
-        self.window.actions.enableElementActions(True)
+        self.window.app_actions.enableElementActions(True)
 
     def storeSceneTo(self, project_item):
         project_item.dtos.clear()
@@ -262,25 +321,17 @@ class GuiLogic:
     def buildSceneFrom(self, project_item):
         for json_dto in project_item.dtos:
             element = BaseElement.fromJson(json_dto)
+            # TODO: override addItem and move setNotify there
+            element.setNotify(self._notify)
             self.scene.addItem(element)
         if project_item.scroll_data is not None:
             hv, hmin, hmax, vv, vmin, vmax = project_item.scroll_data
             self.window.sceneView.setScrollData(hv, hmin, hmax, vv, vmin, vmax)
 
     def on_selection_changed(self, selected: QItemSelection, deselected: QItemSelection):
-        selected_project_items = self._elementsFromSelection(selected)
-        deselected_project_items = self._elementsFromSelection(deselected)
+        selected_project_items = self._projectItemsFromSelection(selected)
+        deselected_project_items = self._projectItemsFromSelection(deselected)
         self.on_project_item_selection_changed(selected_project_items, deselected_project_items)
-
-    def _elementsFromSelection(self, selection):
-        result = []
-        for index in selection.indexes():
-            item = self.window.sti.itemFromIndex(index)
-            if item is None:
-                continue
-            element = self.window.treeView.projectItemFromItem(item)
-            result.append(element)
-        return tuple(result)
 
     def copy_selected_elements(self):
         elements = self.scene.selectedElements()
@@ -301,6 +352,7 @@ class GuiLogic:
         for element in elements:
             # TODO: reposition elements here
             # element.setPos(QPointF(x, y))
+            element.setNotify(self._notify)
             self.scene.addItem(element)
             element.setSelected(True)
 

@@ -19,7 +19,8 @@ def run_application():
 
     store = storage.ProjectStorageImpl()
     project_logic = model.ProjectLogic(store)
-    main_window = gui.MainWindow(project_logic)
+    logic = gui.GuiLogic()
+    main_window = gui.MainWindow(project_logic, logic)
     app.setActiveWindow(main_window)
     main_window.show()
 

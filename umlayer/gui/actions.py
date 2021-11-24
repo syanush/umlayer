@@ -95,11 +95,11 @@ class Actions:
             statusTip='Create folder',
             triggered=self.logic.createFolder)
 
-        self.deleteElementAction = QAction(
-            QIcon('resources/icons/delete.png'), 'Delete element', self.window,
+        self.deleteProjectItemAction = QAction(
+            QIcon('resources/icons/delete.png'), 'Delete project item', self.window,
             shortcut=QKeySequence.Delete,
-            statusTip='Delete element',
-            triggered=self.logic.deleteProjectItem)
+            statusTip='Delete project item',
+            triggered=self.logic.deleteSelectedItem)
 
         self.addActorElementAction = QAction(
             QIcon('resources/icons/user_element.svg'), 'Actor', self.window,

@@ -8,7 +8,7 @@ from . import *
 class TextElement(QGraphicsItem, BaseElement):
     def __init__(self, text: str = None, center: bool = False, parent=None) -> None:
         super().__init__(parent)
-        super(BaseElement, self).__init__()
+        BaseElement.__init__(self)
         self._abilities = set([Abilities.EDITABLE_TEXT])
 
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
@@ -27,12 +27,19 @@ class TextElement(QGraphicsItem, BaseElement):
         return self._text
 
     def setText(self, text: str):
-        self._text = text
-        self._recalculate()
+        if self._text != text:
+            self._text = text
+            self._recalculate()
+            self.notify()
+
+    def center(self):
+        return self._center
 
     def setCenter(self, center: bool):
-        self._center = center
-        self._recalculate()
+        if self._center != center:
+            self._center = center
+            self._recalculate()
+            self.notify()
 
     def toDto(self):
         dto = super().toDto()
@@ -44,14 +51,6 @@ class TextElement(QGraphicsItem, BaseElement):
         super().setFromDto(dto)
         self.setText(dto['text'])
         self.setCenter(dto['center'])
-
-    def _recalculate(self):
-        self.prepareGeometryChange()
-        text = self._text or ''
-        self._text_item.setText(text)
-        self._text_item.setCenter(self._center)
-        self._bounding_rect = self._text_item.boundingRect()
-        self.update()
 
     def boundingRect(self) -> QRectF:
         return self._bounding_rect
@@ -68,8 +67,17 @@ class TextElement(QGraphicsItem, BaseElement):
             painter.drawPath(self.shape())
 
     def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
+        self.positionNotify(change)
         if self.scene() and \
                 change == QGraphicsItem.ItemPositionChange and \
                 QApplication.mouseButtons() == Qt.LeftButton:
             return QPointF(gui_utils.snap(value.x()), gui_utils.snap(value.y()))
         return super().itemChange(change, value)
+
+    def _recalculate(self):
+        self.prepareGeometryChange()
+        text = self._text or ''
+        self._text_item.setText(text)
+        self._text_item.setCenter(self._center)
+        self._bounding_rect = self._text_item.boundingRect()
+        self.update()

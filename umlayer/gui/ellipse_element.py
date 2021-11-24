@@ -8,7 +8,7 @@ from . import *
 class EllipseElement(QGraphicsItem, BaseElement):
     def __init__(self, width: int = 10, height: int = 10, text: str = None, parent=None) -> None:
         super().__init__(parent)
-        super(BaseElement, self).__init__()
+        BaseElement.__init__(self)
         self._abilities = set([Abilities.EDITABLE_TEXT])
 
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
@@ -27,23 +27,29 @@ class EllipseElement(QGraphicsItem, BaseElement):
     def text(self):
         return self._text
 
-    def setText(self, text):
-        self._text = text
-        self._recalculate()
+    def setText(self, text: str):
+        if self._text != text:
+            self._text = text
+            self._recalculate()
+            self.notify()
 
     def width(self):
         return self._width
 
     def setWidth(self, width):
-        self._width = width
-        self._recalculate()
+        if self._width != width:
+            self._width = width
+            self._recalculate()
+            self.notify()
 
     def height(self):
         return self._height
 
     def setHeight(self, height):
-        self._height = height
-        self._recalculate()
+        if self._height != height:
+            self._height = height
+            self._recalculate()
+            self.notify()
 
     def toDto(self):
         dto = super().toDto()
@@ -80,6 +86,7 @@ class EllipseElement(QGraphicsItem, BaseElement):
             painter.drawPath(self.shape())
 
     def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
+        self.positionNotify(change)
         if self.scene() and \
                 change == QGraphicsItem.ItemPositionChange and \
                 QApplication.mouseButtons() == Qt.LeftButton:

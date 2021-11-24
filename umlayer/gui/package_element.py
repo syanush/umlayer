@@ -8,7 +8,7 @@ from . import *
 class PackageElement(QAbstractGraphicsShapeItem, BaseElement):
     def __init__(self, text: str = None, dx: float = 0, dy: float = 0, parent=None) -> None:
         super().__init__(parent)
-        super(BaseElement, self).__init__()
+        BaseElement.__init__(self)
         self._abilities = set([Abilities.EDITABLE_TEXT])
 
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
@@ -28,9 +28,11 @@ class PackageElement(QAbstractGraphicsShapeItem, BaseElement):
     def text(self):
         return self._text
 
-    def setText(self, text):
-        self._text = text
-        self._recalculate()
+    def setText(self, text: str):
+        if self._text != text:
+            self._text = text
+            self._recalculate()
+            self.notify()
 
     def toDto(self):
         dto = super().toDto()
@@ -70,6 +72,7 @@ class PackageElement(QAbstractGraphicsShapeItem, BaseElement):
             painter.drawPath(self.shape())
 
     def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
+        self.positionNotify(change)
         if self.scene() and \
                 change == QGraphicsItem.ItemPositionChange and \
                 QApplication.mouseButtons() == Qt.LeftButton:

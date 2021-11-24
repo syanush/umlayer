@@ -13,10 +13,13 @@ class MainWindow(QMainWindow):
     """Main window of the UMLayer application
     """
 
-    def __init__(self, project_logic, *args, **kwargs):
+    def __init__(self, project_logic, logic, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.project_logic = project_logic
+        self.logic = logic
+        logic.setWindow(self)
+
         self.readSettings()
         self.setDefaultFileName()
         self.initGUI()
@@ -54,34 +57,35 @@ class MainWindow(QMainWindow):
         logging.info('Settings loading finished')
 
     def updateTitle(self):
-        title = model.utils.build_window_title(self.filename, self.project.is_dirty)
+        title = model.utils.build_window_title(self.filename, self.project.dirty())
         self.setWindowTitle(title)
 
     def initGUI(self):
         logging.info('GUI initialization started')
         self.setupComponents()
-        self.treeView.selectRoot()
+        self.treeView.selectionModel().selectionChanged.connect(self.logic.on_selection_changed)
+        self.logic.updateTreeDataModel(self.project)
         self.updateTitle()
         logging.info('GUI initialization finished')
 
     def createToolBar(self):
         self.aToolBar: QToolBar = self.addToolBar('Main')
-        self.aToolBar.addAction(self.actions.newAction)
+        self.aToolBar.addAction(self.app_actions.newAction)
         self.aToolBar.addSeparator()
         # self.aToolBar.addAction(self.actions.cutAction)
         # self.aToolBar.addAction(self.actions.copyAction)
         # self.aToolBar.addAction(self.actions.pasteAction)
         # self.aToolBar.addSeparator()
-        self.aToolBar.addAction(self.actions.addActorElementAction)
-        self.aToolBar.addAction(self.actions.addEllipseElementAction)
-        self.aToolBar.addAction(self.actions.addLineElementAction)
-        self.aToolBar.addAction(self.actions.addRelationshipElementAction)
-        self.aToolBar.addAction(self.actions.addTextElementAction)
-        self.aToolBar.addAction(self.actions.addCenteredTextElementAction)
-        self.aToolBar.addAction(self.actions.addNoteElementAction)
-        self.aToolBar.addAction(self.actions.addSimpleClassElementAction)
-        self.aToolBar.addAction(self.actions.addFatClassElementAction)
-        self.aToolBar.addAction(self.actions.addPackageElementAction)
+        self.aToolBar.addAction(self.app_actions.addActorElementAction)
+        self.aToolBar.addAction(self.app_actions.addEllipseElementAction)
+        self.aToolBar.addAction(self.app_actions.addLineElementAction)
+        self.aToolBar.addAction(self.app_actions.addRelationshipElementAction)
+        self.aToolBar.addAction(self.app_actions.addTextElementAction)
+        self.aToolBar.addAction(self.app_actions.addCenteredTextElementAction)
+        self.aToolBar.addAction(self.app_actions.addNoteElementAction)
+        self.aToolBar.addAction(self.app_actions.addSimpleClassElementAction)
+        self.aToolBar.addAction(self.app_actions.addFatClassElementAction)
+        self.aToolBar.addAction(self.app_actions.addPackageElementAction)
         # self.aToolBar.addAction(self.actions.printSceneElementsAction)
         # self.aToolBar.addAction(self.actions.addHandleItemAction)
 
@@ -155,15 +159,13 @@ class MainWindow(QMainWindow):
         """ Initialize visual components
         """
 
-        self.logic = GuiLogic(self)
-
         self.createStatusBar()  # used in actions
         self.createProjectTree()
         self.createElementsWindow()
         self.createPropertyEditor()
         self.createCentralWidget()  # used in actions
 
-        self.actions = Actions(self)
+        self.app_actions = Actions(self)
         self.createMenu()
         self.createToolBar()
 
@@ -172,17 +174,17 @@ class MainWindow(QMainWindow):
         self.editMenu = self.menuBar().addMenu("&Edit")
         self.helpMenu = self.menuBar().addMenu("&Help")
 
-        self.fileMenu.addAction(self.actions.newAction)
-        self.fileMenu.addAction(self.actions.openAction)
-        self.fileMenu.addAction(self.actions.saveAction)
-        self.fileMenu.addAction(self.actions.saveAsAction)
-        self.fileMenu.addAction(self.actions.closeAction)
+        self.fileMenu.addAction(self.app_actions.newAction)
+        self.fileMenu.addAction(self.app_actions.openAction)
+        self.fileMenu.addAction(self.app_actions.saveAction)
+        self.fileMenu.addAction(self.app_actions.saveAsAction)
+        self.fileMenu.addAction(self.app_actions.closeAction)
         self.fileMenu.addSeparator()
-        self.fileMenu.addAction(self.actions.exitAction)
+        self.fileMenu.addAction(self.app_actions.exitAction)
         # self.editMenu.addAction(self.actions.copyAction)
         self.fileMenu.addSeparator()
         # self.editMenu.addAction(self.actions.pasteAction)
-        self.helpMenu.addAction(self.actions.aboutAction)
+        self.helpMenu.addAction(self.app_actions.aboutAction)
 
     def center(self):
         """Center the main window
@@ -208,23 +210,23 @@ class MainWindow(QMainWindow):
         if item is None:
             return
 
-        element = self.treeView.projectItemFromItem(item)
+        element = self.projectItemFromItem(item)
 
         menu = QMenu(self.treeView)
 
         if type(element) is model.Folder:
-            menu.addAction(self.actions.createDiagramAction)
-            menu.addAction(self.actions.createFolderAction)
+            menu.addAction(self.app_actions.createDiagramAction)
+            menu.addAction(self.app_actions.createFolderAction)
             if element.id != self.project.root.id:
-                menu.addAction(self.actions.deleteElementAction)
+                menu.addAction(self.app_actions.deleteProjectItemAction)
         elif type(element) is model.Diagram:
-            menu.addAction(self.actions.deleteElementAction)
+            menu.addAction(self.app_actions.deleteProjectItemAction)
 
         menu.exec(self.treeView.viewport().mapToGlobal(point))
 
-    def elementFromItem(self, item):
-        element_id = item.data(Qt.UserRole)
-        return self.project.get(element_id)
+    def projectItemFromItem(self, item):
+        id = item.data(Qt.UserRole)
+        return self.project.get(id)
 
     def createProjectTree(self):
         treeWindow = QDockWidget('Project', self)
@@ -236,11 +238,8 @@ class MainWindow(QMainWindow):
 
         self.sti = StandardItemModel()
         self.treeView.setModel(self.sti)
-        self.treeView.selectionModel().selectionChanged.connect(self.logic.on_selection_changed)
-        self.treeView.updateTreeDataModel()
-
 
         shortcut = QShortcut(QKeySequence.Delete,
                              self.treeView,
                              context=Qt.WidgetShortcut,
-                             activated=self.logic.deleteProjectItem)
+                             activated=self.logic.deleteSelectedItem)

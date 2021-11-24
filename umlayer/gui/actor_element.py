@@ -10,8 +10,8 @@ class ActorElement(QGraphicsItemGroup, BaseElement):
     actor_height = 65
 
     def __init__(self, text: str = '', parent=None):
-        super().__init__(parent)
-        super(BaseElement, self).__init__()
+        super().__init__(parent=parent)
+        BaseElement.__init__(self)
         self._abilities = set([Abilities.EDITABLE_TEXT])
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
@@ -37,8 +37,10 @@ class ActorElement(QGraphicsItemGroup, BaseElement):
         return self._text_item.text()
 
     def setText(self, text: str):
-        self._text = text
-        self._recalculate()
+        if self._text != text:
+            self._text = text
+            self._recalculate()
+            self.notify()
 
     def boundingRect(self) -> QRectF:
         return self._bounding_rect
@@ -55,6 +57,7 @@ class ActorElement(QGraphicsItemGroup, BaseElement):
         painter.drawPath(self.shape())
 
     def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
+        self.positionNotify(change)
         if self.scene() and \
                 change == QGraphicsItem.ItemPositionChange and \
                 QApplication.mouseButtons() == Qt.LeftButton:

@@ -4,6 +4,7 @@ import json
 from enum import Enum
 
 from PySide6.QtCore import *
+from PySide6.QtWidgets import *
 
 
 class Abilities(Enum):
@@ -11,6 +12,16 @@ class Abilities(Enum):
 
 
 class BaseElement(object):
+    def __init__(self):
+        self.notify = lambda: None
+
+    def positionNotify(self, change):
+        if self.scene() and change == QGraphicsItem.ItemPositionHasChanged:
+            self.notify()
+
+    def setNotify(self, notify):
+        self.notify = notify
+
     def getAbilities(self):
         return self._abilities
 
