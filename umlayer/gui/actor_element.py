@@ -40,7 +40,6 @@ class ActorElement(QGraphicsItemGroup, BaseElement):
         if self._text != text:
             self._text = text
             self._recalculate()
-            self.notify()
 
     def boundingRect(self) -> QRectF:
         return self._bounding_rect
@@ -66,7 +65,7 @@ class ActorElement(QGraphicsItemGroup, BaseElement):
 
     def toDto(self):
         dto = super().toDto()
-        dto['text'] = self._text
+        dto['text'] = self.text()
         return dto
 
     def setFromDto(self, dto: dict):
@@ -88,3 +87,4 @@ class ActorElement(QGraphicsItemGroup, BaseElement):
         self._bounding_rect = QRectF(0, 0, self.actor_width, self.actor_height)
 
         self.update()
+        self.notify()

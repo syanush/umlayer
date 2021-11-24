@@ -34,19 +34,34 @@ class PackageElement(QAbstractGraphicsShapeItem, BaseElement):
             self._recalculate()
             self.notify()
 
+    def deltaX(self):
+        return self._dx
+
+    def setDeltaX(self, dx):
+        if self._dx != dx:
+            self._dx = dx
+            self._recalculate()
+
+    def deltaY(self):
+        return self._dy
+
+    def setDeltaY(self, dy):
+        if self._dy != dy:
+            self._dy = dy
+            self._recalculate()
+
     def toDto(self):
         dto = super().toDto()
         dto['text'] = self.text()
-        dto['dx'] = self._dx
-        dto['dy'] = self._dy
+        dto['dx'] = self.deltaX()
+        dto['dy'] = self.deltaY()
         return dto
 
     def setFromDto(self, dto: dict):
         super().setFromDto(dto)
         self.setText(dto['text'])
-        self._dx = dto['dx']
-        self._dy = dto['dy']
-        self._recalculate()
+        self.setDeltaX(dto['dx'])
+        self.setDeltaY(dto['dy'])
 
     def boundingRect(self) -> QRectF:
         return self._bounding_rect
@@ -125,3 +140,4 @@ class PackageElement(QAbstractGraphicsShapeItem, BaseElement):
         self._shape_path = path
 
         self.update()
+        self.notify()

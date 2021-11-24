@@ -32,16 +32,45 @@ class NoteElement(QAbstractGraphicsShapeItem, BaseElement):
         if self._text != text:
             self._text = text
             self._recalculate()
-            self.notify()
+
+    def center(self):
+        return self._center
+
+    def setCenter(self, center: bool):
+        if self._center != center:
+            self._center = center
+            self._recalculate()
+
+    def deltaX(self):
+        return self._dx
+
+    def setDeltaX(self, dx):
+        if self._dx != dx:
+            self._dx = dx
+            self._recalculate()
+
+    def deltaY(self):
+        return self._dy
+
+    def setDeltaY(self, dy):
+        if self._dy != dy:
+            self._dy = dy
+            self._recalculate()
 
     def toDto(self):
         dto = super().toDto()
         dto['text'] = self.text()
+        dto['center'] = self.center()
+        dto['dx'] = self.deltaX()
+        dto['dy'] = self.deltaY()
         return dto
 
     def setFromDto(self, dto: dict):
         super().setFromDto(dto)
         self.setText(dto['text'])
+        self.setCenter(dto['center'])
+        self.setDeltaX(dto['dx'])
+        self.setDeltaY(dto['dy'])
 
     def boundingRect(self) -> QRectF:
         return self._bounding_rect
@@ -109,3 +138,4 @@ class NoteElement(QAbstractGraphicsShapeItem, BaseElement):
         self._border_path = path
 
         self.update()
+        self.notify()

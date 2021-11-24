@@ -31,7 +31,6 @@ class EllipseElement(QGraphicsItem, BaseElement):
         if self._text != text:
             self._text = text
             self._recalculate()
-            self.notify()
 
     def width(self):
         return self._width
@@ -40,7 +39,6 @@ class EllipseElement(QGraphicsItem, BaseElement):
         if self._width != width:
             self._width = width
             self._recalculate()
-            self.notify()
 
     def height(self):
         return self._height
@@ -49,7 +47,6 @@ class EllipseElement(QGraphicsItem, BaseElement):
         if self._height != height:
             self._height = height
             self._recalculate()
-            self.notify()
 
     def toDto(self):
         dto = super().toDto()
@@ -106,3 +103,4 @@ class EllipseElement(QGraphicsItem, BaseElement):
         path.addEllipse(self._bounding_rect)
         self._shape_path = path
         self.update()
+        self.notify()

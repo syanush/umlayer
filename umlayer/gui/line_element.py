@@ -27,27 +27,43 @@ class LineElement(QGraphicsItem, BaseElement):
         self.stroker = QPainterPathStroker()
         self.stroker.setWidth(15)
 
-        self.setLine(x1, y1, x2, y2)
+        self._point1 = QPointF(0, 0)
+        self._point2 = QPointF(0, 0)
+        self.setPoint1(x1, y1)
+        self.setPoint2(x2, y2)
         self.setLive(False)
-
-    def setLine(self, x1: float = 0, y1: float = 0, x2: float = 0, y2: float = 0):
-        self._point1 = QPointF(x1, y1)
-        self._point2 = QPointF(x2, y2)
         self._recalculate()
+
+    def point1(self):
+        return self._point1
+
+    def setPoint1(self, x1: float, y1: float):
+        point1 = QPointF(x1, y1)
+        if self._point1 != point1:
+            self._point1 = point1
+            self._recalculate()
+
+    def point2(self):
+        return self._point2
+
+    def setPoint2(self, x2, y2):
+        point2 = QPointF(x2, y2)
+        if self._point2 != point2:
+            self._point2 = point2
+            self._recalculate()
 
     def toDto(self):
         dto = super().toDto()
-        dto['x1'] = self._point1.x()
-        dto['y1'] = self._point1.y()
-        dto['x2'] = self._point2.x()
-        dto['y2'] = self._point2.y()
+        dto['x1'] = self.point1().x()
+        dto['y1'] = self.point1().y()
+        dto['x2'] = self.point2().x()
+        dto['y2'] = self.point2().y()
         return dto
 
     def setFromDto(self, dto: dict):
         super().setFromDto(dto)
-        self._point1 = QPointF(dto['x1'], dto['y1'])
-        self._point2 = QPointF(dto['x2'], dto['y2'])
-        self._recalculate()
+        self.setPoint1(dto['x1'], dto['y1'])
+        self.setPoint2(dto['x2'], dto['y2'])
 
     def boundingRect(self) -> QRectF:
         return self._bounding_rect
@@ -59,12 +75,10 @@ class LineElement(QGraphicsItem, BaseElement):
         painter.setRenderHint(QPainter.Antialiasing)
         pen = Settings.LINE_SELECTED_PEN if self.isSelected() else Settings.LINE_NORMAL_PEN
         painter.setPen(pen)
-        point1 = self._point1
-        point2 = self._point2
-        x1 = point1.x()
-        y1 = point1.y()
-        x2 = point2.x()
-        y2 = point2.y()
+        x1 = self.point1().x()
+        y1 = self.point1().y()
+        x2 = self.point2().x()
+        y2 = self.point2().y()
         painter.drawLine(x1, y1, x2, y2)
         # painter.drawPath(self.shape())
 
@@ -90,24 +104,20 @@ class LineElement(QGraphicsItem, BaseElement):
         self.setLive(is_selected)
 
     def _handle1_position_changed(self, point):
-        self._point1 = point
-        self._recalculate()
-        self.notify()
+        self.setPoint1(point.x(), point.y())
 
     def _handle2_position_changed(self, point):
-        self._point2 = point
-        self._recalculate()
-        self.notify()
+        self.setPoint2(point.x(), point.y())
 
     def _recalculate(self):
         self.prepareGeometryChange()
-        self._handle1.setPos(self._point1)
-        self._handle2.setPos(self._point2)
+        self._handle1.setPos(self.point1())
+        self._handle2.setPos(self.point2())
 
-        x1 = self._point1.x()
-        y1 = self._point1.y()
-        x2 = self._point2.x()
-        y2 = self._point2.y()
+        x1 = self.point1().x()
+        y1 = self.point1().y()
+        x2 = self.point2().x()
+        y2 = self.point2().y()
         # IMPORTANT: width and height of the bounding box must be non-negative,
         # to remove painting artifacts
         x = min(x1, x2)

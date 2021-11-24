@@ -30,7 +30,6 @@ class TextElement(QGraphicsItem, BaseElement):
         if self._text != text:
             self._text = text
             self._recalculate()
-            self.notify()
 
     def center(self):
         return self._center
@@ -39,7 +38,6 @@ class TextElement(QGraphicsItem, BaseElement):
         if self._center != center:
             self._center = center
             self._recalculate()
-            self.notify()
 
     def toDto(self):
         dto = super().toDto()
@@ -81,3 +79,4 @@ class TextElement(QGraphicsItem, BaseElement):
         self._text_item.setCenter(self._center)
         self._bounding_rect = self._text_item.boundingRect()
         self.update()
+        self.notify()

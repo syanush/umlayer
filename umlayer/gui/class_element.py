@@ -10,7 +10,7 @@ class ClassElement(QAbstractGraphicsShapeItem, BaseElement):
     def __init__(self, text: str = '', dx: float = 0, dy: float = 0, parent=None) -> None:
         super().__init__(parent)
         BaseElement.__init__(self)
-        self._abilities = set([Abilities.EDITABLE_TEXT])
+        self._abilities = {Abilities.EDITABLE_TEXT}
 
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
@@ -32,21 +32,35 @@ class ClassElement(QAbstractGraphicsShapeItem, BaseElement):
         if self._text != text:
             self._text = text
             self._recalculate()
-            self.notify()
+
+    def deltaX(self):
+        return self._dx
+
+    def setDeltaX(self, dx):
+        if self._dx != dx:
+            self._dx = dx
+            self._recalculate()
+
+    def deltaY(self):
+        return self._dy
+
+    def setDeltaY(self, dy):
+        if self._dy != dy:
+            self._dy = dy
+            self._recalculate()
 
     def toDto(self):
         dto = super().toDto()
         dto['text'] = self.text()
-        dto['dx'] = self._dx
-        dto['dy'] = self._dy
-        self._recalculate()
+        dto['dx'] = self.deltaX()
+        dto['dy'] = self.deltaY()
         return dto
 
     def setFromDto(self, dto: dict):
         super().setFromDto(dto)
         self.setText(dto['text'])
-        self._dx = dto['dx']
-        self._dy = dto['dy']
+        self.setDeltaX(dto['dx'])
+        self.setDeltaY(dto['dy'])
 
     def boundingRect(self) -> QRectF:
         return self._bounding_rect
@@ -92,6 +106,7 @@ class ClassElement(QAbstractGraphicsShapeItem, BaseElement):
         self._bounding_rect = QRectF(0, 0, width, height)
 
         self.update()
+        self.notify()
 
     def _get_rect(self, item: TextItem) -> QRectF:
         br = item.boundingRect()

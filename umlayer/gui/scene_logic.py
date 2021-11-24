@@ -75,7 +75,8 @@ class SceneLogic:
 
     def addLineElement(self):
         item = LineElement()
-        item.setLine(0, 0, 100, 100)
+        item.setPoint1(0, 0)
+        item.setPoint2(100, 100)
         item.setPos(0, 0)
         self.addElement(item)
 
