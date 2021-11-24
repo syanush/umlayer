@@ -6,16 +6,13 @@ from . import *
 
 
 class LineElement(QGraphicsItem, BaseElement):
-    def __init__(self, x1: float = 0, y1: float = 0, x2: float = 100, y2: float = 100, parent=None):
+    def __init__(self, x1: float = 0, y1: float = 0, x2: float = 0, y2: float = 0, parent=None):
         super().__init__(parent)
         BaseElement.__init__(self)
         self._abilities = set()
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges, True)
-
-        self._point1 = QPointF(x1, y1)
-        self._point2 = QPointF(x2, y2)
 
         self._handle1 = HandleItem(10, parent=self)
         self._handle1.position_changed_signal.connect(self._handle1_position_changed)
@@ -30,7 +27,12 @@ class LineElement(QGraphicsItem, BaseElement):
         self.stroker = QPainterPathStroker()
         self.stroker.setWidth(15)
 
+        self.setLine(x1, y1, x2, y2)
         self.setLive(False)
+
+    def setLine(self, x1: float = 0, y1: float = 0, x2: float = 0, y2: float = 0):
+        self._point1 = QPointF(x1, y1)
+        self._point2 = QPointF(x2, y2)
         self._recalculate()
 
     def toDto(self):

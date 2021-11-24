@@ -17,6 +17,7 @@ from .graphics_scene import GraphicsScene
 from .graphics_view import GraphicsView
 from .standard_item_model import StandardItemModel
 from .tree_view import TreeView
+from .scene_logic import SceneLogic
 from .gui_logic import GuiLogic
 from .actions import Actions
 

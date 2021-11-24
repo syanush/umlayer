@@ -13,12 +13,15 @@ class MainWindow(QMainWindow):
     """Main window of the UMLayer application
     """
 
-    def __init__(self, project_logic, logic, *args, **kwargs):
+    def __init__(self, project_logic, logic, scene_logic, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.project_logic = project_logic
         self.logic = logic
-        logic.setWindow(self)
+        self.scene_logic = scene_logic
+
+        self.logic.setWindow(self)
+        self.scene_logic.setWindow(self)
 
         self.readSettings()
         self.setDefaultFileName()
@@ -29,6 +32,11 @@ class MainWindow(QMainWindow):
     @property
     def project(self):
         return self.project_logic.project
+
+    def setDirty(self):
+        if not self.project.dirty():
+            self.project.setDirty(True)
+            self.updateTitle()
 
     def setDefaultFileName(self):
         self.filename = model.constants.DEFAULT_FILENAME

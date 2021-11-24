@@ -57,97 +57,16 @@ class GraphicsScene(QGraphicsScene):
         for line in self.lines:
             line.setOpacity(opacity)
 
-    def addActorElement(self, x: float, y: float, notify):
-        item = ActorElement('Actor')
-        item.setNotify(notify)
-        item.setPos(x, y)
-        self.addItem(item)
-        notify()
-
-    def addPackageElement(self, x: float, y: float, notify):
-        item = PackageElement('Package 1\n--\nFunctional\nPerformant')
-        item.setNotify(notify)
-        item.setPos(x, y)
-        self.addItem(item)
-        notify()
-
-    def addEllipseElement(self, x: float, y: float, notify):
-        item = EllipseElement(150, 50, 'Use Case 1')
-        item.setNotify(notify)
-        item.setPos(x, y)
-        self.addItem(item)
-        notify()
-
-    def addNoteElement(self, x: float, y: float, notify):
-        item = NoteElement('Note..')
-        item.setNotify(notify)
-        item.setPos(x, y)
-        self.addItem(item)
-        notify()
-
-    def addTextElement(self, x: float, y: float, notify):
-        item = TextElement('Left-aligned\ntext')
-        item.setNotify(notify)
-        item.setPos(x, y)
-        self.addItem(item)
-        notify()
-
-    def addCenteredTextElement(self, x: float, y: float, notify):
-        item = TextElement('Centered\ntext', center=True)
-        item.setNotify(notify)
-        item.setPos(x, y)
-        self.addItem(item)
-        notify()
-
-    def addSimpleClassElement(self, x: float, y: float, notify):
-        item = ClassElement('SimpleClass')
-        item.setNotify(notify)
-        item.setPos(x, y)
-        self.addItem(item)
-        notify()
-
-    def addFatClassElement(self, x: float, y: float, notify):
-        text = '''FatClass
---
--task_name
---
-+set_task_name(name: string)\n+run_asynchronously(monitor: Monitor)'''
-
-        item = ClassElement(text)
-        item.setNotify(notify)
-        item.setPos(x, y)
-        self.addItem(item)
-        notify()
-
-    def addLineElement(self, x: float, y: float, notify):
-        item = LineElement()
-        item.setNotify(notify)
-        item.setPos(x, y)
-        self.addItem(item)
-        notify()
-
-    def addHandleItem(self, x: float, y: float):
-        item = HandleItem(10)
-        item.setLive(True)
-        item.setPos(x, y)
-        self.addItem(item)
-
     def keyPressEvent(self, event: QKeyEvent):
         super().keyPressEvent(event)
         if event.key() == Qt.Key_Delete and event.modifiers() == Qt.NoModifier:
-            self.window.logic.delete_selected_elements()
+            self.window.scene_logic.delete_selected_elements()
         elif event.key() == Qt.Key_X and event.modifiers() == Qt.ControlModifier:
-            self.window.logic.cut_selected_elements()
+            self.window.scene_logic.cut_selected_elements()
         elif event.key() == Qt.Key_C and event.modifiers() == Qt.ControlModifier:
-            self.window.logic.copy_selected_elements()
+            self.window.scene_logic.copy_selected_elements()
         elif event.key() == Qt.Key_V and event.modifiers() == Qt.ControlModifier:
-            self.window.logic.paste_elements()
-
-    def printItems(self):
-        items = [item for item in self.items()
-                 if item.data(ITEM_TYPE) != 'grid']
-        for i, item in enumerate(items):
-            print(i, item)
+            self.window.scene_logic.paste_elements()
 
     def selectedElements(self):
         return self._filter_elements(self.selectedItems())
@@ -155,10 +74,16 @@ class GraphicsScene(QGraphicsScene):
     def elements(self):
         return self._filter_elements(self.items())
 
-    def _filter_elements(self, items):
-        return [item for item in items
-                if isinstance(item, BaseElement)]
-
     def clearElements(self):
         for element in self.elements():
             self.removeItem(element)
+
+    def printItems(self):
+        items = [item for item in self.items()
+                 if item.data(ITEM_TYPE) != 'grid']
+        for i, item in enumerate(items):
+            print(i, item)
+
+    def _filter_elements(self, items):
+        return [item for item in items
+                if isinstance(item, BaseElement)]

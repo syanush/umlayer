@@ -24,6 +24,7 @@ class ProjectStorageImpl(model.ProjectStorage):
 
             for element in elements:
                 json_data = jsonpickle.encode(element)
+
                 sql = f"INSERT INTO elements (id, json_data) VALUES ('{str(element.id)}', '{json_data}')"
                 conn.execute(text(sql))
 
