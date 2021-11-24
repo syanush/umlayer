@@ -19,20 +19,22 @@ class SceneLogic:
         self.window.setDirty()
 
     def addActorElement(self):
-        item = ActorElement('Actor')
+        item = ActorElement()
+        item.setText('Actor')
         item.setPos(50, 50)
         self.addElement(item)
 
     def addPackageElement(self):
-        item = PackageElement('Package 1\n--\nFunctional\nPerformant')
+        item = PackageElement()
+        item.setText('Package 1\n--\nFunctional\nPerformant')
         item.setPos(-20, -20)
         self.addElement(item)
 
     def addEllipseElement(self):
         item = EllipseElement()
+        item.setText('Use Case 1')
         item.setWidth(150)
         item.setHeight(50)
-        item.setText('Use Case 1')
         item.setPos(0, 0)
         self.addElement(item)
 
