@@ -9,7 +9,7 @@ class TextElement(QGraphicsItem, BaseElement):
     def __init__(self, text: str = None, center: bool = False, parent=None) -> None:
         super().__init__(parent)
         BaseElement.__init__(self)
-        self._abilities = set([Abilities.EDITABLE_TEXT])
+        self._abilities = {Abilities.EDITABLE_TEXT}
 
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.setFlag(QGraphicsItem.ItemIsMovable, True)

@@ -10,7 +10,7 @@ from .. import model
 
 
 class ProjectStorageImpl(model.ProjectStorage):
-    def save(self, elements: list[model.Element], filepath: str = None):
+    def save(self, project_items: list[model.BaseItem], filepath: str = None):
         if os.path.exists(filepath):
             os.remove(filepath)
 
@@ -22,20 +22,17 @@ class ProjectStorageImpl(model.ProjectStorage):
         with engine.begin() as conn:
             conn.execute(text("CREATE TABLE elements (id text PRIMARY KEY, json_data text)"))
 
-            for element in elements:
-                json_data = jsonpickle.encode(element)
+            for project_item in project_items:
+                json_data = jsonpickle.encode(project_item)
 
-                sql = f"INSERT INTO elements (id, json_data) VALUES ('{str(element.id)}', '{json_data}')"
+                sql = f"INSERT INTO elements (id, json_data) VALUES ('{str(project_item.id)}', '{json_data}')"
                 conn.execute(text(sql))
 
-    def load(self, filepath: str = None) -> list[model.Element]:
+    def load(self, filepath: str = None) -> list[model.BaseItem]:
         engine = create_engine("sqlite+pysqlite:///" + filepath, echo=True, future=True)
 
         with engine.begin() as conn:
             sql = f"SELECT * FROM elements"
             result: sqlalchemy.engine.cursor.CursorResult = conn.execute(text(sql))
-            # for id, frozen in result:
-            #     element = jsonpickle.decode(frozen)
-            #     print(id, element)
-            elements = [jsonpickle.decode(frozen) for _, frozen in result]
-            return elements
+            project_items = [jsonpickle.decode(json_data) for _, json_data in result]
+            return project_items

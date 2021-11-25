@@ -28,7 +28,7 @@ class StandardItemModel(QStandardItemModel):
         return count
 
     @staticmethod
-    def makeItem(project_item: model.Element):
+    def makeItem(project_item: model.BaseItem):
         project_item_type_to_icon_file = {
             model.Folder: 'resources/icons/folder.png',
             model.Diagram: 'resources/icons/diagram.png'

@@ -9,7 +9,7 @@ class PackageElement(QAbstractGraphicsShapeItem, BaseElement):
     def __init__(self, text: str = None, dx: float = 0, dy: float = 0, parent=None) -> None:
         super().__init__(parent)
         BaseElement.__init__(self)
-        self._abilities = set([Abilities.EDITABLE_TEXT])
+        self._abilities = {Abilities.EDITABLE_TEXT}
 
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.setFlag(QGraphicsItem.ItemIsMovable, True)

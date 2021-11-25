@@ -3,7 +3,7 @@
 
 from abc import ABC, abstractmethod
 
-from . import Element
+from . import BaseItem
 
 
 class ProjectStorage(ABC):
@@ -11,9 +11,9 @@ class ProjectStorage(ABC):
     """
 
     @abstractmethod
-    def save(self, elements: list[Element], filename: str = None):
+    def save(self, elements: list[BaseItem], filename: str = None):
         raise NotImplementedError
 
     @abstractmethod
-    def load(self, filename: str = None) -> list[Element]:
+    def load(self, filename: str = None) -> list[BaseItem]:
         raise NotImplementedError

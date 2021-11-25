@@ -7,7 +7,7 @@ This file contains all package-wide definitions
 
 from . import constants, utils
 
-from .element import Element
+from .base_item import BaseItem
 from .folder import Folder
 from .diagram import Diagram
 from .project import Project

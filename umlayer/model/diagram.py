@@ -3,10 +3,10 @@
 
 from uuid import UUID
 
-from . import Element
+from . import BaseItem
 
 
-class Diagram(Element):
+class Diagram(BaseItem):
     def __init__(self, name: str = "New diagram", parent_id: UUID = None):
         super().__init__(name, parent_id)
         self.dtos = []

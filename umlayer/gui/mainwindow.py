@@ -94,7 +94,7 @@ class MainWindow(QMainWindow):
         self.aToolBar.addAction(self.app_actions.addSimpleClassElementAction)
         self.aToolBar.addAction(self.app_actions.addFatClassElementAction)
         self.aToolBar.addAction(self.app_actions.addPackageElementAction)
-        # self.aToolBar.addAction(self.actions.printSceneElementsAction)
+        self.aToolBar.addAction(self.app_actions.printSceneElementsAction)
         # self.aToolBar.addAction(self.actions.addHandleItemAction)
 
     def createStatusBar(self):

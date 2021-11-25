@@ -1,5 +1,8 @@
+import logging
+
 from PySide6.QtCore import *
 from PySide6.QtGui import *
+from PySide6.QtWidgets import *
 
 from .. import model
 from . import *
@@ -98,6 +101,7 @@ class SceneLogic:
             self.storeSceneTo(project_item)
 
     def storeSceneTo(self, diagram: model.Diagram):
+        logging.info(f'Store scene to {diagram.name()}')
         diagram.dtos.clear()
         for item in self.window.scene.elements():
             json_dto = item.toJson()
@@ -149,6 +153,7 @@ class SceneLogic:
         self.window.app_actions.enableElementActions(True)
 
     def on_select_project_item(self, project_item):
+        logging.info(f'Project item selected: {project_item.name()}')
         if isinstance(project_item, model.Diagram):
             self.enableScene()
             self.buildSceneFrom(project_item)

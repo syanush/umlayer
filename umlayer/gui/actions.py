@@ -77,7 +77,7 @@ class Actions:
         self.printElementsAction = QAction(
             QIcon('resources/icons/cache.png'), 'Print', self.window,
             statusTip='print',
-            triggered=self.window.project.printElements)
+            triggered=self.window.project.printProjectItems)
 
         self.printSceneElementsAction = QAction(
             QIcon('resources/icons/cache.png'), 'Print', self.window,

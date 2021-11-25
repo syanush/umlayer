@@ -13,6 +13,7 @@ class ActorElement(QGraphicsItemGroup, BaseElement):
         super().__init__(parent=parent)
         BaseElement.__init__(self)
         self._abilities = set([Abilities.EDITABLE_TEXT])
+
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges, True)

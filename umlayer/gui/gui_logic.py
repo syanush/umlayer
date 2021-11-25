@@ -136,7 +136,7 @@ class GuiLogic:
         if item is None:
             return
         id = item.data(Qt.UserRole)
-        self.window.project_logic.delete_element(id)
+        self.window.project_logic.delete_project_item(id)
         index = item.index()
         self.window.sti.removeRow(index.row(), index.parent())
         self.window.updateTitle()
