@@ -16,6 +16,7 @@ def run_application():
     logging.info('Application started')
 
     app = gui.UMLayerApplication(sys.argv)
+    # app.setStyle('Fusion')
 
     store = storage.ProjectStorageImpl()
     project_logic = model.ProjectLogic(store)

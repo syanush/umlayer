@@ -7,12 +7,7 @@ from . import *
 class GraphicsScene(QGraphicsScene):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        self.lines = []
-        self.draw_grid()
-        self.set_grid_opacity(0.2)
-        # self.set_grid_visible(False)
-        # self.delete_grid()
+        self.init_grid()
 
     @property
     def window(self):
@@ -21,6 +16,12 @@ class GraphicsScene(QGraphicsScene):
     def deselectAll(self):
         for item in self.selectedItems():
             item.setSelected(False)
+
+    def init_grid(self):
+        self.lines = []
+        self.draw_grid()
+        # self.set_grid_visible(False)
+        # self.delete_grid()
 
     def draw_grid(self):
         X = self.sceneRect().x()
@@ -52,10 +53,6 @@ class GraphicsScene(QGraphicsScene):
         for line in self.lines:
             self.removeItem(line)
         del self.lines[:]
-
-    def set_grid_opacity(self, opacity):
-        for line in self.lines:
-            line.setOpacity(opacity)
 
     def keyPressEvent(self, event: QKeyEvent):
         super().keyPressEvent(event)

@@ -68,10 +68,10 @@ class SceneLogic:
 
     def addFatClassElement(self):
         text = '''FatClass
-        --
-        -task_name
-        --
-        +set_task_name(name: string)\n+run_asynchronously(monitor: Monitor)'''
+--
+-task_name
+--
++set_task_name(name: string)\n+run_asynchronously(monitor: Monitor)'''
 
         item = ClassElement()
         item.setText(text)

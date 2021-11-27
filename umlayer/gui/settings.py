@@ -3,7 +3,7 @@ from PySide6.QtGui import *
 
 class Settings:
     BLOCK_SIZE = 10
-    GRID_PEN = QPen(Qt.gray, 1, Qt.SolidLine)
+    GRID_PEN = QPen(QColor(244, 244, 245), 1, Qt.SolidLine)
     ACTOR_ELEMENT_PEN = QPen(QColor(255, 255, 255, 255), 3)
     HANDLE_NORMAL_PEN = QPen(Qt.black, 1)
     HANDLE_SELECTED_PEN = QPen(Qt.blue, 1)
