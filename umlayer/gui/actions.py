@@ -155,7 +155,19 @@ class Actions:
             statusTip='Add handle',
             triggered=self.window.scene_logic.addHandleItem)
 
-    def enableElementActions(self, enable):
+        self.exportAsRasterImageAction = QAction(
+            text='Export as raster image...',
+            parent=self.window,
+            statusTip='Export as raster image...',
+            triggered=self.window.logic.exportAsRasterImageHandler)
+
+        self.exportAsSvgImageAction = QAction(
+            text='Export as SVG image...',
+            parent=self.window,
+            statusTip='Export as SVG image...',
+            triggered=self.window.logic.exportAsSvgImageHandler)
+
+    def enableSceneActions(self, enable):
         self.addActorElementAction.setEnabled(enable)
         self.addEllipseElementAction.setEnabled(enable)
         self.addLineElementAction.setEnabled(enable)
@@ -166,3 +178,5 @@ class Actions:
         self.addSimpleClassElementAction.setEnabled(enable)
         self.addFatClassElementAction.setEnabled(enable)
         self.addPackageElementAction.setEnabled(enable)
+        self.exportAsSvgImageAction.setEnabled(enable)
+        self.exportAsRasterImageAction.setEnabled(enable)

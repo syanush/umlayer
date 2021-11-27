@@ -2,6 +2,7 @@ import logging
 
 from PySide6.QtCore import *
 from PySide6.QtGui import *
+from PySide6.QtSvg import QSvgGenerator
 from PySide6.QtWidgets import *
 
 from .. import model
@@ -161,6 +162,77 @@ class GuiLogic:
         deselected_project_items = self._projectItemsFromSelection(deselected)
         self.window.scene_logic.on_project_item_selection_changed(
             selected_project_items, deselected_project_items)
+
+    def exportAsRasterImageHandler(self):
+        filename = self._getFileNameForRasterImageDialog()
+
+        if filename is not None and len(filename.strip()) != 0:
+            self.exportAsRasterImage1(filename)
+
+    def exportAsSvgImageHandler(self):
+        filename = self._getFileNameForSvgImageDialog()
+
+        if filename is not None and len(filename.strip()) != 0:
+            self.exportAsSvgImage(filename)
+
+    def _getFileNameForRasterImageDialog(self):
+        initial_filename = model.constants.DEFAULT_RASTER_FILENAME
+        filename, selected_filter = \
+            QFileDialog.getSaveFileName(
+                parent=self.window,
+                caption='Export diagram as raster image',
+                dir=QDir.currentPath() + '/' + initial_filename,
+                filter='PNG (*.png);;JPEG (*.JPEG);;BMP Files (*.bmp)',
+                selectedFilter='PNG image (*.png)'
+            )
+        return filename
+
+    def _getFileNameForSvgImageDialog(self):
+        initial_filename = model.constants.DEFAULT_SVG_FILENAME
+
+        filename, selected_filter = \
+            QFileDialog.getSaveFileName(
+                parent=self.window,
+                caption='Export diagram as SVG image',
+                dir=QDir.currentPath() + '/' + initial_filename,
+                filter='All (*);;SVG image (*.svg)',
+                selectedFilter='SVG image (*.svg')
+        return filename
+
+    def exportAsRasterImage(self, filename):
+        pixMap = self.window.sceneView.grab()
+        pixMap.save(filename)
+        logging.info('The scene was exported as raster image')
+
+    def exportAsRasterImage1(self, filename):
+        tempScene = self.window.scene.getTempScene()
+        newSceneRect = tempScene.itemsBoundingRect()
+        sceneSize = newSceneRect.size().toSize()
+        image = QImage(sceneSize, QImage.Format_ARGB32)
+        image.fill(Qt.transparent)
+        painter = QPainter()
+        painter.begin(image)
+        tempScene.render(painter)
+        painter.end()
+        image.save(filename)
+        logging.info('The scene was exported as raster image (Method 1)')
+
+    def exportAsSvgImage(self, filename):
+        tempScene = self.window.scene.getTempScene()
+        newSceneRect = tempScene.itemsBoundingRect()
+        sceneSize = newSceneRect.size().toSize()
+        generator = QSvgGenerator()
+        generator.setFileName(filename)
+        generator.setSize(sceneSize)
+        generator.setViewBox(QRect(0, 0, sceneSize.width(), sceneSize.height()))
+        generator.setDescription("UML diagram")
+        generator.setTitle(filename)
+        painter = QPainter()
+        painter.begin(generator)
+        tempScene.render(painter)
+        painter.end()
+        tempScene.clear()
+        logging.info('The scene was exported as SVG image')
 
     def _projectItemsFromSelection(self, selection):
         result = []

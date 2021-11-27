@@ -2,7 +2,6 @@ import logging
 
 from PySide6.QtCore import *
 from PySide6.QtGui import *
-from PySide6.QtWidgets import *
 
 from .. import model
 from . import *
@@ -143,14 +142,14 @@ class SceneLogic:
             element.setSelected(True)
 
     def disableScene(self):
-        self.window.app_actions.enableElementActions(False)
+        self.window.app_actions.enableSceneActions(False)
         self.window.scene.set_grid_visible(False)
         self.window.centralWidget.setEnabled(False)
 
     def enableScene(self):
         self.window.centralWidget.setEnabled(True)
         self.window.scene.set_grid_visible(True)
-        self.window.app_actions.enableElementActions(True)
+        self.window.app_actions.enableSceneActions(True)
 
     def on_select_project_item(self, project_item):
         logging.info(f'Project item selected: {project_item.name()}')

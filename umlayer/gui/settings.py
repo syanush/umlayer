@@ -4,7 +4,7 @@ from PySide6.QtGui import *
 class Settings:
     BLOCK_SIZE = 10
 
-    _TRANSPARENT_COLOR = QColor(0, 0, 0, 0)
+    _TRANSPARENT_COLOR = Qt.transparent
     _SELECTION_COLOR = QColor(254, 95, 0)
 
     _ELEMENT_NORMAL_COLOR = Qt.black

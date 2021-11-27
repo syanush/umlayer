@@ -1,2 +1,5 @@
 EXTENSION = '.ulr'
 DEFAULT_FILENAME = 'Untitled' + EXTENSION
+
+DEFAULT_SVG_FILENAME = 'image.svg'
+DEFAULT_RASTER_FILENAME = 'image.png'

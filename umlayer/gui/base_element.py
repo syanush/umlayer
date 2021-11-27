@@ -45,6 +45,12 @@ class BaseElement(object):
             raise ValueError('dto')
         self.setPos(QPointF(dto['x'], dto['y']))
 
+    def clone(self):
+        dto = self.toDto()
+        element = self.__class__()
+        element.setFromDto(dto)
+        return element
+
     @staticmethod
     def fromJson(json_dto):
         dto = json.loads(json_dto)

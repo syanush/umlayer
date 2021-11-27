@@ -94,8 +94,6 @@ class MainWindow(QMainWindow):
         self.aToolBar.addAction(self.app_actions.addSimpleClassElementAction)
         self.aToolBar.addAction(self.app_actions.addFatClassElementAction)
         self.aToolBar.addAction(self.app_actions.addPackageElementAction)
-        self.aToolBar.addAction(self.app_actions.printSceneElementsAction)
-        # self.aToolBar.addAction(self.actions.addHandleItemAction)
 
     def createStatusBar(self):
         """Create Status Bar
@@ -187,6 +185,9 @@ class MainWindow(QMainWindow):
         self.fileMenu.addAction(self.app_actions.saveAction)
         self.fileMenu.addAction(self.app_actions.saveAsAction)
         self.fileMenu.addAction(self.app_actions.closeAction)
+        self.fileMenu.addSeparator()
+        self.fileMenu.addAction(self.app_actions.exportAsSvgImageAction)
+        self.fileMenu.addAction(self.app_actions.exportAsRasterImageAction)
         self.fileMenu.addSeparator()
         self.fileMenu.addAction(self.app_actions.exitAction)
         # self.editMenu.addAction(self.actions.copyAction)

@@ -1,3 +1,4 @@
+from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
@@ -74,6 +75,18 @@ class GraphicsScene(QGraphicsScene):
     def clearElements(self):
         for element in self.elements():
             self.removeItem(element)
+
+    def getTempScene(self):
+        sceneRect = self.sceneRect()
+        tempScene = QGraphicsScene(sceneRect)
+        tempScene.setBackgroundBrush(QBrush(Qt.transparent))
+        tempScene.setItemIndexMethod(QGraphicsScene.BspTreeIndex)
+        for element in self.elements():
+            tempScene.addItem(element.clone())
+        newSceneRect = tempScene.itemsBoundingRect()
+        tempScene.setSceneRect(newSceneRect)
+        tempScene.clearSelection()
+        return tempScene
 
     def printItems(self):
         items = [item for item in self.items()
