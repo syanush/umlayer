@@ -182,41 +182,28 @@ class LineElement(QGraphicsItem, BaseElement):
         self.prepareGeometryChange()
         self._parse_text()
 
-        x1 = self.point1().x()
-        y1 = self.point1().y()
-        x2 = self.point2().x()
-        y2 = self.point2().y()
+        p1 = self.point1()
+        p2 = self.point2()
 
         tip1_class = self._tip_class_from_tip_type[self._tip1]
         self._tip1_figure = tip1_class()
-        self._tip1_figure.recalculate(self.point1(), self.point2())
+        self._tip1_figure.recalculate(p1, p2)
 
         tip2_class = self._tip_class_from_tip_type[self._tip2]
         self._tip2_figure = tip2_class()
-        self._tip2_figure.recalculate(self.point2(), self.point1())
+        self._tip2_figure.recalculate(p2, p1)
 
-        self._handle1.setPos(self.point1())
-        self._handle2.setPos(self.point2())
+        self._handle1.setPos(p1)
+        self._handle2.setPos(p2)
 
-        # IMPORTANT: width and height of the bounding box must be non-negative,
-        # to remove painting artifacts
-        x = min(x1, x2)
-        y = min(y1, y2)
-        w = abs(x1 - x2)
-        h = abs(y1 - y2)
-
-        tip_size = max(self._tip1_figure.tip_size, self._tip2_figure.tip_size)
-        self._bounding_rect = QRectF(
-            x - tip_size,
-            y - tip_size,
-            w + 2 * tip_size,
-            h + 2 * tip_size
-        )
+        extra = max(self._tip1_figure.tip_size, self._tip2_figure.tip_size)
+        rect = QRectF(p1, QSizeF(p2.x() - p1.x(), p2.y() - p1.y()))
+        self._bounding_rect = rect.normalized().adjusted(-extra, -extra, extra, extra)
 
         path = QPainterPath()
-        path.moveTo(self._handle1.pos())
-        path.lineTo(self._handle2.pos())
-        path.lineTo(self._handle1.pos())
+        path.moveTo(p1)
+        path.lineTo(p2)
+        path.lineTo(p1)
         self._shape_path = self.stroker.createStroke(path)
 
         self.update()
