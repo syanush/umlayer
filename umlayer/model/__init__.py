@@ -13,4 +13,3 @@ from .diagram import Diagram
 from .project import Project
 from .project_storage import ProjectStorage
 from .project_logic import ProjectLogic
-from .actor_model import ActorModel
