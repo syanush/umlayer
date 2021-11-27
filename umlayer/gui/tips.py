@@ -36,18 +36,13 @@ class ArrowTip(Tip):
     def recalculate(self, point1: QPointF, point2: QPointF):
         line = QLineF(point1, point2)
         angle = line.angle()
-        line1 = QLineF.fromPolar(self.tip_size, angle + 30).translated(point1)
-        line2 = QLineF.fromPolar(self.tip_size, angle - 30).translated(point1)
+        self._line1 = QLineF.fromPolar(self.tip_size, angle + 30).translated(point1)
+        self._line2 = QLineF.fromPolar(self.tip_size, angle - 30).translated(point1)
         self.setPoint(QPointF(point1))
 
-        path = QPainterPath()
-        path.moveTo(line1.p2())
-        path.lineTo(point1)
-        path.lineTo(line2.p2())
-        self._path = path
-
     def paint(self, painter: QPainter):
-        painter.drawPath(self._path)
+        painter.drawLine(self._line1)
+        painter.drawLine(self._line2)
 
 
 class TriangleTip(Tip):

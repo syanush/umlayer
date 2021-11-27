@@ -73,25 +73,23 @@ class NoteElement(QAbstractGraphicsShapeItem, BaseElement):
         self.setDeltaY(dto['dy'])
 
     def boundingRect(self) -> QRectF:
-        return self._bounding_rect
+        extra = max(Settings.ELEMENT_PEN_SIZE, Settings.ELEMENT_SHAPE_SIZE) / 2
+        return self._rect.adjusted(-extra, -extra, extra, extra)
 
     def shape(self) -> QPainterPath:
         return self._shape_path
 
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
-        painter.setRenderHint(QPainter.Antialiasing)
-        painter.setPen(Settings.element_pen)
-        painter.setBrush(Settings.element_brush)
+        text_pen = Settings.ELEMENT_TEXT_SELECTED_PEN if self.isSelected() else Settings.ELEMENT_TEXT_NORMAL_PEN
+        self._text_item.setPen(text_pen)
+
+        pen = Settings.ELEMENT_SELECTED_PEN if self.isSelected() else Settings.ELEMENT_NORMAL_PEN
+        painter.setPen(pen)
         painter.drawPath(self._border_path)
 
         if self.isSelected():
-            painter.setPen(Settings.highlight_pen)
-            painter.setBrush(Settings.highlight_brush)
-
-            path = QPainterPath()
-            path.addRect(self._bounding_rect)
-            painter.fillPath(path, Settings.highlight_brush)
-
+            shape_pen = Settings.ELEMENT_SHAPE_SELECTED_PEN
+            painter.setPen(shape_pen)
             painter.drawPath(self.shape())
 
     def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
@@ -112,9 +110,9 @@ class NoteElement(QAbstractGraphicsShapeItem, BaseElement):
         height = 2 * Settings.ELEMENT_PADDING + br.height() + self._dy
         width = snap_up(width)
         height = snap_up(height)
-        self._bounding_rect = QRectF(0, 0, width, height)
+        self._rect = QRectF(0, 0, width, height)
 
-        br = self._bounding_rect
+        br = self._rect
         x = br.width()
         y = br.height()
         path = QPainterPath()

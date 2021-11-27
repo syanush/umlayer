@@ -5,7 +5,7 @@ from PySide6.QtWidgets import *
 from . import *
 
 
-class ActorElement(QGraphicsItemGroup, BaseElement):
+class ActorElement(QGraphicsItem, BaseElement):
     actor_width = 30
     actor_height = 65
 
@@ -25,11 +25,11 @@ class ActorElement(QGraphicsItemGroup, BaseElement):
         self._text_item = TextItem(self._text, center=True, parent=self)
 
         self.items = (
-            QGraphicsEllipseItem(5, 0, 20, 20, self),  # head
-            QGraphicsLineItem(15, 20, 15, 45, self),  # vertical line
-            QGraphicsLineItem(0, 25, 30, 25, self),  # horizontal line
-            QGraphicsLineItem(15, 45, 0, 65, self),  # left leg
-            QGraphicsLineItem(15, 45, 30, 65, self),  # right leg
+            QGraphicsEllipseItem(5, 0, 20, 20, parent=self),  # head
+            QGraphicsLineItem(15, 20, 15, 45, parent=self),  # vertical line
+            QGraphicsLineItem(0, 25, 30, 25, parent=self),  # horizontal line
+            QGraphicsLineItem(15, 45, 0, 65, parent=self),  # left leg
+            QGraphicsLineItem(15, 45, 30, 65, parent=self),  # right leg
         )
 
         self._recalculate()
@@ -42,19 +42,29 @@ class ActorElement(QGraphicsItemGroup, BaseElement):
             self._text = text
             self._recalculate()
 
+    def rect(self) -> QRectF:
+        return self._rect
+
     def boundingRect(self) -> QRectF:
-        return self._bounding_rect
+        extra = max(Settings.ELEMENT_PEN_SIZE, Settings.ELEMENT_SHAPE_SIZE) / 2
+        return self._rect.adjusted(-extra, -extra, extra, extra)
 
     def shape(self) -> QPainterPath:
         path = QPainterPath()
-        path.addRect(self.boundingRect())
+        path.addRect(self.rect())
         return path
 
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
-        is_selected = option.state & QStyle.State_Selected
-        pen = Settings.highlight_pen if is_selected else Settings.ACTOR_ELEMENT_PEN
-        painter.setPen(pen)
-        painter.drawPath(self.shape())
+        pen = Settings.ELEMENT_SELECTED_PEN if self.isSelected() else Settings.ELEMENT_NORMAL_PEN
+        self._setElementPen(pen)
+
+        text_pen = Settings.ELEMENT_TEXT_SELECTED_PEN if self.isSelected() else Settings.ELEMENT_TEXT_NORMAL_PEN
+        self._text_item.setPen(text_pen)
+
+        if self.isSelected():
+            shape_pen = Settings.ELEMENT_SHAPE_SELECTED_PEN
+            painter.setPen(shape_pen)
+            painter.drawPath(self.shape())
 
     def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
         self.positionNotify(change)
@@ -85,7 +95,13 @@ class ActorElement(QGraphicsItemGroup, BaseElement):
         text_y = self.actor_height + Settings.ELEMENT_PADDING
         self._text_item.setPos(text_x, text_y)
 
-        self._bounding_rect = QRectF(0, 0, self.actor_width, self.actor_height)
+        text_rect = QRectF(text_x, text_y, br.width(), br.height())
+        actor_rect = QRectF(0, 0, self.actor_width, self.actor_height)
+        self._rect = actor_rect.united(text_rect)
 
         self.update()
         self.notify()
+
+    def _setElementPen(self, pen):
+        for item in self.items:
+            item.setPen(pen)

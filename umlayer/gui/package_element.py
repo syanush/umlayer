@@ -64,26 +64,25 @@ class PackageElement(QAbstractGraphicsShapeItem, BaseElement):
         self.setDeltaY(dto['dy'])
 
     def boundingRect(self) -> QRectF:
-        return self._bounding_rect
+        extra = max(Settings.ELEMENT_PEN_SIZE, Settings.ELEMENT_SHAPE_SIZE) / 2
+        return self._rect.adjusted(-extra, -extra, extra, extra)
 
     def shape(self) -> QPainterPath:
         return self._shape_path
 
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
-        painter.setRenderHint(QPainter.Antialiasing)
-        painter.setPen(Settings.element_pen)
-        painter.setBrush(Settings.element_brush)
+        text_pen = Settings.ELEMENT_TEXT_SELECTED_PEN if self.isSelected() else Settings.ELEMENT_TEXT_NORMAL_PEN
+        self._text_item1.setPen(text_pen)
+        self._text_item2.setPen(text_pen)
+
+        pen = Settings.ELEMENT_SELECTED_PEN if self.isSelected() else Settings.ELEMENT_NORMAL_PEN
+        painter.setPen(pen)
         painter.drawRect(self._rect1)
         painter.drawRect(self._rect2)
 
         if self.isSelected():
-            painter.setPen(Settings.highlight_pen)
-            painter.setBrush(Settings.highlight_brush)
-
-            # br = QPainterPath()
-            # br.addRect(self._bounding_rect)
-            # painter.fillPath(br, highlight_brush)
-
+            shape_pen = Settings.ELEMENT_SHAPE_SELECTED_PEN
+            painter.setPen(shape_pen)
             painter.drawPath(self.shape())
 
     def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
@@ -113,7 +112,7 @@ class PackageElement(QAbstractGraphicsShapeItem, BaseElement):
         self._size1 = QPointF(size1_x, size1_y)
         self._text_item2.setPos(Settings.ELEMENT_PADDING, Settings.ELEMENT_PADDING + size1_y)
         br2 = self._text_item2.boundingRect()
-        size2_x = max(br2.width() + 2 * Settings.ELEMENT_PADDING + self._dx, size1_x + Settings.HANDLE_MIN2 + self._dx)
+        size2_x = max(br2.width() + 2 * Settings.ELEMENT_PADDING + self._dx, size1_x + Settings.PACKAGE_MIN2 + self._dx)
         size2_y = br2.height() + 2 * Settings.ELEMENT_PADDING + self._dy
         size2_x = snap_up(size2_x)
         size2_y = snap_up(size2_y)
@@ -121,7 +120,7 @@ class PackageElement(QAbstractGraphicsShapeItem, BaseElement):
         self._size2 = QPointF(size2_x, size2_y)
         width = max(size1_x, size2_x)
         height = size1_y + size2_y
-        self._bounding_rect = QRectF(0, 0, width, height)
+        self._rect = QRectF(0, 0, width, height)
         self._rect1 = QRectF(0, 0, size1_x, size1_y)
         self._rect2 = QRectF(0, size1_y, size2_x, size2_y)
 

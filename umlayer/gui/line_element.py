@@ -32,12 +32,12 @@ class LineElement(QGraphicsItem, BaseElement):
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges, True)
 
-        self._handle1 = HandleItem(10, parent=self)
+        self._handle1 = HandleItem(Settings.LINE_HANDLE_SIZE, parent=self)
         self._handle1.position_changed_signal.connect(self._handle1_position_changed)
         self._handle1.selection_changed_signal.connect(self._handle_selection_changed)
         self._handle1.setSelected(False)
 
-        self._handle2 = HandleItem(10, parent=self)
+        self._handle2 = HandleItem(Settings.LINE_HANDLE_SIZE, parent=self)
         self._handle2.position_changed_signal.connect(self._handle2_position_changed)
         self._handle2.selection_changed_signal.connect(self._handle_selection_changed)
         self._handle2.setSelected(False)
@@ -111,14 +111,19 @@ class LineElement(QGraphicsItem, BaseElement):
     }
 
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
-        painter.setRenderHint(QPainter.Antialiasing)
+        def get_tip_brush(tip_type):
+            if tip_type in [TipType.FullTriangle, TipType.FullDiamond]:
+                brush = Settings.LINE_SELECTED_BRUSH if self.isSelected() else Settings.ELEMENT_NORMAL_BRUSH
+            else:
+                brush = Settings.ELEMENT_SELECTED_TRANSPARENT_BRUSH if self.isSelected() else Settings.ELEMENT_NORMAL_TRANSPARENT_BRUSH
+            return brush
 
         x1 = self._tip1_figure.point().x()
         y1 = self._tip1_figure.point().y()
         x2 = self._tip2_figure.point().x()
         y2 = self._tip2_figure.point().y()
 
-        pen = Settings.LINE_SELECTED_PEN if self.isSelected() else Settings.LINE_NORMAL_PEN
+        pen = Settings.LINE_SELECTED_PEN if self.isSelected() else Settings.ELEMENT_NORMAL_PEN
 
         line_pen = QPen(pen)
         line_pen_style = self._pen_style_from_line_type[self._line_type]
@@ -128,19 +133,12 @@ class LineElement(QGraphicsItem, BaseElement):
         painter.drawLine(x1, y1, x2, y2)
 
         painter.setPen(pen)
-        if self._tip1 in [TipType.FullTriangle, TipType.FullDiamond]:
-            painter.setBrush(QBrush(Qt.black))
-        else:
-            painter.setBrush(QBrush(QColor(0, 0, 0, 0)))
+
+        painter.setBrush(get_tip_brush(self._tip1))
         self._tip1_figure.paint(painter)
 
-        if self._tip2 in [TipType.FullTriangle, TipType.FullDiamond]:
-            painter.setBrush(QBrush(Qt.black))
-        else:
-            painter.setBrush(QBrush(QColor(0, 0, 0, 0)))
+        painter.setBrush(get_tip_brush(self._tip2))
         self._tip2_figure.paint(painter)
-
-        # painter.drawPath(self.shape())
 
     def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
         self.positionNotify(change)

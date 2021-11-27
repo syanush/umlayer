@@ -62,24 +62,23 @@ class EllipseElement(QGraphicsItem, BaseElement):
         self.setHeight(dto['height'])
 
     def boundingRect(self) -> QRectF:
-        return self._bounding_rect
+        extra = max(Settings.ELEMENT_PEN_SIZE, Settings.ELEMENT_SHAPE_SIZE) / 2
+        return self._rect.adjusted(-extra, -extra, extra, extra)
 
     def shape(self) -> QPainterPath:
         return self._shape_path
 
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
-        painter.setRenderHint(QPainter.Antialiasing)
+        text_pen = Settings.ELEMENT_TEXT_SELECTED_PEN if self.isSelected() else Settings.ELEMENT_TEXT_NORMAL_PEN
+        self._text_item.setPen(text_pen)
 
-        painter.setPen(Settings.element_pen)
-        painter.setBrush(Settings.element_brush)
+        pen = Settings.ELEMENT_SELECTED_PEN if self.isSelected() else Settings.ELEMENT_NORMAL_PEN
+        painter.setPen(pen)
         painter.drawEllipse(0, 0, self._width, self._height)
 
         if self.isSelected():
-            painter.setPen(Settings.highlight_pen)
-            painter.setBrush(Settings.highlight_brush)
-            br = QPainterPath()
-            br.addRect(self._bounding_rect)
-            painter.fillPath(br, Settings.highlight_brush)
+            shape_pen = Settings.ELEMENT_SHAPE_SELECTED_PEN
+            painter.setPen(shape_pen)
             painter.drawPath(self.shape())
 
     def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
@@ -98,9 +97,9 @@ class EllipseElement(QGraphicsItem, BaseElement):
         x = (self._width - br.width()) / 2
         y = (self._height - br.height()) / 2
         self._text_item.setPos(x, y)
-        self._bounding_rect = QRectF(0, 0, self._width, self._height)
+        self._rect = QRectF(0, 0, self._width, self._height)
         path = QPainterPath()
-        path.addEllipse(self._bounding_rect)
+        path.addEllipse(self._rect)
         self._shape_path = path
         self.update()
         self.notify()

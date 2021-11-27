@@ -5,7 +5,7 @@ from PySide6.QtWidgets import *
 from . import *
 
 
-class TextItem(QGraphicsItem):
+class TextItem(QAbstractGraphicsShapeItem):
     _correction_factor = 0.925
 
     def __init__(self, text: str = None, center: bool = False, parent=None) -> None:
@@ -85,8 +85,7 @@ class TextItem(QGraphicsItem):
 
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
         painter.setFont(Settings.element_font)
-        painter.setPen(Settings.element_pen)
-        painter.setBrush(Settings.element_brush)
+        painter.setPen(self.pen())
         # painter.drawRect(self._bounding_rect)  # for debugging
         n = len(self._lines)
         if n > 0:
