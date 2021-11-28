@@ -1,6 +1,13 @@
 import math
+import os
+
+from PySide6.QtGui import QIcon
+
+import model
 from . import *
 
+def icon(filename: str):
+    return QIcon(model.icon_path(filename))
 
 def snap(x: float) -> float:
     return math.floor(x / Settings.BLOCK_SIZE) * Settings.BLOCK_SIZE

@@ -1,11 +1,11 @@
+#!/usr/bin/env python3
+
 import logging
 import sys
-import time
 import traceback
 
-from PySide6.QtCore import QCoreApplication
-
-from umlayer import model, gui, storage
+from version import __version__
+import model, gui, storage
 
 
 def run_application():
@@ -13,10 +13,12 @@ def run_application():
     """
 
     logging.basicConfig(filename='umlayer.log', filemode='w', level=logging.INFO)
-    logging.info('Application started')
+    logging.info(f'UMLayer {__version__}')
 
     app = gui.UMLayerApplication(sys.argv)
     # app.setStyle('Fusion')
+
+    logging.info('Application started')
 
     store = storage.ProjectStorageImpl()
     project_logic = model.ProjectLogic(store)
@@ -25,6 +27,8 @@ def run_application():
     main_window = gui.MainWindow(project_logic, gui_logic, scene_logic)
     app.setActiveWindow(main_window)
     main_window.show()
+
+    logging.info('Main window displayed')
 
     result_code = app.exec()
     main_window = None

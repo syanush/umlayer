@@ -3,7 +3,7 @@ import logging
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 
-from .. import model
+import model
 from . import *
 
 

@@ -5,7 +5,7 @@ from PySide6.QtGui import *
 from PySide6.QtSvg import QSvgGenerator
 from PySide6.QtWidgets import *
 
-from .. import model
+import model
 from . import *
 
 

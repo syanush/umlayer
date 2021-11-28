@@ -1,4 +1,10 @@
+import os
+
 from . import constants
+
+
+def icon_path(filename: str) -> str:
+    return os.path.join('resources/icons', filename)
 
 
 def build_window_title(filename: str, is_dirty: bool):

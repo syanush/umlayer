@@ -1,7 +1,7 @@
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 
-from .. import model
+import model
 
 
 class StandardItemModel(QStandardItemModel):
@@ -30,8 +30,8 @@ class StandardItemModel(QStandardItemModel):
     @staticmethod
     def makeItem(project_item: model.BaseItem):
         project_item_type_to_icon_file = {
-            model.Folder: 'resources/icons/folder.png',
-            model.Diagram: 'resources/icons/diagram.png'
+            model.Folder: model.icon_path('folder.png'),
+            model.Diagram: model.icon_path('diagram.png')
         }
 
         item = QStandardItem(project_item.name())
