@@ -6,13 +6,13 @@ from . import *
 
 
 class GraphicsScene(QGraphicsScene):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, scene_logic: SceneLogic, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.init_grid()
+        self._scene_logic: SceneLogic = scene_logic
 
-    @property
-    def window(self):
-        return self.parent()
+    def notify(self):
+        self._scene_logic.setDirty()
 
     def deselectAll(self):
         for item in self.selectedItems():
@@ -58,13 +58,13 @@ class GraphicsScene(QGraphicsScene):
     def keyPressEvent(self, event: QKeyEvent):
         super().keyPressEvent(event)
         if event.key() == Qt.Key_Delete and event.modifiers() == Qt.NoModifier:
-            self.window.scene_logic.delete_selected_elements()
+            self._scene_logic.delete_selected_elements()
         elif event.key() == Qt.Key_X and event.modifiers() == Qt.ControlModifier:
-            self.window.scene_logic.cut_selected_elements()
+            self._scene_logic.cut_selected_elements()
         elif event.key() == Qt.Key_C and event.modifiers() == Qt.ControlModifier:
-            self.window.scene_logic.copy_selected_elements()
+            self._scene_logic.copy_selected_elements()
         elif event.key() == Qt.Key_V and event.modifiers() == Qt.ControlModifier:
-            self.window.scene_logic.paste_elements()
+            self._scene_logic.paste_elements()
 
     def selectedElements(self):
         return self._filter_elements(self.selectedItems())

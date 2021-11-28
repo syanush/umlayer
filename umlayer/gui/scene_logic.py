@@ -15,10 +15,12 @@ class SceneLogic:
     def setWindow(self, window):
         self.window = window
 
+    def setDirty(self):
+        self.window.project.setDirty(True)
+
     def addElement(self, element: BaseElement) -> None:
         self.window.scene.addItem(element)
-        element.setNotify(self.window.setDirty)
-        self.window.setDirty()
+        self.setDirty()
 
     def addActorElement(self):
         item = ActorElement()
@@ -112,7 +114,6 @@ class SceneLogic:
         for json_dto in project_item.dtos:
             element = BaseElement.fromJson(json_dto)
             # TODO: override addItem and move setNotify there
-            element.setNotify(self.window.setDirty)
             self.window.scene.addItem(element)
         if project_item.scroll_data is not None:
             hv, hmin, hmax, vv, vmin, vmax = project_item.scroll_data
@@ -137,8 +138,8 @@ class SceneLogic:
         for element in elements:
             # TODO: reposition elements here
             # element.setPos(QPointF(x, y))
-            element.setNotify(self.window.setDirty)
             self.window.scene.addItem(element)
+            self.setDirty()
             element.setSelected(True)
 
     def disableScene(self):
@@ -179,6 +180,7 @@ class SceneLogic:
     def _remove_elements(self, elements):
         for element in elements:
             self.window.scene.removeItem(element)
+            self.setDirty()
 
     def _serialize_elements_to_temp_storage(self, elements):
         self.temp_list.clear()

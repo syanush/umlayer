@@ -2,19 +2,43 @@ from uuid import UUID
 
 from . import BaseItem
 
+class Event:
+    def __init__(self):
+        self._handlers = []
+
+    def subscribe(self, handler):
+        self._handlers.append(handler)
+
+    def unsubscribe(self, handler):
+        index = self._handlers.index(handler)
+        if index != -1:
+            del self._handlers[index]
+
+    def notify(self):
+        for handler in self._handlers:
+            handler()
+
 
 class Project:
     def __init__(self):
         self.project_items = {}
         self.root = None
         self._is_dirty = False
+        self._is_dirty_changed = Event()
+
+    @property
+    def isDirtyChangedEvent(self):
+        return self._is_dirty_changed
 
     def dirty(self):
         return self._is_dirty
 
     def setDirty(self, dirty):
-        # print(f'{self._is_dirty=}')
+        if self._is_dirty == dirty:
+            return
+
         self._is_dirty = dirty
+        self.isDirtyChangedEvent.notify()
 
     def setRoot(self, root: BaseItem):
         self._add(root)

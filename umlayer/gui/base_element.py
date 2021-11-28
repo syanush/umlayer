@@ -12,15 +12,13 @@ class Abilities(Enum):
 
 
 class BaseElement(object):
-    def __init__(self):
-        self.notify = lambda: None
-
     def positionNotify(self, change):
         if self.scene() and change == QGraphicsItem.ItemPositionHasChanged:
             self.notify()
 
-    def setNotify(self, notify):
-        self.notify = notify
+    def notify(self):
+        if self.scene():
+            self.scene().notify()
 
     def getAbilities(self):
         return self._abilities

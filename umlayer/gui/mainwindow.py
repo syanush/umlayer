@@ -28,15 +28,14 @@ class MainWindow(QMainWindow):
         self.initGUI()
 
         self.element_with_text = None
+        self.project.isDirtyChangedEvent.subscribe(self.onIsDirtyChanged)
 
     @property
     def project(self):
         return self.project_logic.project
 
-    def setDirty(self):
-        if not self.project.dirty():
-            self.project.setDirty(True)
-            self.updateTitle()
+    def onIsDirtyChanged(self):
+        self.updateTitle()
 
     def setDefaultFileName(self):
         self.filename = model.constants.DEFAULT_FILENAME
@@ -142,7 +141,7 @@ class MainWindow(QMainWindow):
     def createCentralWidget(self):
         scene_size = 2000
         self.scene: GraphicsScene = \
-            GraphicsScene(-scene_size//2, -scene_size//2, scene_size, scene_size, parent=self)
+            GraphicsScene(self.scene_logic, -scene_size//2, -scene_size//2, scene_size, scene_size, parent=self)
 
         self.scene.selectionChanged.connect(self.on_scene_selection_changed)
 

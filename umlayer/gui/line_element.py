@@ -63,6 +63,7 @@ class LineElement(QGraphicsItem, BaseElement):
     def setText(self, text: str):
         if self._text != text:
             self._text = text
+            self.notify()
             self._recalculate()
 
     def point1(self):
@@ -72,6 +73,7 @@ class LineElement(QGraphicsItem, BaseElement):
         point1 = QPointF(x1, y1)
         if self._point1 != point1:
             self._point1 = point1
+            self.notify()
             self._recalculate()
 
     def point2(self):
@@ -81,6 +83,7 @@ class LineElement(QGraphicsItem, BaseElement):
         point2 = QPointF(x2, y2)
         if self._point2 != point2:
             self._point2 = point2
+            self.notify()
             self._recalculate()
 
     def toDto(self):
@@ -148,7 +151,6 @@ class LineElement(QGraphicsItem, BaseElement):
             return QPointF(gui_utils.snap(value.x()), gui_utils.snap(value.y()))
         if change == QGraphicsItem.GraphicsItemChange.ItemSelectedHasChanged:
             is_selected = bool(value)
-            self.prepareGeometryChange()
             self.setLive(is_selected)
         return super().itemChange(change, value)
 
@@ -159,7 +161,8 @@ class LineElement(QGraphicsItem, BaseElement):
         self._recalculate()
 
     def _handle_selection_changed(self, is_selected):
-        self.setLive(is_selected)
+        if is_selected:
+            self.setLive(is_selected)
 
     def _handle1_position_changed(self, point):
         self.setPoint1(point.x(), point.y())
@@ -216,7 +219,7 @@ class LineElement(QGraphicsItem, BaseElement):
         lines = self.text().split('\n')
         for line in lines:
             if len(line) >= 4 and line[:3] == 'lt=':
-                self.set_line_type(line[3:])
+                self.set_line_type_from_text(line[3:])
             else:
                 label_lines.append(line)
         self._label_text = '\n'.join(label_lines)
@@ -233,7 +236,7 @@ class LineElement(QGraphicsItem, BaseElement):
         '..': LineType.Dot,
     }
 
-    def set_line_type(self, txt: str):
+    def set_line_type_from_text(self, txt: str):
         """Parse line type"""
 
         if txt.find('-') >= 0:
@@ -246,6 +249,7 @@ class LineElement(QGraphicsItem, BaseElement):
             splitter = '-'
 
         self._line_type = self._lt_from_splitter[splitter]
+
         tips = txt.split(splitter)
 
         self._tip1 = TipType.Empty
