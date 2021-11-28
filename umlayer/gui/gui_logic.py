@@ -16,23 +16,9 @@ class GuiLogic:
     def setWindow(self, window):
         self.window = window
 
-    def newProject(self):
-        logging.info('Action: New project')
-        if not self.closeProject():
-            return
-        self.window.project_logic.new_project()
-        self.updateTreeDataModel(self.window.project)
-        self.window.filename = model.constants.DEFAULT_FILENAME
-        self.window.updateTitle()
-
-    def updateTreeDataModel(self, project):
-        logging.info('Update Tree Data Model')
-        self.window.sti.updateItemModel(project)
-        self.window.treeView.setInitialState()
-
     def openProject(self):
         logging.info('Action: Open')
-        if not self.closeProject():
+        if not self.window.closeProject():
             return
 
         filename = self._getFileNameFromOpenDialog('Open')
@@ -41,14 +27,14 @@ class GuiLogic:
             return
 
         try:
-            self._doOpenProject(filename)
+            self.window.doOpenProject(filename)
         except Exception as ex:
             print(ex)
         else:
             self.window.filename = filename
             self.window.updateTitle()
 
-        self._printStats()
+        self.window.printStats()
 
     def saveProject(self):
         logging.info('Action: Save')
@@ -84,23 +70,9 @@ class GuiLogic:
             self.window.filename = filename
             self.window.updateTitle()
 
-    def closeProject(self) -> bool:
-        logging.info('Action: Close')
-        if not self.saveFileIfNeeded():
-            return False
-
-        if not self._closeDiagramWindows():
-            return False
-
-        self.window.sti.clear()
-        self.window.project_logic.clear_project()
-        self.window.filename = None
-        self.window.updateTitle()
-        return True
-
     def saveFileIfNeeded(self) -> bool:
         logging.info('Try to save file if needed')
-        if not self.window.project.dirty():
+        if not self.window.isDirty():
             return True
 
         reply = QMessageBox.question(
@@ -280,10 +252,6 @@ class GuiLogic:
                 selectedFilter="Umlayer project (*.ulr)")
         return filename
 
-    def _doOpenProject(self, filename):
-        self.window.project_logic.load(filename)
-        self.updateTreeDataModel(self.window.project_logic.project)
-
     def _doSaveProject(self, filename):
         """Really save project"""
         self.window.scene_logic.storeScene()
@@ -291,11 +259,3 @@ class GuiLogic:
 
     def _isFileNameNotSet(self) -> bool:
         return self.window.filename is None or self.window.filename == model.constants.DEFAULT_FILENAME
-
-    def _printStats(self):
-        print('number of elements', self.window.project.count())
-        print('number of items', self.window.sti.count())
-
-    def _closeDiagramWindows(self) -> bool:
-        """Returns true if windows are closed successfully"""
-        return True

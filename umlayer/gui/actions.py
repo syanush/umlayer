@@ -13,7 +13,7 @@ class Actions:
             parent=self.window,
             shortcut=QKeySequence.New,
             statusTip='Create a New Project',
-            triggered=self.window.logic.newProject)
+            triggered=self.window.recreateProject)
 
         self.openAction = QAction(
             QIcon('icons:open.png'), '&Open', self.window,
@@ -37,7 +37,7 @@ class Actions:
             QIcon('icons:close.png'), '&Close', self.window,
             shortcut=QKeySequence.Close,
             statusTip='Close current project',
-            triggered=self.window.logic.closeProject)
+            triggered=self.window.closeProject)
 
         self.exitAction = QAction(
             QIcon('icons:exit.png'), '&Quit', self.window,
@@ -74,10 +74,10 @@ class Actions:
             statusTip='Displays info about the app',
             triggered=self.window.logic.aboutWindow)
 
-        self.printElementsAction = QAction(
-            QIcon('icons:cache.png'), 'Print', self.window,
-            statusTip='print',
-            triggered=self.window.project.printProjectItems)
+        # self.printElementsAction = QAction(
+        #     QIcon('icons:cache.png'), 'Print', self.window,
+        #     statusTip='print',
+        #     triggered=self.window.project.printProjectItems)
 
         self.printSceneElementsAction = QAction(
             QIcon('icons:cache.png'), 'Print', self.window,

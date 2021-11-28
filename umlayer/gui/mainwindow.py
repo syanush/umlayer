@@ -15,7 +15,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self, project_logic, logic, scene_logic, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
+        self._project = None
         self.project_logic = project_logic
         self.logic = logic
         self.scene_logic = scene_logic
@@ -28,11 +28,11 @@ class MainWindow(QMainWindow):
         self.initGUI()
 
         self.element_with_text = None
-        self.project.isDirtyChangedEvent.subscribe(self.onIsDirtyChanged)
+        self.createNewProject()
 
     @property
     def project(self):
-        return self.project_logic.project
+        return self._project
 
     def onIsDirtyChanged(self):
         self.updateTitle()
@@ -63,15 +63,19 @@ class MainWindow(QMainWindow):
         settings.endGroup()
         logging.info('Settings loading finished')
 
+    def isDirty(self):
+        is_dirty = False if self._project is None else self._project.dirty()
+        return is_dirty
+
     def updateTitle(self):
-        title = model.utils.build_window_title(self.filename, self.project.dirty())
+        title = model.utils.build_window_title(self.filename, self.isDirty())
         self.setWindowTitle(title)
 
     def initGUI(self):
         logging.info('GUI initialization started')
         self.setupComponents()
         self.treeView.selectionModel().selectionChanged.connect(self.logic.on_selection_changed)
-        self.logic.updateTreeDataModel(self.project)
+        # self.logic.updateTreeDataModel(self.project)
         self.updateTitle()
         logging.info('GUI initialization finished')
 
@@ -174,6 +178,8 @@ class MainWindow(QMainWindow):
         self.createMenu()
         self.createToolBar()
 
+        self.scene_logic.disableScene()
+
     def createMenu(self):
         self.fileMenu = self.menuBar().addMenu("&File")
         self.editMenu = self.menuBar().addMenu("&Edit")
@@ -251,3 +257,68 @@ class MainWindow(QMainWindow):
                              self.treeView,
                              context=Qt.WidgetShortcut,
                              activated=self.logic.deleteSelectedItem)
+
+    def _getNewProject(self):
+        project = model.Project()
+        project.isDirtyChangedEvent.subscribe(self.onIsDirtyChanged)
+        return project
+
+    def updateTreeDataModel(self):
+        self.sti.updateItemModel(self._project)
+        self.treeView.setInitialState()
+
+    def createNewProject(self):
+        self._project = self._getNewProject()
+        self.project_logic.init_new_project(self._project)
+        self.updateTreeDataModel()
+        self.filename = model.constants.DEFAULT_FILENAME
+        self.updateTitle()
+
+    def recreateProject(self):
+        """Close old and create new project"""
+        logging.info('Action: New project')
+        if not self.closeProject():
+            return
+
+        self.createNewProject()
+
+    def closeProject(self) -> bool:
+        logging.info('Action: Close')
+        if not self.logic.saveFileIfNeeded():
+            return False
+
+        self.scene_logic.disableScene()
+        self.sti.clear()
+        if self._project is not None:
+            self._project.isDirtyChangedEvent.unsubscribe(self.onIsDirtyChanged)
+        self._project = None
+        self.filename = None
+        self.updateTitle()
+        return True
+
+    def printStats(self):
+        if self._project is not None:
+            print('number of elements', self._project.count())
+            print('number of items', self.sti.count())
+
+    def load(self, filename: str):
+        """Loads project data and settings from a file
+
+        Throws exceptions in case of errors
+        """
+
+        project_items: list = self.project_logic.storage_load(filename)
+        root = project_items[0]
+
+        self._project = self._getNewProject()
+        self._project.setRoot(root)
+
+        for project_item in project_items:
+            if project_item.id != root.id:
+                self._project.add(project_item, project_item.parent_id)
+
+        self._project.setDirty(False)
+
+    def doOpenProject(self, filename):
+        self.load(filename)
+        self.updateTreeDataModel()

@@ -7,21 +7,12 @@ class ProjectLogic:
     def __init__(self, storage: ProjectStorage):
         self._storage = storage
         self._project = None
-        self.new_project()
 
-    @property
-    def project(self):
-        return self._project
-
-    def new_project(self):
-        self._project = Project()
+    def init_new_project(self, project):
+        self._project = project
         root = Folder("Root")
         self._project.setRoot(root)
         self._project.add(Diagram("Diagram 1"), root.id)
-        self._project.setDirty(False)
-
-    def clear_project(self):
-        self._project = Project()
         self._project.setDirty(False)
 
     def get_project(self):
@@ -59,19 +50,5 @@ class ProjectLogic:
         self._storage.save(project_items, filename)
         self._project.setDirty(False)
 
-    def load(self, filename: str):
-        """Loads project data and settings from a file
-
-        Throws exceptions in case of errors
-        """
-
-        project_items: list = self._storage.load(filename)
-
-        root = project_items[0]
-        self._project.setRoot(root)
-
-        for project_item in project_items:
-            if project_item.id != root.id:
-                self._project.add(project_item, project_item.parent_id)
-
-        self._project.setDirty(False)
+    def storage_load(self, filename):
+        return self._storage.load(filename)
