@@ -6,7 +6,7 @@ import sqlalchemy.engine.cursor
 
 from sqlalchemy import create_engine, text
 
-import model
+from umlayer import model
 
 
 class ProjectStorageImpl(model.ProjectStorage):

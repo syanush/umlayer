@@ -5,7 +5,7 @@ from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
-import model
+from umlayer import model
 from . import *
 
 

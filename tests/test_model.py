@@ -5,7 +5,7 @@ import jsonpickle
 from marshmallow import Schema, fields
 from pprint import pprint
 
-from umlayer import gui, model, storage
+from umlayer import model, storage
 
 
 class TestFolder(unittest.TestCase):
@@ -15,9 +15,9 @@ class TestFolder(unittest.TestCase):
         FolderSchema = Schema.from_dict({'name': fields.Str()})
         schema = FolderSchema()
         dto = schema.dump(folder)
-        print(json.dumps(dto))
-        print(jsonpickle.encode(dto))
-        print(jsonpickle.encode(folder))
+        # print(json.dumps(dto))
+        # print(jsonpickle.encode(dto))
+        # print(jsonpickle.encode(folder))
 
 
 class TestDiagram(unittest.TestCase):

@@ -4,8 +4,8 @@ import logging
 import sys
 import traceback
 
-from version import __version__
-import model, gui, storage
+from umlayer import version
+from umlayer import model, gui, storage
 
 
 def run_application():
@@ -13,7 +13,7 @@ def run_application():
     """
 
     logging.basicConfig(filename='umlayer.log', filemode='w', level=logging.INFO)
-    logging.info(f'UMLayer {__version__}')
+    logging.info(f'UMLayer {version.__version__}')
 
     app = gui.UMLayerApplication(sys.argv)
     # app.setStyle('Fusion')

@@ -1,4 +1,4 @@
-# order is important
+# the order is important
 from .constants import *
 from .settings import Settings
 from .gui_utils import snap, snap_up

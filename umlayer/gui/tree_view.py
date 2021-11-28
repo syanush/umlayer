@@ -2,8 +2,6 @@ from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
-from . import StandardItemModel
-
 
 class TreeView(QTreeView):
     def __init__(self, project_logic, *args, **kwargs):
