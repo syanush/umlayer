@@ -150,7 +150,7 @@ class GuiLogic:
         id = item.data(Qt.UserRole)
         project_item = self.window.project.get(id)
         if project_item.name != item.text():
-            project_item.name = item.text()
+            project_item.setName(item.text())
             self.window.project.is_dirty = True
         parent_item = item.parent()
         parent_item.sortChildren(0, Qt.SortOrder.AscendingOrder)
