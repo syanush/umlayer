@@ -16,6 +16,7 @@ class TreeView(QTreeView):
         # self.setStyleSheet("""""")
 
         self.itemDelegate().closeEditor.connect(self.onCloseEditor)
+        self.onFocused(False)
 
     @property
     def sti(self):
@@ -54,3 +55,14 @@ class TreeView(QTreeView):
     def onCloseEditor(self, editor: QAbstractItemDelegate, hint):
         """Set element name after editing"""
         self.window.logic.finishNameEditing()
+
+    def focusInEvent(self, event: QFocusEvent) -> None:
+        self.onFocused(True)
+        super().focusInEvent(event)
+
+    def focusOutEvent(self, event: QFocusEvent) -> None:
+        self.onFocused(False)
+        super().focusOutEvent(event)
+
+    def onFocused(self, is_focused: bool) -> None:
+        self.setFrameStyle(QFrame.Panel | (QFrame.Plain if is_focused else QFrame.Sunken))

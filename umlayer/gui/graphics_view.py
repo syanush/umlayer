@@ -13,6 +13,7 @@ class GraphicsView(QGraphicsView):
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
         self.setRubberBandSelection()
+        self.onFocused(False)
 
     @property
     def window(self):
@@ -64,3 +65,14 @@ class GraphicsView(QGraphicsView):
             # print('middle button released', self.isInteractive(), self.dragMode())
             return
         super().mouseReleaseEvent(event)
+
+    def focusInEvent(self, event: QFocusEvent) -> None:
+        self.onFocused(True)
+        super().focusInEvent(event)
+
+    def focusOutEvent(self, event: QFocusEvent) -> None:
+        self.onFocused(False)
+        super().focusOutEvent(event)
+
+    def onFocused(self, is_focused: bool) -> None:
+        self.setFrameStyle(QFrame.Panel | (QFrame.Plain if is_focused else QFrame.Sunken))
