@@ -115,8 +115,7 @@ class MainWindow(QMainWindow):
 
     def createElementsWindow(self):
         elementsWindow = QDockWidget('Elements', self)
-        self.elementsView = QTextEdit()
-        elementsWindow.setWidget(self.elementsView)
+        elementsWindow.setMinimumHeight(150)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, elementsWindow)
 
     def createPropertyEditor(self):
