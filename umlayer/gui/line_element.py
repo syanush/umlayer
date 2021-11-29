@@ -36,11 +36,13 @@ class LineElement(QGraphicsItem, BaseElement):
         self._handle1.position_changed_signal.connect(self._handle1_position_changed)
         self._handle1.selection_changed_signal.connect(self._handle_selection_changed)
         self._handle1.setSelected(False)
+        self._handle1.setZValue(1.0)
 
         self._handle2 = HandleItem(Settings.LINE_HANDLE_SIZE, parent=self)
         self._handle2.position_changed_signal.connect(self._handle2_position_changed)
         self._handle2.selection_changed_signal.connect(self._handle_selection_changed)
         self._handle2.setSelected(False)
+        self._handle2.setZValue(1.0)
 
         self.stroker = QPainterPathStroker()
         self.stroker.setWidth(15)
@@ -155,14 +157,15 @@ class LineElement(QGraphicsItem, BaseElement):
         return super().itemChange(change, value)
 
     def setLive(self, is_live):
-        self._is_live = is_live
-        self._handle1.setLive(is_live)
-        self._handle2.setLive(is_live)
+        """A line must stay live when the line or its handle were selected"""
+        is_really_live = is_live or self.isSelected() or self._handle1.isSelected() or self._handle2.isSelected()
+        self._is_live = is_really_live
+        self._handle1.setLive(is_really_live)
+        self._handle2.setLive(is_really_live)
         self._recalculate()
 
     def _handle_selection_changed(self, is_selected):
-        if is_selected:
-            self.setLive(is_selected)
+        self.setLive(is_selected)
 
     def _handle1_position_changed(self, point):
         self.setPoint1(point.x(), point.y())
@@ -259,5 +262,3 @@ class LineElement(QGraphicsItem, BaseElement):
         self._tip2 = TipType.Empty
         if len(tips) > 1:
             self._tip2 = self._tip2_type_from_txt.get(tips[1]) or TipType.Empty
-
-        # print(self._tip1, self._line_type, self._tip2)
