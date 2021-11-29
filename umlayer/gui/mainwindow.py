@@ -201,9 +201,13 @@ class MainWindow(QMainWindow):
         self.fileMenu.addAction(self.app_actions.exportAsRasterImageAction)
         self.fileMenu.addSeparator()
         self.fileMenu.addAction(self.app_actions.exitAction)
-        # self.editMenu.addAction(self.actions.copyAction)
-        self.fileMenu.addSeparator()
-        # self.editMenu.addAction(self.actions.pasteAction)
+
+        self.editMenu.addAction(self.app_actions.cutAction)
+        self.editMenu.addAction(self.app_actions.copyAction)
+        self.editMenu.addAction(self.app_actions.pasteAction)
+        self.editMenu.addSeparator()
+        self.editMenu.addAction(self.app_actions.deleteAction)
+
         self.helpMenu.addAction(self.app_actions.aboutAction)
 
     def center(self):

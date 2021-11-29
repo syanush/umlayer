@@ -54,32 +54,34 @@ class Actions:
             parent=None,
             checkable=True)
 
-        # self.deleteAction = QAction(
-        #     QIcon('icons:delete.png'), '&Delete', self.window,
-        #     shortcut="Delete",
-        #     statusTip="Delete",
-        #     triggered=self.logic.delete)
+        self.deleteAction = QAction(
+            icon=QIcon('icons:delete.png'),
+            text='&Delete',
+            shortcut="Delete",
+            statusTip="Delete",
+            parent=self.window.sceneView,
+            triggered=self.window.scene_logic.delete_selected_elements)
 
         self.cutAction = QAction(
             icon=QIcon('icons:cut.png'),
-            text='Cut (Ctrl-X)',
+            text='Cut',
             statusTip='Cut (Ctrl-X)',
-            shortcut='Ctrl+X',
+            shortcut=QKeySequence.Cut,
             parent=self.window.sceneView,
             triggered=self.window.scene_logic.cut_selected_elements)
 
         self.copyAction = QAction(
             icon=QIcon('icons:copy.png'),
-            text='C&opy (Ctrl-C)',
-            shortcut='Copy (Ctrl-C)',
+            text='C&opy',
+            shortcut=QKeySequence.Copy,
             statusTip='Copy (Ctrl-C)',
             parent=self.window.sceneView,
             triggered=self.window.scene_logic.copy_selected_elements)
 
         self.pasteAction = QAction(
             icon=QIcon('icons:paste.png'),
-            text='&Paste (Ctrl-V)',
-            shortcut='Paste (Ctrl-V)',
+            text='&Paste',
+            shortcut=QKeySequence.Paste,
             statusTip='Paste (Ctrl-V)',
             parent=self.window.sceneView,
             triggered=self.window.scene_logic.paste_elements)
