@@ -20,6 +20,9 @@ class MainWindow(QMainWindow):
         self.logic = logic
         self.scene_logic = scene_logic
 
+        self.scene: GraphicsScene = None
+        self.sceneView: GraphicsView = None
+
         self.logic.setWindow(self)
         self.scene_logic.setWindow(self)
 

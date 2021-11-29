@@ -157,11 +157,6 @@ class Actions:
             statusTip='Add class',
             triggered=self.window.scene_logic.addFatClassElement)
 
-        self.addHandleItemAction = QAction(
-            QIcon('icons:miscellaneous.png'), '', self.window,
-            statusTip='Add handle',
-            triggered=self.window.scene_logic.addHandleItem)
-
         self.exportAsRasterImageAction = QAction(
             text='Export as raster image...',
             parent=self.window,
