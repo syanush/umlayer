@@ -14,37 +14,37 @@ class Actions:
             text='&New',
             parent=self.window,
             shortcut=QKeySequence.New,
-            statusTip='Create a New Project',
+            statusTip='Create new project',
             triggered=self.window.recreateProject)
 
         self.openAction = QAction(
             QIcon('icons:open.png'), '&Open', self.window,
             shortcut=QKeySequence.Open,
-            statusTip='Open a project in editor',
+            statusTip='Open project',
             triggered=self.window.logic.openProject)
 
         self.saveAction = QAction(
             QIcon('icons:save.png'), '&Save', self.window,
             shortcut=QKeySequence.Save,
-            statusTip='Save a project',
+            statusTip='Save project',
             triggered=self.window.logic.saveProject)
 
         self.saveAsAction = QAction(
             QIcon('icons:save_as.png'), 'Save As...', self.window,
             shortcut=QKeySequence.SaveAs,
-            statusTip='Save a project',
+            statusTip='Save project as...',
             triggered=self.window.logic.saveProjectAs)
 
         self.closeAction = QAction(
             QIcon('icons:close.png'), '&Close', self.window,
             shortcut=QKeySequence.Close,
-            statusTip='Close current project',
+            statusTip='Close project',
             triggered=self.window.closeProject)
 
         self.exitAction = QAction(
             QIcon('icons:exit.png'), '&Quit', self.window,
             shortcut=QKeySequence.Quit,
-            statusTip='Quit the Application',
+            statusTip='Quit the application',
             triggered=self.window.logic.exitApp)
 
         self.toggleGridAction = QAction(
@@ -70,7 +70,7 @@ class Actions:
 
         self.copyAction = QAction(
             icon=QIcon('icons:copy.png'),
-            text='C&opy',
+            text='C&opy (Ctrl-C)',
             shortcut='Copy (Ctrl-C)',
             statusTip='Copy (Ctrl-C)',
             parent=self.window.sceneView,
@@ -78,7 +78,7 @@ class Actions:
 
         self.pasteAction = QAction(
             icon=QIcon('icons:paste.png'),
-            text='&Paste',
+            text='&Paste (Ctrl-V)',
             shortcut='Paste (Ctrl-V)',
             statusTip='Paste (Ctrl-V)',
             parent=self.window.sceneView,
