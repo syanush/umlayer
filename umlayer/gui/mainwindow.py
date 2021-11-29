@@ -82,11 +82,17 @@ class MainWindow(QMainWindow):
     def createToolBar(self):
         self.aToolBar: QToolBar = self.addToolBar('Main')
         self.aToolBar.addAction(self.app_actions.newAction)
+        self.aToolBar.addAction(self.app_actions.openAction)
+        self.aToolBar.addAction(self.app_actions.saveAction)
+        self.aToolBar.addAction(self.app_actions.saveAsAction)
+        self.aToolBar.addAction(self.app_actions.closeAction)
         self.aToolBar.addSeparator()
-        # self.aToolBar.addAction(self.actions.cutAction)
-        # self.aToolBar.addAction(self.actions.copyAction)
-        # self.aToolBar.addAction(self.actions.pasteAction)
-        # self.aToolBar.addSeparator()
+        self.aToolBar.addAction(self.app_actions.cutAction)
+        self.aToolBar.addAction(self.app_actions.copyAction)
+        self.aToolBar.addAction(self.app_actions.pasteAction)
+        self.aToolBar.addSeparator()
+        self.aToolBar.addAction(self.app_actions.toggleGridAction)
+        self.aToolBar.addSeparator()
         self.aToolBar.addAction(self.app_actions.addActorElementAction)
         self.aToolBar.addAction(self.app_actions.addEllipseElementAction)
         self.aToolBar.addAction(self.app_actions.addLineElementAction)
@@ -322,3 +328,17 @@ class MainWindow(QMainWindow):
     def doOpenProject(self, filename):
         self.load(filename)
         self.updateTreeDataModel()
+
+    def selectedProjectItem(self):
+        item = self.treeView.getSelectedItem()
+        if item is None:
+            return None
+        id = item.data(Qt.UserRole)
+        project_item = self._project.get(id)
+        return project_item
+
+    def isDiagramSelected(self):
+        project_item = self.selectedProjectItem()
+        if project_item is None:
+            return False
+        return isinstance(project_item, model.Diagram)

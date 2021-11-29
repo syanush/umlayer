@@ -6,6 +6,8 @@ class Actions:
         self.window = window
         self.createActions()
 
+        self.toggleGridAction.triggered[bool].connect(self.window.scene_logic.toggleGrid)
+
     def createActions(self):
         self.newAction = QAction(
             icon=QIcon('icons:new.png'),
@@ -45,44 +47,47 @@ class Actions:
             statusTip='Quit the Application',
             triggered=self.window.logic.exitApp)
 
+        self.toggleGridAction = QAction(
+            icon=QIcon('icons:grid.png'),
+            text='Toggle grid',
+            statusTip='Toggle grid',
+            parent=None,
+            checkable=True)
+
         # self.deleteAction = QAction(
         #     QIcon('icons:delete.png'), '&Delete', self.window,
         #     shortcut="Delete",
         #     statusTip="Delete",
         #     triggered=self.logic.delete)
 
-        # self.cutAction = QAction(
-        #     QIcon('icons:cut.png'), 'Cut', self.window,
-        #     shortcut='Ctrl+X',
-        #     statusTip='Cut (Ctrl-X)',
-        #     triggered=self.logic.cut)
+        self.cutAction = QAction(
+            icon=QIcon('icons:cut.png'),
+            text='Cut (Ctrl-X)',
+            statusTip='Cut (Ctrl-X)',
+            shortcut='Ctrl+X',
+            parent=self.window.sceneView,
+            triggered=self.window.scene_logic.cut_selected_elements)
 
-        # self.copyAction = QAction(
-        #     QIcon('icons:copy.png'), 'C&opy', self.window,
-        #     shortcut='Ctrl+C',
-        #     statusTip='Copy (Ctrl-C)',
-        #     triggered=self.logic.copy)
+        self.copyAction = QAction(
+            icon=QIcon('icons:copy.png'),
+            text='C&opy',
+            shortcut='Copy (Ctrl-C)',
+            statusTip='Copy (Ctrl-C)',
+            parent=self.window.sceneView,
+            triggered=self.window.scene_logic.copy_selected_elements)
 
-        # self.pasteAction = QAction(
-        #     QIcon('icons:paste.png'), '&Paste', self.window,
-        #     shortcut='Ctrl+V',
-        #     statusTip='Paste (Ctrl-V)',
-        #     triggered=self.logic.paste)
+        self.pasteAction = QAction(
+            icon=QIcon('icons:paste.png'),
+            text='&Paste',
+            shortcut='Paste (Ctrl-V)',
+            statusTip='Paste (Ctrl-V)',
+            parent=self.window.sceneView,
+            triggered=self.window.scene_logic.paste_elements)
 
         self.aboutAction = QAction(
             QIcon('icons:about.png'), 'A&bout', self.window,
             statusTip='Displays info about the app',
             triggered=self.window.logic.aboutWindow)
-
-        # self.printElementsAction = QAction(
-        #     QIcon('icons:cache.png'), 'Print', self.window,
-        #     statusTip='print',
-        #     triggered=self.window.project.printProjectItems)
-
-        self.printSceneElementsAction = QAction(
-            QIcon('icons:cache.png'), 'Print', self.window,
-            statusTip='print scene elements',
-            triggered=self.window.scene.printItems)
 
         self.createDiagramAction = QAction(
             QIcon('icons:diagram.png'), 'Create diagram', self.window,

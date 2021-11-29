@@ -11,6 +11,7 @@ class SceneLogic:
     def __init__(self):
         """Do not use window here"""
         self.temp_list = []
+        self._grid_enabled = False
 
     def setWindow(self, window):
         self.window = window
@@ -93,12 +94,7 @@ class SceneLogic:
         self.window.scene.addItem(item)
 
     def storeScene(self):
-        item: QStandardItem = self.window.treeView.getSelectedItem()
-        if item is None:
-            return
-        id = item.data(Qt.UserRole)
-        project_item = self.window.project.get(id)
-        if isinstance(project_item, model.Diagram):
+        if self.window.isDiagramSelected():
             self.storeSceneTo(project_item)
 
     def storeSceneTo(self, diagram: model.Diagram):
@@ -144,12 +140,12 @@ class SceneLogic:
 
     def disableScene(self):
         self.window.app_actions.enableSceneActions(False)
-        self.window.scene.set_grid_visible(False)
+        self.refreshGrid()
         self.window.centralWidget.setEnabled(False)
 
     def enableScene(self):
         self.window.centralWidget.setEnabled(True)
-        self.window.scene.set_grid_visible(True)
+        self.refreshGrid()
         self.window.app_actions.enableSceneActions(True)
 
     def on_select_project_item(self, project_item):
@@ -157,14 +153,8 @@ class SceneLogic:
         if isinstance(project_item, model.Diagram):
             self.enableScene()
             self.buildSceneFrom(project_item)
-            # TODO: focus scene view?
-            # w: QWidget = self.window.centralWidget
-            # s: QGraphicsScene = self.scene
-            # s.setFocus(Qt.FocusReason.ActiveWindowFocusReason)
-        elif isinstance(project_item, model.Folder):
-            self.disableScene()
         else:
-            raise NotImplementedError
+            self.disableScene()
 
     def on_project_item_selection_changed(self, selected_items, deselected_items):
         if deselected_items:
@@ -187,3 +177,11 @@ class SceneLogic:
         for item in elements:
             json_dto = item.toJson()
             self.temp_list.append(json_dto)
+
+    def toggleGrid(self, check: bool = False) -> None:
+        self._grid_enabled = check
+        self.refreshGrid()
+
+    def refreshGrid(self):
+        self.window.scene.set_grid_visible(
+            self._grid_enabled and self.window.isDiagramSelected())

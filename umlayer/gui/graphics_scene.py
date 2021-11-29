@@ -11,6 +11,7 @@ class GraphicsScene(QGraphicsScene):
         self.init_grid()
         self._scene_logic: SceneLogic = scene_logic
 
+
     def notify(self):
         self._scene_logic.setDirty()
 
@@ -21,7 +22,8 @@ class GraphicsScene(QGraphicsScene):
     def init_grid(self):
         self.lines = []
         self.draw_grid()
-        # self.set_grid_visible(False)
+        self._is_grid_visible = True
+        self.set_grid_visible(False)
         # self.delete_grid()
 
     def draw_grid(self):
@@ -46,7 +48,13 @@ class GraphicsScene(QGraphicsScene):
         for line in self.lines:
             line.setData(ITEM_TYPE, 'grid')
 
+    def is_grid_visible(self):
+        return self._is_grid_visible
+
     def set_grid_visible(self, visible=True):
+        if self._is_grid_visible is visible:
+            return
+        self._is_grid_visible = visible
         for line in self.lines:
             line.setVisible(visible)
 
