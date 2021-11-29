@@ -88,6 +88,11 @@ class LineElement(QGraphicsItem, BaseElement):
             self.notify()
             self._recalculate()
 
+    def selectAll(self):
+        self.setSelected(True)
+        self._handle1.setSelected(True)
+        self._handle2.setSelected(True)
+
     def toDto(self):
         dto = super().toDto()
         dto['x1'] = self.point1().x()

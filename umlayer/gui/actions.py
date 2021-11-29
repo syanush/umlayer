@@ -120,12 +120,12 @@ class Actions:
         self.addLineElementAction = QAction(
             QIcon('icons:simple_line.png'), 'Line', self.window,
             statusTip='Add line',
-            triggered=self.window.scene_logic.addLineElement)
+            triggered=self.window.scene_logic.addLineElement1)
 
         self.addRelationshipElementAction = QAction(
             QIcon('icons:arrow_triangle.png'), 'Relationship', self.window,
             statusTip='Add relationship',
-            triggered=self.window.scene_logic.addLineElement)
+            triggered=self.window.scene_logic.addLineElement4)
 
         self.addTextElementAction = QAction(
             QIcon('icons:left_text.png'), 'Text', self.window,

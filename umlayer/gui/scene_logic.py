@@ -20,9 +20,17 @@ class SceneLogic:
     def setDirty(self):
         self.window.project.setDirty(True)
 
+    def selectElement(self, element):
+        if isinstance(element, LineElement):
+            element.selectAll()
+        else:
+            element.setSelected(True)
+
     def addElement(self, element: BaseElement) -> None:
         element.setPos(self.initialPosition())
+        self.window.scene.deselectAll()
         self.window.scene.addItem(element)
+        self.selectElement(element)
         self.setDirty()
 
     def initialPosition(self) -> QRectF:
@@ -78,11 +86,33 @@ class SceneLogic:
         item.setText(text)
         self.addElement(item)
 
-    def addLineElement(self):
-        item = LineElement()
-        item.setPoint1(0, 0)
-        item.setPoint2(100, 100)
-        self.addElement(item)
+    def addLineElement1(self):
+        element = LineElement()
+        element.setPoint1(0, 0)
+        element.setPoint2(100, 0)
+        element.setText('lt=-')
+        self.addElement(element)
+
+    def addLineElement2(self):
+        element = LineElement()
+        element.setPoint1(0, 0)
+        element.setPoint2(100, 0)
+        element.setText('lt=.')
+        self.addElement(element)
+
+    def addLineElement3(self):
+        element = LineElement()
+        element.setPoint1(0, 0)
+        element.setPoint2(100, 0)
+        element.setText('lt=..')
+        self.addElement(element)
+
+    def addLineElement4(self):
+        element = LineElement()
+        element.setPoint1(0, 0)
+        element.setPoint2(100, 0)
+        element.setText('lt=->')
+        self.addElement(element)
 
     def storeScene(self):
         if self.window.isDiagramSelected():
@@ -141,7 +171,7 @@ class SceneLogic:
         for element in elements:
             element.setPos(ipos + element.pos())
             self.window.scene.addItem(element)
-            element.setSelected(True)
+            self.selectElement(element)
 
     def disableScene(self):
         self.window.app_actions.enableSceneActions(False)
