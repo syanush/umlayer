@@ -83,6 +83,11 @@ class MainWindow(QMainWindow):
         logging.info('GUI initialization finished')
 
     def createToolBar(self):
+        self._scene_scale_combo = QComboBox()
+        self._scene_scale_combo.addItems(["50%", "75%", "100%", "125%", "150%"])
+        self._scene_scale_combo.setCurrentIndex(2)
+        self._scene_scale_combo.currentTextChanged.connect(self.scene_scale_changed)
+
         self.aToolBar: QToolBar = self.addToolBar('Main')
         self.aToolBar.addAction(self.app_actions.newAction)
         self.aToolBar.addAction(self.app_actions.openAction)
@@ -108,6 +113,10 @@ class MainWindow(QMainWindow):
         self.aToolBar.addAction(self.app_actions.addSimpleClassElementAction)
         self.aToolBar.addAction(self.app_actions.addFatClassElementAction)
         self.aToolBar.addAction(self.app_actions.addPackageElementAction)
+        self.aToolBar.addWidget(self._scene_scale_combo)
+
+    def scene_scale_changed(self, scale):
+        self.sceneView.scale_changed(scale)
 
     def createStatusBar(self):
         """Create Status Bar

@@ -76,3 +76,10 @@ class GraphicsView(QGraphicsView):
 
     def onFocused(self, is_focused: bool) -> None:
         self.setFrameStyle(QFrame.Panel | (QFrame.Plain if is_focused else QFrame.Sunken))
+
+    def scale_changed(self, scale):
+        new_scale = int(scale[:-1]) / 100.0
+        old_matrix = self.transform()
+        self.resetTransform()
+        self.translate(old_matrix.dx(), old_matrix.dy())
+        self.scale(new_scale, new_scale)
