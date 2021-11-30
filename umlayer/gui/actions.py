@@ -246,6 +246,7 @@ class Actions:
         self.pasteAction.setEnabled(enable)
         self.deleteAction.setEnabled(enable)
 
+        self.toggleGridAction.setEnabled(enable)
         self.bringToFrontAction.setEnabled(enable)
         self.sendToBackAction.setEnabled(enable)
 
