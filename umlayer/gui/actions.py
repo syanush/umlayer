@@ -68,6 +68,13 @@ class Actions:
             parent=self.window,
             triggered=self.window.logic.aboutWindow)
 
+        self.aboutQtAction = QAction(
+            icon=QIcon('icons:qt.png'),
+            text='About Qt',
+            statusTip='Displays info about Qt',
+            parent=self.window,
+            triggered=self.window.logic.aboutQtWindow)
+
         self.exitAction = QAction(
             icon=QIcon('icons:exit.png'),
             text='&Quit',

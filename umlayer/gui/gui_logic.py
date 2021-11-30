@@ -5,7 +5,7 @@ from PySide6.QtGui import *
 from PySide6.QtSvg import QSvgGenerator
 from PySide6.QtWidgets import *
 
-from umlayer import model
+from umlayer import version, model
 from . import *
 
 
@@ -93,7 +93,20 @@ class GuiLogic:
 
     def aboutWindow(self):
         logging.info('Action: About window')
-        QMessageBox.about(self.window, "About ...", "About window")
+        QMessageBox.about(
+            self.window,
+            'About UMLayer',
+            f'<h3 align=center>UMLayer</h3>'
+            f'<p align=center>{version.__version__}</p>'
+            '<p align=center>UML diagram editor</p>'
+            '<p align=center><a href="https://github.com/selforthis/umlayer">https://github.com/selforthis/umlayer</a></p>'
+            '<p align=center>Copyright 2021 Serguei Yanush &lt;selforthis@gmail.com&gt;<p>'
+            '<p align=center>MIT License</p>'
+        )
+
+    def aboutQtWindow(self):
+        logging.info('Action: About Qt window')
+        QMessageBox.aboutQt(self.window)
 
     def createDiagram(self):
         logging.info('Action: Create Diagram')

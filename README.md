@@ -4,7 +4,7 @@ This is a small UML diagram editor, inspired by [UMLet](https://umlet.com).
 
 ### Installation in a virtual environment
 
-Get the source code from GitHub: https://github.com/selforthis/umlayer
+Get the source code from [GitHub](https://github.com/selforthis/umlayer)
 and put it in some directory on your filesystem.
 
 ```bash

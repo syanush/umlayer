@@ -216,6 +216,7 @@ class MainWindow(QMainWindow):
         self.editMenu.addAction(self.app_actions.deleteAction)
 
         self.helpMenu.addAction(self.app_actions.aboutAction)
+        self.helpMenu.addAction(self.app_actions.aboutQtAction)
 
     def center(self):
         """Center the main window
