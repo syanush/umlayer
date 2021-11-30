@@ -95,6 +95,8 @@ class MainWindow(QMainWindow):
         self.aToolBar.addAction(self.app_actions.pasteAction)
         self.aToolBar.addSeparator()
         self.aToolBar.addAction(self.app_actions.toggleGridAction)
+        self.aToolBar.addAction(self.app_actions.bringToFrontAction)
+        self.aToolBar.addAction(self.app_actions.sendToBackAction)
         self.aToolBar.addSeparator()
         self.aToolBar.addAction(self.app_actions.addActorElementAction)
         self.aToolBar.addAction(self.app_actions.addEllipseElementAction)
@@ -214,6 +216,9 @@ class MainWindow(QMainWindow):
         self.editMenu.addAction(self.app_actions.pasteAction)
         self.editMenu.addSeparator()
         self.editMenu.addAction(self.app_actions.deleteAction)
+        self.editMenu.addSeparator()
+        self.editMenu.addAction(self.app_actions.bringToFrontAction)
+        self.editMenu.addAction(self.app_actions.sendToBackAction)
 
         self.helpMenu.addAction(self.app_actions.aboutAction)
         self.helpMenu.addAction(self.app_actions.aboutQtAction)

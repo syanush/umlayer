@@ -232,3 +232,33 @@ class SceneLogic:
 
         for element in self.window.scene.elements():
             self.selectElement(element)
+
+    def bring_to_front(self):
+        if not self.window.scene.selectedElements():
+            return
+
+        selected_element = self.window.scene.selectedElements()[0]
+        overlap_elements = self.window.scene.collidingElements(selected_element)
+
+        z_value = 0
+        for element in overlap_elements:
+            if element.zValue() >= z_value:
+                z_value = element.zValue() + 0.1
+        selected_element.setZValue(z_value)
+        print(z_value)
+        selected_element.update()
+
+    def send_to_back(self):
+        if not self.window.scene.selectedElements():
+            return
+
+        selected_element = self.window.scene.selectedElements()[0]
+        overlap_elements = self.window.scene.collidingElements(selected_element)
+
+        z_value = 0
+        for element in overlap_elements:
+            if element.zValue() <= z_value:
+                z_value = element.zValue() - 0.1
+        selected_element.setZValue(z_value)
+        print(z_value)
+        selected_element.update()

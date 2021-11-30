@@ -221,7 +221,34 @@ class Actions:
             parent=self.window.sceneView,
             triggered=self.window.scene_logic.addPackageElement)
 
+        self.bringToFrontAction = QAction(
+            icon=QIcon('icons:bring_to_front.png'),
+            text='Bring to &Front',
+            statusTip='Bring item to front',
+            parent=self.window.sceneView,
+            shortcut='Ctrl+F',
+            triggered=self.window.scene_logic.bring_to_front)
+
+        self.sendToBackAction = QAction(
+            icon=QIcon('icons:send_to_back.png'),
+            text='Send to &Back',
+            statusTip='Send item to back',
+            parent=self.window.sceneView,
+            shortcut='Ctrl+B',
+            triggered=self.window.scene_logic.send_to_back)
+
     def enableSceneActions(self, enable):
+        self.exportAsSvgImageAction.setEnabled(enable)
+        self.exportAsRasterImageAction.setEnabled(enable)
+
+        self.cutAction.setEnabled(enable)
+        self.copyAction.setEnabled(enable)
+        self.pasteAction.setEnabled(enable)
+        self.deleteAction.setEnabled(enable)
+
+        self.bringToFrontAction.setEnabled(enable)
+        self.sendToBackAction.setEnabled(enable)
+
         self.addActorElementAction.setEnabled(enable)
         self.addEllipseElementAction.setEnabled(enable)
         self.addLineElementAction.setEnabled(enable)
@@ -232,5 +259,3 @@ class Actions:
         self.addSimpleClassElementAction.setEnabled(enable)
         self.addFatClassElementAction.setEnabled(enable)
         self.addPackageElementAction.setEnabled(enable)
-        self.exportAsSvgImageAction.setEnabled(enable)
-        self.exportAsRasterImageAction.setEnabled(enable)

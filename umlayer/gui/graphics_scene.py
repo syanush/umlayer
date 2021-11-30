@@ -11,7 +11,6 @@ class GraphicsScene(QGraphicsScene):
         self.init_grid()
         self._scene_logic: SceneLogic = scene_logic
 
-
     def notify(self):
         self._scene_logic.setDirty()
 
@@ -37,13 +36,19 @@ class GraphicsScene(QGraphicsScene):
 
         pen = Settings.GRID_PEN
 
+        small_z_value = -1e100
+
         for x in range(0, num_blocks_x + 1):
             xc = X + x * Settings.BLOCK_SIZE
-            self.lines.append(self.addLine(xc, Y, xc, height, pen))
+            line = self.addLine(xc, Y, xc, height, pen)
+            line.setZValue(small_z_value)
+            self.lines.append(line)
 
         for y in range(0, num_blocks_y + 1):
             yc = Y + y * Settings.BLOCK_SIZE
-            self.lines.append(self.addLine(X, yc, width, yc, pen))
+            line = self.addLine(X, yc, width, yc, pen)
+            line.setZValue(small_z_value)
+            self.lines.append(line)
 
         for line in self.lines:
             line.setData(ITEM_TYPE, 'grid')
@@ -73,6 +78,9 @@ class GraphicsScene(QGraphicsScene):
             self._scene_logic.copy_selected_elements()
         elif event.key() == Qt.Key_V and event.modifiers() == Qt.ControlModifier:
             self._scene_logic.paste_elements()
+
+    def collidingElements(self, element):
+        return self._filter_elements(element.collidingItems())
 
     def selectedElements(self):
         return self._filter_elements(self.selectedItems())
@@ -105,3 +113,10 @@ class GraphicsScene(QGraphicsScene):
     def _filter_elements(self, items):
         return [item for item in items
                 if isinstance(item, BaseElement)]
+
+    def drawBackground(self, painter: QPainter, rect) -> None:
+        super().drawBackground(painter, rect)
+        # TODO: more effective grid?
+        # create vector image of the grid
+        # store it in an attribute
+        # use it to redraw the grid at the background

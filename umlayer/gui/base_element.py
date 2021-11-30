@@ -35,6 +35,7 @@ class BaseElement(object):
         position = self.pos()
         dto['x'] = position.x()
         dto['y'] = position.y()
+        dto['zValue'] = self.zValue()
         return dto
 
     @abc.abstractmethod
@@ -42,6 +43,7 @@ class BaseElement(object):
         if dto['class_name'] != self.__class__.__name__:
             raise ValueError('dto')
         self.setPos(QPointF(dto['x'], dto['y']))
+        self.setZValue(dto['zValue'])
 
     def clone(self):
         dto = self.toDto()
