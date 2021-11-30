@@ -8,12 +8,16 @@ from PySide6.QtWidgets import *
 
 
 class GraphicsView(QGraphicsView):
+    step_ticks = 120
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
         self.setRubberBandSelection()
         self.onFocused(False)
+        self.last_ticks: int = 0
+        self.current_ticks: int = 0
 
     @property
     def window(self):
@@ -46,23 +50,23 @@ class GraphicsView(QGraphicsView):
         v.setMaximum(vmax)
         v.setValue(vv)
 
+    panMouseButton = Qt.RightButton
+
     def mousePressEvent(self, event):
-        if event.button() == Qt.MiddleButton:
+        if event.button() == self.panMouseButton:
             # Must precede fake event handling
             self.setPanning()
             fake = QMouseEvent(event.type(), event.pos(), Qt.LeftButton, event.buttons(), event.modifiers())
             super().mousePressEvent(fake)
-            # print('middle button pressed', self.isInteractive(), self.dragMode())
             return
         super().mousePressEvent(event)
 
     def mouseReleaseEvent(self, event):
-        if event.button() == Qt.MiddleButton:
+        if event.button() == self.panMouseButton:
             fake = QMouseEvent(event.type(), event.pos(), Qt.LeftButton, event.buttons(), event.modifiers())
             super().mouseReleaseEvent(fake)
             # Must follow fake event handling
             self.setRubberBandSelection()
-            # print('middle button released', self.isInteractive(), self.dragMode())
             return
         super().mouseReleaseEvent(event)
 
@@ -83,3 +87,21 @@ class GraphicsView(QGraphicsView):
         self.resetTransform()
         self.translate(old_matrix.dx(), old_matrix.dy())
         self.scale(new_scale, new_scale)
+
+    def wheelEvent(self, event: QWheelEvent) -> None:
+        self.current_ticks += event.angleDelta().y()
+        while self.current_ticks >= self.last_ticks + self.step_ticks:
+            self.last_ticks += self.step_ticks
+            self._zoom(1)
+        while self.current_ticks <= self.last_ticks - self.step_ticks:
+            self.last_ticks -= self.step_ticks
+            self._zoom(-1)
+        event.accept()
+
+    def _zoom(self, change):
+        assert abs(change) == 1
+        if change > 0 and self.window.scaleIndex() == self.window.scaleCount() - 1:
+            return
+        if change < 0 and self.window.scaleIndex() == 0:
+            return
+        self.window.setScaleIndex(self.window.scaleIndex() + change)
