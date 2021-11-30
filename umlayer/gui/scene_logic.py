@@ -183,6 +183,9 @@ class SceneLogic:
         self.refreshGrid()
         self.window.app_actions.enableSceneActions(True)
 
+    def isEnabled(self):
+        return self.window.centralWidget.isEnabled()
+
     def on_select_project_item(self, project_item):
         logging.info(f'Project item selected: {project_item.name()}')
         if isinstance(project_item, model.Diagram):
@@ -220,3 +223,12 @@ class SceneLogic:
     def refreshGrid(self):
         self.window.scene.set_grid_visible(
             self._grid_enabled and self.window.isDiagramSelected())
+
+    def selectAllElements(self):
+        logging.info('Action: Select all elements')
+
+        if not self.isEnabled():
+            return
+
+        for element in self.window.scene.elements():
+            self.selectElement(element)

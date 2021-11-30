@@ -12,55 +12,113 @@ class Actions:
         self.newAction = QAction(
             icon=QIcon('icons:new.png'),
             text='&New',
+            statusTip='Create new project',
             parent=self.window,
             shortcut=QKeySequence.New,
-            statusTip='Create new project',
             triggered=self.window.recreateProject)
 
         self.openAction = QAction(
-            QIcon('icons:open.png'), '&Open', self.window,
-            shortcut=QKeySequence.Open,
+            icon=QIcon('icons:open.png'),
+            text='&Open',
             statusTip='Open project',
+            parent=self.window,
+            shortcut=QKeySequence.Open,
             triggered=self.window.logic.openProject)
 
         self.saveAction = QAction(
-            QIcon('icons:save.png'), '&Save', self.window,
-            shortcut=QKeySequence.Save,
+            icon=QIcon('icons:save.png'),
+            text='&Save',
             statusTip='Save project',
+            parent=self.window,
+            shortcut=QKeySequence.Save,
             triggered=self.window.logic.saveProject)
 
         self.saveAsAction = QAction(
-            QIcon('icons:save_as.png'), 'Save As...', self.window,
-            shortcut=QKeySequence.SaveAs,
+            icon=QIcon('icons:save_as.png'),
+            text='Save As...',
             statusTip='Save project as...',
+            parent=self.window,
+            shortcut=QKeySequence.SaveAs,
             triggered=self.window.logic.saveProjectAs)
 
         self.closeAction = QAction(
-            QIcon('icons:close.png'), '&Close', self.window,
-            shortcut=QKeySequence.Close,
+            icon=QIcon('icons:close.png'),
+            text='&Close',
             statusTip='Close project',
+            parent=self.window,
+            shortcut=QKeySequence.Close,
             triggered=self.window.closeProject)
 
+        self.exportAsRasterImageAction = QAction(
+            text='Export as raster image...',
+            statusTip='Export as raster image...',
+            parent=self.window,
+            triggered=self.window.logic.exportAsRasterImageHandler)
+
+        self.exportAsSvgImageAction = QAction(
+            text='Export as SVG image...',
+            statusTip='Export as SVG image...',
+            parent=self.window,
+            triggered=self.window.logic.exportAsSvgImageHandler)
+
+        self.aboutAction = QAction(
+            icon=QIcon('icons:about.png'),
+            text='A&bout',
+            statusTip='Displays info about the app',
+            parent=self.window,
+            triggered=self.window.logic.aboutWindow)
+
         self.exitAction = QAction(
-            QIcon('icons:exit.png'), '&Quit', self.window,
-            shortcut=QKeySequence.Quit,
+            icon=QIcon('icons:exit.png'),
+            text='&Quit',
             statusTip='Quit the application',
+            parent=self.window,
+            shortcut=QKeySequence.Quit,
             triggered=self.window.logic.exitApp)
+
+        self.createDiagramAction = QAction(
+            icon=QIcon('icons:diagram.png'),
+            text='Create diagram',
+            statusTip='Create diagram',
+            parent=self.window.treeView,
+            triggered=self.window.logic.createDiagram)
+
+        self.createFolderAction = QAction(
+            icon=QIcon('icons:create_folder.png'),
+            text='Create folder',
+            statusTip='Create folder',
+            parent=self.window.treeView,
+            triggered=self.window.logic.createFolder)
+
+        self.deleteProjectItemAction = QAction(
+            icon=QIcon('icons:delete.png'),
+            text='Delete project item',
+            shortcut=QKeySequence.Delete,
+            parent=self.window.treeView,
+            statusTip='Delete project item',
+            triggered=self.window.logic.deleteSelectedItem)
 
         self.toggleGridAction = QAction(
             icon=QIcon('icons:grid.png'),
             text='Toggle grid',
             statusTip='Toggle grid',
-            parent=None,
+            parent=self.window.sceneView,
             checkable=True)
 
         self.deleteAction = QAction(
             icon=QIcon('icons:delete.png'),
             text='&Delete',
-            shortcut="Delete",
             statusTip="Delete",
+            shortcut=QKeySequence.Delete,
             parent=self.window.sceneView,
             triggered=self.window.scene_logic.delete_selected_elements)
+
+        self.selectAllElementsAction = QAction(
+            text='Select all elements',
+            statusTip='Select all elements',
+            shortcut=QKeySequence.SelectAll,
+            parent=self.window.sceneView,
+            triggered=self.window.scene_logic.selectAllElements)
 
         self.cutAction = QAction(
             icon=QIcon('icons:cut.png'),
@@ -73,101 +131,88 @@ class Actions:
         self.copyAction = QAction(
             icon=QIcon('icons:copy.png'),
             text='C&opy',
-            shortcut=QKeySequence.Copy,
             statusTip='Copy (Ctrl-C)',
             parent=self.window.sceneView,
+            shortcut=QKeySequence.Copy,
             triggered=self.window.scene_logic.copy_selected_elements)
 
         self.pasteAction = QAction(
             icon=QIcon('icons:paste.png'),
             text='&Paste',
-            shortcut=QKeySequence.Paste,
             statusTip='Paste (Ctrl-V)',
             parent=self.window.sceneView,
+            shortcut=QKeySequence.Paste,
             triggered=self.window.scene_logic.paste_elements)
 
-        self.aboutAction = QAction(
-            QIcon('icons:about.png'), 'A&bout', self.window,
-            statusTip='Displays info about the app',
-            triggered=self.window.logic.aboutWindow)
-
-        self.createDiagramAction = QAction(
-            QIcon('icons:diagram.png'), 'Create diagram', self.window,
-            statusTip='Create diagram',
-            triggered=self.window.logic.createDiagram)
-
-        self.createFolderAction = QAction(
-            QIcon('icons:create_folder.png'), 'Create folder', self.window,
-            statusTip='Create folder',
-            triggered=self.window.logic.createFolder)
-
-        self.deleteProjectItemAction = QAction(
-            QIcon('icons:delete.png'), 'Delete project item', self.window,
-            shortcut=QKeySequence.Delete,
-            statusTip='Delete project item',
-            triggered=self.window.logic.deleteSelectedItem)
-
         self.addActorElementAction = QAction(
-            QIcon('icons:user_element.svg'), 'Actor', self.window,
+            icon=QIcon('icons:user_element.svg'),
+            text='Actor',
             statusTip='Add actor',
+            parent=self.window.sceneView,
             triggered=self.window.scene_logic.addActorElement)
 
         self.addEllipseElementAction = QAction(
-            QIcon('icons:ellipse.png'), 'Ellipse', self.window,
+            icon=QIcon('icons:ellipse.png'),
+            text='Ellipse',
             statusTip='Add ellipse',
+            parent=self.window.sceneView,
             triggered=self.window.scene_logic.addEllipseElement)
 
         self.addLineElementAction = QAction(
-            QIcon('icons:simple_line.png'), 'Line', self.window,
+            icon=QIcon('icons:simple_line.png'),
+            text='Line',
             statusTip='Add line',
+            parent=self.window.sceneView,
             triggered=self.window.scene_logic.addLineElement1)
 
         self.addRelationshipElementAction = QAction(
-            QIcon('icons:arrow_triangle.png'), 'Relationship', self.window,
+            icon=QIcon('icons:arrow_triangle.png'),
+            text='Relationship',
             statusTip='Add relationship',
+            parent=self.window.sceneView,
             triggered=self.window.scene_logic.addLineElement4)
 
         self.addTextElementAction = QAction(
-            QIcon('icons:left_text.png'), 'Text', self.window,
+            icon=QIcon('icons:left_text.png'),
+            text='Text',
             statusTip='Add text',
+            parent=self.window.sceneView,
             triggered=self.window.scene_logic.addTextElement)
 
         self.addCenteredTextElementAction = QAction(
-            QIcon('icons:center_text.png'), 'Centered text', self.window,
+            icon=QIcon('icons:center_text.png'),
+            text='Centered text',
             statusTip='Add centered text',
+            parent=self.window.sceneView,
             triggered=self.window.scene_logic.addCenteredTextElement)
 
         self.addNoteElementAction = QAction(
-            QIcon('icons:note.png'), 'Note', self.window,
+            icon=QIcon('icons:note.png'),
+            text='Note',
             statusTip='Add note',
+            parent=self.window.sceneView,
             triggered=self.window.scene_logic.addNoteElement)
 
-        self.addPackageElementAction = QAction(
-            QIcon('icons:package.png'), 'Package', self.window,
-            statusTip='Add package',
-            triggered=self.window.scene_logic.addPackageElement)
-
         self.addSimpleClassElementAction = QAction(
-            QIcon('icons:simple_class.png'), 'Simple class', self.window,
+            icon=QIcon('icons:simple_class.png'),
+            text='Simple class',
+            parent=self.window.sceneView,
             statusTip='Add simple class',
             triggered=self.window.scene_logic.addSimpleClassElement)
 
         self.addFatClassElementAction = QAction(
-            QIcon('icons:class_icon.png'), 'Fat class', self.window,
+            icon=QIcon('icons:class_icon.png'),
+            text='Fat class',
+            parent=self.window.sceneView,
             statusTip='Add class',
             triggered=self.window.scene_logic.addFatClassElement)
 
-        self.exportAsRasterImageAction = QAction(
-            text='Export as raster image...',
-            parent=self.window,
-            statusTip='Export as raster image...',
-            triggered=self.window.logic.exportAsRasterImageHandler)
-
-        self.exportAsSvgImageAction = QAction(
-            text='Export as SVG image...',
-            parent=self.window,
-            statusTip='Export as SVG image...',
-            triggered=self.window.logic.exportAsSvgImageHandler)
+        self.addPackageElementAction = QAction(
+            icon=QIcon('icons:package.png'),
+            text='Package',
+            statusTip='Add package',
+            parent=self.window.sceneView,
+            triggered=self.window.scene_logic.addPackageElement)
 
     def enableSceneActions(self, enable):
         self.addActorElementAction.setEnabled(enable)

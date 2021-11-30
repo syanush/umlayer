@@ -165,6 +165,11 @@ class MainWindow(QMainWindow):
             QPainter.VerticalSubpixelPositioning
         )
 
+        shortcut = QShortcut(QKeySequence.SelectAll,
+                             self.sceneView,
+                             context=Qt.ShortcutContext.WidgetShortcut,
+                             activated=self.scene_logic.selectAllElements)
+
         vbox = QVBoxLayout()
         vbox.addWidget(self.sceneView)
 
@@ -264,11 +269,6 @@ class MainWindow(QMainWindow):
 
         self.sti = StandardItemModel()
         self.treeView.setModel(self.sti)
-
-        shortcut = QShortcut(QKeySequence.Delete,
-                             self.treeView,
-                             context=Qt.WidgetShortcut,
-                             activated=self.logic.deleteSelectedItem)
 
     def _getNewProject(self):
         project = model.Project()
