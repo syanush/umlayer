@@ -4,8 +4,7 @@ from PySide6.QtWidgets import *
 
 
 class TreeView(QTreeView):
-    def __init__(self, project_logic, *args, **kwargs):
-        self.project_logic = project_logic
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setHeaderHidden(True)
         self.setContextMenuPolicy(Qt.CustomContextMenu)

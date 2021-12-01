@@ -48,8 +48,8 @@ class GuiLogic:
 
         try:
             self._doSaveProject(filename)
-        except Exception:
-            pass
+        except Exception as ex:
+            raise ex
         else:
             self.window.filename = filename
             self.window.updateTitle()
@@ -110,11 +110,11 @@ class GuiLogic:
 
     def createDiagram(self):
         logging.info('Action: Create Diagram')
-        self._createProjectItem(self.window.project_logic.create_diagram)
+        self._createProjectItem(True)
 
     def createFolder(self):
         logging.info('Action: Create Folder')
-        self._createProjectItem(self.window.project_logic.create_folder)
+        self._createProjectItem(False)
 
     def deleteSelectedItem(self):
         logging.info('Action: Delete selected project item')
@@ -122,7 +122,7 @@ class GuiLogic:
         if item is None:
             return
         id = item.data(Qt.UserRole)
-        self.window.project_logic.delete_project_item(id)
+        self.window.delete_project_item(id)
         index = item.index()
         self.window.sti.removeRow(index.row(), index.parent())
         self.window.updateTitle()
@@ -136,7 +136,7 @@ class GuiLogic:
         project_item = self.window.project.get(id)
         if project_item.name() != item.text():
             project_item.setName(item.text())
-            self.window.project.setDirty(True)
+            self.window.setDirty(True)
         parent_item = item.parent()
         parent_item.sortChildren(0, Qt.SortOrder.AscendingOrder)
         self.window.treeView.scrollTo(item.index())
@@ -230,16 +230,18 @@ class GuiLogic:
             result.append(project_item)
         return tuple(result)
 
-    def _createProjectItem(self, project_item_creation_method):
+    def _createProjectItem(self, isDiagram=True):
         parent_item: QStandardItem = self.window.treeView.getSelectedItem()
         parent_index = parent_item.index()
-
         self.window.treeView.expand(parent_index)
-
         parent_id = parent_item.data(Qt.UserRole)
-        project_item = project_item_creation_method(parent_id)
-        item = StandardItemModel.makeItem(project_item)
 
+        if isDiagram:
+            project_item = self.window.create_diagram(parent_id)
+        else:
+            project_item = self.window.create_folder(parent_id)
+
+        item = StandardItemModel.makeItem(project_item)
         parent_item.insertRow(0, [item])
         self.window.treeView.startEditName(item)
         self.window.updateTitle()
@@ -268,7 +270,7 @@ class GuiLogic:
     def _doSaveProject(self, filename):
         """Really save project"""
         self.window.scene_logic.storeScene()
-        self.window.project_logic.save(filename)
+        self.window.save(filename)
 
     def _isFileNameNotSet(self) -> bool:
         return self.window.filename is None or self.window.filename == model.constants.DEFAULT_FILENAME

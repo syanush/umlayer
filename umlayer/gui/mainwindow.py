@@ -1,5 +1,6 @@
 import logging
 import pprint
+from uuid import UUID
 
 from PySide6.QtCore import *
 from PySide6.QtGui import *
@@ -22,12 +23,12 @@ class MainWindow(QMainWindow):
     """Main window of the UMLayer application
     """
 
-    def __init__(self, project_logic, logic, scene_logic, *args, **kwargs):
+    def __init__(self, logic, scene_logic, storage, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._project = None
-        self.project_logic = project_logic
         self.logic = logic
         self.scene_logic = scene_logic
+        self._storage: ProjectStorage = storage
 
         self.scene: GraphicsScene = None
         self.sceneView: GraphicsView = None
@@ -46,7 +47,9 @@ class MainWindow(QMainWindow):
     def project(self):
         return self._project
 
-    def onIsDirtyChanged(self):
+    def setDirty(self, dirty):
+        if self._project:
+            self._project.setProjectDirty(dirty)
         self.updateTitle()
 
     def setDefaultFileName(self):
@@ -87,7 +90,6 @@ class MainWindow(QMainWindow):
         logging.info('GUI initialization started')
         self.setupComponents()
         self.treeView.selectionModel().selectionChanged.connect(self.logic.on_selection_changed)
-        # self.logic.updateTreeDataModel(self.project)
         self.updateTitle()
         logging.info('GUI initialization finished')
 
@@ -138,6 +140,7 @@ class MainWindow(QMainWindow):
         self.aToolBar.addWidget(self._line_button)
         self._scene_scale_combo = self._createSceneScaleCombo()
         self.aToolBar.addWidget(self._scene_scale_combo)
+        # self.aToolBar.addAction(self.app_actions.printProjectAction)
 
     def setSceneWidgetsEnabled(self, isEnabled):
         self._line_button.setEnabled(isEnabled)
@@ -337,7 +340,7 @@ class MainWindow(QMainWindow):
 
     def createProjectTree(self):
         treeWindow = QDockWidget('Project', self)
-        self.treeView: TreeView = TreeView(self.project_logic, self)
+        self.treeView: TreeView = TreeView(self)
         self.treeView.customContextMenuRequested.connect(self.onTreeViewCustomContextMenuRequested)
 
         treeWindow.setWidget(self.treeView)
@@ -347,9 +350,7 @@ class MainWindow(QMainWindow):
         self.treeView.setModel(self.sti)
 
     def _getNewProject(self):
-        project = model.Project()
-        project.isDirtyChangedEvent.subscribe(self.onIsDirtyChanged)
-        return project
+        return model.Project()
 
     def updateTreeDataModel(self):
         self.sti.updateItemModel(self._project)
@@ -357,7 +358,7 @@ class MainWindow(QMainWindow):
 
     def createNewProject(self):
         self._project = self._getNewProject()
-        self.project_logic.init_new_project(self._project)
+        self.init_new_project()
         self.updateTreeDataModel()
         self.filename = model.constants.DEFAULT_FILENAME
         self.updateTitle()
@@ -377,8 +378,6 @@ class MainWindow(QMainWindow):
 
         self.scene_logic.disableScene()
         self.sti.clear()
-        if self._project is not None:
-            self._project.isDirtyChangedEvent.unsubscribe(self.onIsDirtyChanged)
         self._project = None
         self.filename = None
         self.updateTitle()
@@ -395,7 +394,7 @@ class MainWindow(QMainWindow):
         Throws exceptions in case of errors
         """
 
-        project_items: list = self.project_logic.storage_load(filename)
+        project_items: list = self.storage_load(filename)
         root = project_items[0]
 
         self._project = self._getNewProject()
@@ -405,7 +404,7 @@ class MainWindow(QMainWindow):
             if project_item.id != root.id:
                 self._project.add(project_item, project_item.parent_id)
 
-        self._project.setDirty(False)
+        self.setDirty(False)
 
     def doOpenProject(self, filename):
         self.load(filename)
@@ -424,3 +423,51 @@ class MainWindow(QMainWindow):
         if project_item is None:
             return False
         return isinstance(project_item, model.Diagram)
+
+    def printProjectItems(self):
+        """Debugging feature"""
+        if self.project is None:
+            print('Project is None')
+            return
+        self.project.printProjectItems()
+
+    def init_new_project(self):
+        root = model.Folder("Root")
+        self._project.setRoot(root)
+        self._project.add(model.Diagram("Diagram 1"), root.id)
+        self.setDirty(False)
+
+    def _add_project_item(self, element, parent_id):
+        self._project.add(element, parent_id)
+
+    def create_folder(self, parent_id):
+        project_item = model.Folder("New folder")
+        self._add_project_item(project_item, parent_id)
+        return project_item
+
+    def create_diagram(self, parent_id):
+        project_item = model.Diagram("New diagram")
+        self._add_project_item(project_item, parent_id)
+        return project_item
+
+    def delete_project_item(self, project_item_id: UUID):
+        """Delete elements from model recursively"""
+        if project_item_id == self._project.root.id:
+            return
+        self._project.remove(project_item_id)
+
+    def save(self, filename: str):
+        """Saves project data and settings to a file
+
+        Throws exceptions in case of errors
+        """
+
+        if filename is None:
+            raise ValueError('filename is None')
+
+        project_items = self._project.project_items.values()
+        self._storage.save(project_items, filename)
+        self.setDirty(False)
+
+    def storage_load(self, filename):
+        return self._storage.load(filename)

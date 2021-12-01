@@ -21,10 +21,9 @@ def run_application():
     logging.info('Application started')
 
     store = storage.ProjectStorageImpl()
-    project_logic = model.ProjectLogic(store)
     gui_logic = gui.GuiLogic()
     scene_logic = gui.SceneLogic()
-    main_window = gui.MainWindow(project_logic, gui_logic, scene_logic)
+    main_window = gui.MainWindow(gui_logic, scene_logic, store)
     app.setActiveWindow(main_window)
     main_window.show()
 

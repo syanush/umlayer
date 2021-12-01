@@ -18,7 +18,7 @@ class SceneLogic:
         self.window = window
 
     def setDirty(self):
-        self.window.project.setDirty(True)
+        self.window.setDirty(True)
 
     def selectElement(self, element):
         if isinstance(element, LineElement):
@@ -95,7 +95,7 @@ class SceneLogic:
 
     def storeScene(self):
         if self.window.isDiagramSelected():
-            self.storeSceneTo(project_item)
+            self.storeSceneTo(self.window.selectedProjectItem())
 
     def storeSceneTo(self, diagram: model.Diagram):
         logging.info(f'Store scene to {diagram.name()}')

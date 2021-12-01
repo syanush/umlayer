@@ -223,6 +223,13 @@ class Actions:
             shortcut='Ctrl+B',
             triggered=self.window.scene_logic.send_to_back)
 
+        self.printProjectAction = QAction(
+            icon=QIcon('icons:miscellaneous.png'),
+            text='Print project data',
+            statusTip='Print project data',
+            parent=self.window,
+            triggered=self.window.printProjectItems)
+
     def enableSceneActions(self, enable):
         self.exportAsSvgImageAction.setEnabled(enable)
         self.exportAsRasterImageAction.setEnabled(enable)
