@@ -9,6 +9,15 @@ from umlayer import model
 from . import *
 
 
+class LineIconsProxyStyle(QProxyStyle):
+
+    def pixelMetric(self, metric, option=None, widget=None):
+        if metric == QStyle.PM_SmallIconSize:
+            return 100
+        else:
+            return super().pixelMetric(metric, option, widget)
+
+
 class MainWindow(QMainWindow):
     """Main window of the UMLayer application
     """
@@ -91,15 +100,17 @@ class MainWindow(QMainWindow):
     def scaleCount(self):
         return self._scene_scale_combo.count()
 
-    def createToolBar(self):
-        self._scene_scale_combo = QComboBox()
+    def _createSceneScaleCombo(self):
+        scene_scale_combo = QComboBox()
         min_scale = 50
         max_scale = 250
-        self._scene_scale_combo.addItems(
+        scene_scale_combo.addItems(
             [f'{scale}%' for scale in range(min_scale, max_scale + 10, 10)])
-        self._scene_scale_combo.currentTextChanged.connect(self.scene_scale_changed)
-        self.setScaleIndex(5)  # 100%
+        scene_scale_combo.currentTextChanged.connect(self.scene_scale_changed)
+        scene_scale_combo.setCurrentIndex(5)  # 100%
+        return scene_scale_combo
 
+    def createToolBar(self):
         self.aToolBar: QToolBar = self.addToolBar('Main')
         self.aToolBar.addAction(self.app_actions.newAction)
         self.aToolBar.addAction(self.app_actions.openAction)
@@ -117,15 +128,53 @@ class MainWindow(QMainWindow):
         self.aToolBar.addSeparator()
         self.aToolBar.addAction(self.app_actions.addActorElementAction)
         self.aToolBar.addAction(self.app_actions.addEllipseElementAction)
-        self.aToolBar.addAction(self.app_actions.addLineElementAction)
-        self.aToolBar.addAction(self.app_actions.addRelationshipElementAction)
         self.aToolBar.addAction(self.app_actions.addTextElementAction)
         self.aToolBar.addAction(self.app_actions.addCenteredTextElementAction)
         self.aToolBar.addAction(self.app_actions.addNoteElementAction)
         self.aToolBar.addAction(self.app_actions.addSimpleClassElementAction)
         self.aToolBar.addAction(self.app_actions.addFatClassElementAction)
         self.aToolBar.addAction(self.app_actions.addPackageElementAction)
+        self._line_button = self._createLineButton()
+        self.aToolBar.addWidget(self._line_button)
+        self._scene_scale_combo = self._createSceneScaleCombo()
         self.aToolBar.addWidget(self._scene_scale_combo)
+
+    def setSceneWidgetsEnabled(self, isEnabled):
+        self._line_button.setEnabled(isEnabled)
+        self._scene_scale_combo.setEnabled(isEnabled)
+
+    def _createLineButton(self):
+        lineButton = QPushButton('Lines')
+        menu = QMenu(lineButton)
+        # line icon size: 110 x 40
+        menu.addAction(QAction(icon=QIcon('icons:a1.png'), text='Association', parent=lineButton,
+                               triggered=lambda: self.scene_logic.addLine('lt=-')))
+        menu.addAction(QAction(icon=QIcon('icons:a4.png'), text='Directional association', parent=lineButton,
+                               triggered=lambda: self.scene_logic.addLine('lt=->'))),
+        menu.addAction(QAction(icon=QIcon('icons:a5.png'), text='Bidirectional association', parent=lineButton,
+                               triggered=lambda: self.scene_logic.addLine('lt=<->')))
+        menu.addAction(QAction(icon=QIcon('icons:a7.png'), text='Aggregation', parent=lineButton,
+                               triggered=lambda: self.scene_logic.addLine('lt=->>>>')))
+        menu.addAction(QAction(icon=QIcon('icons:a8.png'), text='Composition', parent=lineButton,
+                               triggered=lambda: self.scene_logic.addLine('lt=->>>>>')))
+        menu.addAction(QAction(icon=QIcon('icons:a9.png'), text='Inheritance/Generalization', parent=lineButton,
+                               triggered=lambda: self.scene_logic.addLine('lt=->>')))
+        menu.addAction(QAction(icon=QIcon('icons:a10.png'), text='Realization/Implementation', parent=lineButton,
+                               triggered=lambda: self.scene_logic.addLine('lt=.>>')))
+        menu.addAction(QAction(icon=QIcon('icons:a11.png'), text='Dependency', parent=lineButton,
+                               triggered=lambda: self.scene_logic.addLine('lt=.>')))
+        menu.addAction(QAction(icon=QIcon('icons:a2.png'), text='', parent=lineButton,
+                               triggered=lambda: self.scene_logic.addLine('lt=.')))
+        menu.addAction(QAction(icon=QIcon('icons:a3.png'), text='Note connector', parent=lineButton,
+                               triggered=lambda: self.scene_logic.addLine('lt=..')))
+        menu.addAction(QAction(icon=QIcon('icons:a6.png'), text='Synchronous message', parent=lineButton,
+                               triggered=lambda: self.scene_logic.addLine('lt=->>>')))
+        menu.addAction(QAction(icon=QIcon('icons:a12.png'), text='Asynchronous message', parent=lineButton,
+                               triggered=lambda: self.scene_logic.addLine('lt=->>>>>>')))
+        lineButton.setMenu(menu)
+        myStyle = LineIconsProxyStyle()
+        menu.setStyle(myStyle)
+        return lineButton
 
     def scene_scale_changed(self, scale):
         self.sceneView.scale_changed(scale)

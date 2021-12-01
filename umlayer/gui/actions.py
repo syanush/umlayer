@@ -165,20 +165,6 @@ class Actions:
             parent=self.window.sceneView,
             triggered=self.window.scene_logic.addEllipseElement)
 
-        self.addLineElementAction = QAction(
-            icon=QIcon('icons:simple_line.png'),
-            text='Line',
-            statusTip='Add line',
-            parent=self.window.sceneView,
-            triggered=self.window.scene_logic.addLineElement1)
-
-        self.addRelationshipElementAction = QAction(
-            icon=QIcon('icons:arrow_triangle.png'),
-            text='Relationship',
-            statusTip='Add relationship',
-            parent=self.window.sceneView,
-            triggered=self.window.scene_logic.addLineElement4)
-
         self.addTextElementAction = QAction(
             icon=QIcon('icons:left_text.png'),
             text='Text',
@@ -252,11 +238,11 @@ class Actions:
 
         self.addActorElementAction.setEnabled(enable)
         self.addEllipseElementAction.setEnabled(enable)
-        self.addLineElementAction.setEnabled(enable)
-        self.addRelationshipElementAction.setEnabled(enable)
         self.addTextElementAction.setEnabled(enable)
         self.addCenteredTextElementAction.setEnabled(enable)
         self.addNoteElementAction.setEnabled(enable)
         self.addSimpleClassElementAction.setEnabled(enable)
         self.addFatClassElementAction.setEnabled(enable)
         self.addPackageElementAction.setEnabled(enable)
+
+        self.window.setSceneWidgetsEnabled(enable)

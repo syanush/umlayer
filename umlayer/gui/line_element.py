@@ -20,6 +20,7 @@ class TipType(Enum):
     FullTriangle = 3
     HollowDiamond = 4
     FullDiamond = 5
+    FullHalfTriangle = 6
 
 
 class LineElement(QGraphicsItem, BaseElement):
@@ -122,7 +123,7 @@ class LineElement(QGraphicsItem, BaseElement):
 
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
         def get_tip_brush(tip_type):
-            if tip_type in [TipType.FullTriangle, TipType.FullDiamond]:
+            if tip_type in [TipType.FullTriangle, TipType.FullDiamond, TipType.FullHalfTriangle]:
                 brush = Settings.LINE_SELECTED_BRUSH if self.isSelected() else Settings.ELEMENT_NORMAL_BRUSH
             else:
                 brush = Settings.ELEMENT_SELECTED_TRANSPARENT_BRUSH if self.isSelected() else Settings.ELEMENT_NORMAL_TRANSPARENT_BRUSH
@@ -185,6 +186,7 @@ class LineElement(QGraphicsItem, BaseElement):
         TipType.FullTriangle: TriangleTip,
         TipType.HollowDiamond: DiamondTip,
         TipType.FullDiamond: DiamondTip,
+        TipType.FullHalfTriangle: HalfTriangleTip
     }
 
     def _recalculate(self):
@@ -233,10 +235,11 @@ class LineElement(QGraphicsItem, BaseElement):
         self._label_text = '\n'.join(label_lines)
 
     _tip_types = [TipType.Empty, TipType.Arrow, TipType.HollowTriangle,
-                  TipType.FullTriangle, TipType.HollowDiamond, TipType.FullDiamond]
+                  TipType.FullTriangle, TipType.HollowDiamond, TipType.FullDiamond,
+                  TipType.FullHalfTriangle]
 
-    _tip1_type_from_txt = dict(zip(['', '<', '<<', '<<<', '<<<<', '<<<<<'], _tip_types))
-    _tip2_type_from_txt = dict(zip(['', '>', '>>', '>>>', '>>>>', '>>>>>'], _tip_types))
+    _tip1_type_from_txt = dict(zip(['', '<', '<<', '<<<', '<<<<', '<<<<<', '<<<<<<'], _tip_types))
+    _tip2_type_from_txt = dict(zip(['', '>', '>>', '>>>', '>>>>', '>>>>>', '>>>>>>'], _tip_types))
 
     _lt_from_splitter = {
         '-': LineType.Solid,

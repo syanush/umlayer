@@ -11,7 +11,7 @@ from .ellipse_element import EllipseElement
 from .note_element import NoteElement
 from .class_element import ClassElement
 from .handle_item import HandleItem
-from .tips import Tip, NoTip, ArrowTip, TriangleTip, DiamondTip
+from .tips import Tip, NoTip, ArrowTip, TriangleTip, HalfTriangleTip, DiamondTip
 from .line_element import LineElement
 
 from .scene_logic import SceneLogic

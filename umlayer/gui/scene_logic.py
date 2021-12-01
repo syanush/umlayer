@@ -86,32 +86,11 @@ class SceneLogic:
         item.setText(text)
         self.addElement(item)
 
-    def addLineElement1(self):
+    def addLine(self, line_text):
         element = LineElement()
         element.setPoint1(0, 0)
         element.setPoint2(100, 0)
-        element.setText('lt=-')
-        self.addElement(element)
-
-    def addLineElement2(self):
-        element = LineElement()
-        element.setPoint1(0, 0)
-        element.setPoint2(100, 0)
-        element.setText('lt=.')
-        self.addElement(element)
-
-    def addLineElement3(self):
-        element = LineElement()
-        element.setPoint1(0, 0)
-        element.setPoint2(100, 0)
-        element.setText('lt=..')
-        self.addElement(element)
-
-    def addLineElement4(self):
-        element = LineElement()
-        element.setPoint1(0, 0)
-        element.setPoint2(100, 0)
-        element.setText('lt=->')
+        element.setText(line_text)
         self.addElement(element)
 
     def storeScene(self):

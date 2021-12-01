@@ -67,6 +67,28 @@ class TriangleTip(Tip):
         painter.drawPath(self._path)
 
 
+class HalfTriangleTip(Tip):
+    tip_size = 15
+
+    def recalculate(self, point1: QPointF, point2: QPointF):
+        line = QLineF(point1, point2)
+        angle = line.angle()
+        line1 = QLineF.fromPolar(self.tip_size, angle + 30).translated(point1)
+        line2 = QLineF.fromPolar(self.tip_size, angle - 30).translated(point1)
+        line3 = QLineF(line1.p2(), line2.p2())
+        self.setPoint(line3.center())
+
+        path = QPainterPath()
+        path.moveTo(point1)
+        path.lineTo(line1.p2())
+        path.lineTo(line3.center())
+        path.lineTo(point1)
+        self._path = path
+
+    def paint(self, painter: QPainter):
+        painter.drawPath(self._path)
+
+
 class DiamondTip(Tip):
     tip_size = 15
 
