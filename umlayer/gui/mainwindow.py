@@ -15,11 +15,12 @@ class MainWindow(QMainWindow):
     """Main window of the UMLayer application
     """
 
-    def __init__(self, scene_logic, storage, interactors, *args, **kwargs):
+    def __init__(self, scene_logic, storage, data_model, interactors, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.scene_logic = scene_logic
         self._storage: ProjectStorage = storage
         self._interactors = interactors
+        self._data_model = data_model
 
         self.scene: GraphicsScene = None
         self.sceneView: GraphicsView = None
@@ -35,11 +36,11 @@ class MainWindow(QMainWindow):
 
     @property
     def filename(self):
-        return self._interactors.data_model.filename
+        return self._data_model.filename
 
     @property
     def project(self):
-        return self._interactors.data_model.project
+        return self._data_model.project
 
     def setDirty(self, dirty):
         if self.project:
@@ -47,7 +48,15 @@ class MainWindow(QMainWindow):
         self.updateTitle()
 
     def setDefaultFileName(self):
-        self._interactors.set_filename(model.constants.DEFAULT_FILENAME)
+        self._data_model.set_filename(model.constants.DEFAULT_FILENAME)
+
+    def saveProject(self):
+        logging.info('Action: Save')
+        self._interactors.save_interactor.saveProject()
+
+    def saveProjectAs(self):
+        logging.info('Action: Save As')
+        self._interactors.save_interactor.saveProjectAs()
 
     def writeSettings(self):
         settings = QSettings()
@@ -481,9 +490,6 @@ class MainWindow(QMainWindow):
     def setFilename(self, filename):
         self._interactors.set_filename(filename)
 
-    def isFileNameNotSet(self) -> bool:
-        return self.filename is None or self.filename == model.constants.DEFAULT_FILENAME
-
     def doSaveProject(self, filename):
         """Really save project"""
 
@@ -685,46 +691,7 @@ class MainWindow(QMainWindow):
 
         return reply != QMessageBox.Cancel
 
-    def saveProjectAs(self):
-        logging.info('Action: Save As')
 
-        if self.project is None:
-            return
-
-        filename = self.getFileNameFromSaveDialog('Save as...')
-
-        if len(filename) == 0:
-            return
-
-        try:
-            self.doSaveProject(filename)
-        except Exception as ex:
-            raise ex
-        else:
-            self.setFilename(filename)
-            self.updateTitle()
-
-    def saveProject(self):
-        logging.info('Action: Save')
-
-        if self.project is None:
-            return
-
-        if self.isFileNameNotSet():
-            filename = self.getFileNameFromSaveDialog('Save')
-        else:
-            filename = self.filename
-
-        if len(filename) == 0:
-            return
-
-        try:
-            self.doSaveProject(filename)
-        except Exception as ex:
-            raise ex
-        else:
-            self.setFilename(filename)
-            self.updateTitle()
 
     def openProject(self):
         logging.info('Action: Open')

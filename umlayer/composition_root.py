@@ -14,12 +14,13 @@ class CompositionRoot:
 
         data_model = model.DataModel()
 
-        save_interactor = usecases.SaveInteractor()
+        save_interactor = usecases.SaveInteractor(data_model)
         interactors = usecases.Interactors(data_model, save_interactor)
 
         scene_logic = gui.SceneLogic()
         store = storage.ProjectStorageImpl()
-        self._main_window = gui.MainWindow(scene_logic, store, interactors)
+        self._main_window = gui.MainWindow(scene_logic, store, data_model, interactors)
+        interactors.set_window(self._main_window)
 
     @property
     def main_window(self):
