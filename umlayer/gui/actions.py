@@ -23,7 +23,7 @@ class Actions:
             statusTip='Open project',
             parent=self.window,
             shortcut=QKeySequence.Open,
-            triggered=self.window.logic.openProject)
+            triggered=self.window.openProject)
 
         self.saveAction = QAction(
             icon=QIcon('icons:save.png'),
@@ -31,7 +31,7 @@ class Actions:
             statusTip='Save project',
             parent=self.window,
             shortcut=QKeySequence.Save,
-            triggered=self.window.logic.saveProject)
+            triggered=self.window.saveProject)
 
         self.saveAsAction = QAction(
             icon=QIcon('icons:save_as.png'),
@@ -39,7 +39,7 @@ class Actions:
             statusTip='Save project as...',
             parent=self.window,
             shortcut=QKeySequence.SaveAs,
-            triggered=self.window.logic.saveProjectAs)
+            triggered=self.window.saveProjectAs)
 
         self.closeAction = QAction(
             icon=QIcon('icons:close.png'),
@@ -53,27 +53,27 @@ class Actions:
             text='Export as raster image...',
             statusTip='Export as raster image...',
             parent=self.window,
-            triggered=self.window.logic.exportAsRasterImageHandler)
+            triggered=self.window.exportAsRasterImageHandler)
 
         self.exportAsSvgImageAction = QAction(
             text='Export as SVG image...',
             statusTip='Export as SVG image...',
             parent=self.window,
-            triggered=self.window.logic.exportAsSvgImageHandler)
+            triggered=self.window.exportAsSvgImageHandler)
 
         self.aboutAction = QAction(
             icon=QIcon('icons:about.png'),
             text='A&bout',
             statusTip='Displays info about the app',
             parent=self.window,
-            triggered=self.window.logic.aboutWindow)
+            triggered=self.window.aboutWindow)
 
         self.aboutQtAction = QAction(
             icon=QIcon('icons:qt.png'),
             text='About Qt',
             statusTip='Displays info about Qt',
             parent=self.window,
-            triggered=self.window.logic.aboutQtWindow)
+            triggered=self.window.aboutQtWindow)
 
         self.exitAction = QAction(
             icon=QIcon('icons:exit.png'),
@@ -81,21 +81,21 @@ class Actions:
             statusTip='Quit the application',
             parent=self.window,
             shortcut=QKeySequence.Quit,
-            triggered=self.window.logic.exitApp)
+            triggered=self.window.exitApp)
 
         self.createDiagramAction = QAction(
             icon=QIcon('icons:diagram.png'),
             text='Create diagram',
             statusTip='Create diagram',
             parent=self.window.treeView,
-            triggered=self.window.logic.createDiagram)
+            triggered=self.window.createDiagram)
 
         self.createFolderAction = QAction(
             icon=QIcon('icons:create_folder.png'),
             text='Create folder',
             statusTip='Create folder',
             parent=self.window.treeView,
-            triggered=self.window.logic.createFolder)
+            triggered=self.window.createFolder)
 
         self.deleteProjectItemAction = QAction(
             icon=QIcon('icons:delete.png'),
@@ -103,7 +103,7 @@ class Actions:
             shortcut=QKeySequence.Delete,
             parent=self.window.treeView,
             statusTip='Delete project item',
-            triggered=self.window.logic.deleteSelectedItem)
+            triggered=self.window.deleteSelectedItem)
 
         self.toggleGridAction = QAction(
             icon=QIcon('icons:grid.png'),

@@ -53,7 +53,7 @@ class TreeView(QTreeView):
 
     def onCloseEditor(self, editor: QAbstractItemDelegate, hint):
         """Set element name after editing"""
-        self.window.logic.finishNameEditing()
+        self.window.finishNameEditing()
 
     def focusInEvent(self, event: QFocusEvent) -> None:
         self.onFocused(True)

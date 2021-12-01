@@ -6,34 +6,35 @@ import traceback
 
 from umlayer import version
 from umlayer import model, gui, storage
+from .composition_root import CompositionRoot
 
 
-def run_application():
-    """Construct and run the UMLayer application
-    """
-
+def init_logging():
     logging.basicConfig(filename='umlayer.log', filemode='w', level=logging.INFO)
     logging.info(f'UMLayer {version.__version__}')
 
-    app = gui.UMLayerApplication(sys.argv)
-    # app.setStyle('Fusion')
+
+def run():
+    """Construct and run the UMLayer application
+    """
+    init_logging()
 
     logging.info('Application started')
+    composer = CompositionRoot()
+    composer.compose()
+    app: QApplication = composer.app
+    main_window: QMainWindow = composer.main_window
+    del composer
 
-    store = storage.ProjectStorageImpl()
-    gui_logic = gui.GuiLogic()
-    scene_logic = gui.SceneLogic()
-    main_window = gui.MainWindow(gui_logic, scene_logic, store)
+    # app.setStyle('Fusion')
     app.setActiveWindow(main_window)
     main_window.show()
-
     logging.info('Main window displayed')
+    del main_window
 
     result_code = app.exec()
-    main_window = None
-    app = None
-
     logging.info('Application finished')
+    del app
 
     return result_code
 
@@ -43,7 +44,7 @@ def main():
     """
 
     try:
-        errcode = run_application()
+        errcode = run()
     except SystemExit:
         errcode = 0
     except Exception as ex:

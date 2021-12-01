@@ -4,36 +4,26 @@ from uuid import UUID
 
 from PySide6.QtCore import *
 from PySide6.QtGui import *
+from PySide6.QtSvg import QSvgGenerator
 from PySide6.QtWidgets import *
 
-from umlayer import model
+from umlayer import version, model
 from . import *
-
-
-class LineIconsProxyStyle(QProxyStyle):
-
-    def pixelMetric(self, metric, option=None, widget=None):
-        if metric == QStyle.PM_SmallIconSize:
-            return 100
-        else:
-            return super().pixelMetric(metric, option, widget)
 
 
 class MainWindow(QMainWindow):
     """Main window of the UMLayer application
     """
 
-    def __init__(self, logic, scene_logic, storage, *args, **kwargs):
+    def __init__(self, scene_logic, storage, interactors, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._project = None
-        self.logic = logic
         self.scene_logic = scene_logic
         self._storage: ProjectStorage = storage
+        self._interactors = interactors
 
         self.scene: GraphicsScene = None
         self.sceneView: GraphicsView = None
 
-        self.logic.setWindow(self)
         self.scene_logic.setWindow(self)
 
         self.readSettings()
@@ -44,16 +34,20 @@ class MainWindow(QMainWindow):
         self.createNewProject()
 
     @property
+    def filename(self):
+        return self._interactors.data_model.filename
+
+    @property
     def project(self):
-        return self._project
+        return self._interactors.data_model.project
 
     def setDirty(self, dirty):
-        if self._project:
-            self._project.setProjectDirty(dirty)
+        if self.project:
+            self.project.setProjectDirty(dirty)
         self.updateTitle()
 
     def setDefaultFileName(self):
-        self.filename = model.constants.DEFAULT_FILENAME
+        self._interactors.set_filename(model.constants.DEFAULT_FILENAME)
 
     def writeSettings(self):
         settings = QSettings()
@@ -79,17 +73,32 @@ class MainWindow(QMainWindow):
         logging.info('Settings loading finished')
 
     def isDirty(self):
-        is_dirty = False if self._project is None else self._project.dirty()
+        is_dirty = False if self.project is None else self.project.dirty()
         return is_dirty
 
     def updateTitle(self):
-        title = model.utils.build_window_title(self.filename, self.isDirty())
+        # tested
+        title = MainWindow.build_window_title(self.filename, self.isDirty())
+        # not tested
         self.setWindowTitle(title)
+
+    @staticmethod
+    def build_window_title(filename: str, is_dirty: bool):
+        title = 'UMLayer'
+
+        if filename:
+            if len(filename) >= 4 and filename.endswith(model.constants.EXTENSION):
+                filename = filename[:-4]
+
+            star = ' *' if is_dirty else ''
+            title = f'{filename}{star} \u2014 ' + title
+
+        return title
 
     def initGUI(self):
         logging.info('GUI initialization started')
         self.setupComponents()
-        self.treeView.selectionModel().selectionChanged.connect(self.logic.on_selection_changed)
+        self.treeView.selectionModel().selectionChanged.connect(self.on_selection_changed)
         self.updateTitle()
         logging.info('GUI initialization finished')
 
@@ -306,7 +315,7 @@ class MainWindow(QMainWindow):
         self.move(qRect.topLeft())
 
     def closeEvent(self, event):
-        if self.logic.saveFileIfNeeded():
+        if self.saveFileIfNeeded():
             self.writeSettings()
             logging.info('Main window closed')
             event.accept()
@@ -349,18 +358,15 @@ class MainWindow(QMainWindow):
         self.sti = StandardItemModel()
         self.treeView.setModel(self.sti)
 
-    def _getNewProject(self):
-        return model.Project()
-
     def updateTreeDataModel(self):
-        self.sti.updateItemModel(self._project)
+        self.sti.updateItemModel(self.project)
         self.treeView.setInitialState()
 
     def createNewProject(self):
-        self._project = self._getNewProject()
+        self._interactors.create_project()
         self.init_new_project()
         self.updateTreeDataModel()
-        self.filename = model.constants.DEFAULT_FILENAME
+        self.setDefaultFileName()
         self.updateTitle()
 
     def recreateProject(self):
@@ -373,19 +379,19 @@ class MainWindow(QMainWindow):
 
     def closeProject(self) -> bool:
         logging.info('Action: Close')
-        if not self.logic.saveFileIfNeeded():
+        if not self.saveFileIfNeeded():
             return False
 
         self.scene_logic.disableScene()
         self.sti.clear()
-        self._project = None
-        self.filename = None
+        self._interactors.delete_project()
+        self._interactors.delete_filename()
         self.updateTitle()
         return True
 
     def printStats(self):
-        if self._project is not None:
-            print('number of elements', self._project.count())
+        if self.project is not None:
+            print('number of elements', self.project.count())
             print('number of items', self.sti.count())
 
     def load(self, filename: str):
@@ -397,12 +403,12 @@ class MainWindow(QMainWindow):
         project_items: list = self.storage_load(filename)
         root = project_items[0]
 
-        self._project = self._getNewProject()
-        self._project.setRoot(root)
+        self._interactors.create_project()
+        self.project.setRoot(root)
 
         for project_item in project_items:
             if project_item.id != root.id:
-                self._project.add(project_item, project_item.parent_id)
+                self.project.add(project_item, project_item.parent_id)
 
         self.setDirty(False)
 
@@ -415,7 +421,7 @@ class MainWindow(QMainWindow):
         if item is None:
             return None
         id = item.data(Qt.UserRole)
-        project_item = self._project.get(id)
+        project_item = self.project.get(id)
         return project_item
 
     def isDiagramSelected(self):
@@ -433,12 +439,12 @@ class MainWindow(QMainWindow):
 
     def init_new_project(self):
         root = model.Folder("Root")
-        self._project.setRoot(root)
-        self._project.add(model.Diagram("Diagram 1"), root.id)
+        self.project.setRoot(root)
+        self.project.add(model.Diagram("Diagram 1"), root.id)
         self.setDirty(False)
 
     def _add_project_item(self, element, parent_id):
-        self._project.add(element, parent_id)
+        self.project.add(element, parent_id)
 
     def create_folder(self, parent_id):
         project_item = model.Folder("New folder")
@@ -452,9 +458,9 @@ class MainWindow(QMainWindow):
 
     def delete_project_item(self, project_item_id: UUID):
         """Delete elements from model recursively"""
-        if project_item_id == self._project.root.id:
+        if project_item_id == self.project.root.id:
             return
-        self._project.remove(project_item_id)
+        self.project.remove(project_item_id)
 
     def save(self, filename: str):
         """Saves project data and settings to a file
@@ -463,11 +469,279 @@ class MainWindow(QMainWindow):
         """
 
         if filename is None:
-            raise ValueError('filename is None')
+            raise ValueError('filename')
 
-        project_items = self._project.project_items.values()
+        project_items = self.project.project_items.values()
         self._storage.save(project_items, filename)
         self.setDirty(False)
 
     def storage_load(self, filename):
         return self._storage.load(filename)
+
+    def setFilename(self, filename):
+        self._interactors.set_filename(filename)
+
+    def isFileNameNotSet(self) -> bool:
+        return self.filename is None or self.filename == model.constants.DEFAULT_FILENAME
+
+    def doSaveProject(self, filename):
+        """Really save project"""
+
+        if self.project is None:
+            return
+
+        self.scene_logic.storeScene()
+        self.save(filename)
+
+    def getFileNameFromSaveDialog(self, caption=None):
+        initial_filename = self.filename or model.constants.DEFAULT_FILENAME
+        filename, selected_filter = \
+            QFileDialog.getSaveFileName(
+                parent=self,
+                caption=caption,
+                dir=QDir.currentPath() + '/' + initial_filename,
+                filter="All (*);;Umlayer project (*.ulr)",
+                selectedFilter="Umlayer project (*.ulr)")
+        return filename
+
+    def getFileNameFromOpenDialog(self, caption=None):
+        filename, selected_filter = \
+            QFileDialog.getOpenFileName(
+                parent=self,
+                caption=caption,
+                dir=QDir.currentPath(),
+                filter="All (*);;Umlayer project (*.ulr)",
+                selectedFilter="Umlayer project (*.ulr)")
+        return filename
+
+    def createProjectItem(self, isDiagram=True):
+        parent_item: QStandardItem = self.treeView.getSelectedItem()
+        parent_index = parent_item.index()
+        self.treeView.expand(parent_index)
+        parent_id = parent_item.data(Qt.UserRole)
+
+        if isDiagram:
+            project_item = self.create_diagram(parent_id)
+        else:
+            project_item = self.create_folder(parent_id)
+
+        item = StandardItemModel.makeItem(project_item)
+        parent_item.insertRow(0, [item])
+        self.treeView.startEditName(item)
+        self.updateTitle()
+
+    def projectItemsFromSelection(self, selection):
+        result = []
+        for index in selection.indexes():
+            item = self.sti.itemFromIndex(index)
+            if item is None:
+                continue
+            id = item.data(Qt.UserRole)
+            project_item = self.project.get(id)
+            result.append(project_item)
+        return tuple(result)
+
+    def exportAsSvgImage(self, filename):
+        tempScene = self.scene.getTempScene()
+        newSceneRect = tempScene.itemsBoundingRect()
+        sceneSize = newSceneRect.size().toSize()
+        generator = QSvgGenerator()
+        generator.setFileName(filename)
+        generator.setSize(sceneSize)
+        generator.setViewBox(QRect(0, 0, sceneSize.width(), sceneSize.height()))
+        generator.setDescription("UML diagram")
+        generator.setTitle(filename)
+        painter = QPainter()
+        painter.begin(generator)
+        tempScene.render(painter)
+        painter.end()
+        tempScene.clear()
+        logging.info('The scene was exported as SVG image')
+
+    def exportAsRasterImage(self, filename):
+        tempScene = self.scene.getTempScene()
+        newSceneRect = tempScene.itemsBoundingRect()
+        sceneSize = newSceneRect.size().toSize()
+        image = QImage(sceneSize, QImage.Format_ARGB32)
+        image.fill(Qt.transparent)
+        painter = QPainter()
+        painter.begin(image)
+        tempScene.render(painter)
+        painter.end()
+        image.save(filename)
+        logging.info('The scene was exported as raster image')
+
+    def getFileNameForRasterImageDialog(self):
+        initial_filename = model.constants.DEFAULT_RASTER_FILENAME
+        filename, selected_filter = \
+            QFileDialog.getSaveFileName(
+                parent=self,
+                caption='Export diagram as raster image',
+                dir=QDir.currentPath() + '/' + initial_filename,
+                filter='PNG (*.png);;JPG (*.jpg);;JPEG (*.jpeg);;BMP (*.bmp);;PPM (*.ppm);;XBM (*.xbm);;XPM (*.xpm);;All (*)',
+                selectedFilter='PNG (*.png)'
+            )
+        return filename
+
+    def getFileNameForSvgImageDialog(self):
+        initial_filename = model.constants.DEFAULT_SVG_FILENAME
+
+        filename, selected_filter = \
+            QFileDialog.getSaveFileName(
+                parent=self,
+                caption='Export diagram as SVG image',
+                dir=QDir.currentPath() + '/' + initial_filename,
+                filter='SVG image (*.svg);;All (*)',
+                selectedFilter='SVG image (*.svg)')
+        return filename
+
+    def exportAsRasterImageHandler(self):
+        filename = self.getFileNameForRasterImageDialog()
+
+        if filename is not None and len(filename.strip()) != 0:
+            self.exportAsRasterImage(filename)
+
+    def exportAsSvgImageHandler(self):
+        filename = self.getFileNameForSvgImageDialog()
+
+        if filename is not None and len(filename.strip()) != 0:
+            self.exportAsSvgImage(filename)
+
+    def createDiagram(self):
+        logging.info('Action: Create Diagram')
+        self.createProjectItem(True)
+
+    def createFolder(self):
+        logging.info('Action: Create Folder')
+        self.createProjectItem(False)
+
+    def on_selection_changed(self, selected: QItemSelection, deselected: QItemSelection):
+        # logging.info('Project selection changed')
+        selected_project_items = self.projectItemsFromSelection(selected)
+        deselected_project_items = self.projectItemsFromSelection(deselected)
+        self.scene_logic.on_project_item_selection_changed(
+            selected_project_items, deselected_project_items)
+
+    def finishNameEditing(self):
+        logging.info('Finish name editing')
+        item: QStandardItem = self.treeView.getSelectedItem()
+        if item is None:
+            return
+        id = item.data(Qt.UserRole)
+        project_item = self.project.get(id)
+        if project_item.name() != item.text():
+            project_item.setName(item.text())
+            self.setDirty(True)
+        parent_item = item.parent()
+        parent_item.sortChildren(0, Qt.SortOrder.AscendingOrder)
+        self.treeView.scrollTo(item.index())
+
+    def deleteSelectedItem(self):
+        logging.info('Action: Delete selected project item')
+        item: QStandardItem = self.treeView.getSelectedItem()
+        if item is None:
+            return
+        id = item.data(Qt.UserRole)
+        self.delete_project_item(id)
+        index = item.index()
+        self.sti.removeRow(index.row(), index.parent())
+        self.updateTitle()
+
+    def aboutQtWindow(self):
+        logging.info('Action: About Qt window')
+        QMessageBox.aboutQt(self)
+
+    def exitApp(self):
+        logging.info('Action: Exit app')
+        self.close()
+
+    def aboutWindow(self):
+        logging.info('Action: About window')
+        QMessageBox.about(
+            self,
+            'About UMLayer',
+            f'<h3 align=center>UMLayer</h3>'
+            f'<p align=center>{version.__version__}</p>'
+            '<p align=center>UML diagram editor</p>'
+            '<p align=center><a href="https://github.com/selforthis/umlayer">https://github.com/selforthis/umlayer</a></p>'
+            '<p align=center>Copyright 2021 Serguei Yanush &lt;selforthis@gmail.com&gt;<p>'
+            '<p align=center>MIT License</p>'
+        )
+
+    def saveFileIfNeeded(self) -> bool:
+        logging.info('Try to save file if needed')
+        if not self.isDirty():
+            return True
+
+        reply = QMessageBox.question(
+            self,
+            'Warning \u2014 Umlayer',
+            'The current file has been modified.\nDo you want to save it?',
+            QMessageBox.Cancel | QMessageBox.Discard | QMessageBox.Save,
+            QMessageBox.Save)
+
+        if reply == QMessageBox.Save:
+            self.saveProject()
+
+        return reply != QMessageBox.Cancel
+
+    def saveProjectAs(self):
+        logging.info('Action: Save As')
+
+        if self.project is None:
+            return
+
+        filename = self.getFileNameFromSaveDialog('Save as...')
+
+        if len(filename) == 0:
+            return
+
+        try:
+            self.doSaveProject(filename)
+        except Exception as ex:
+            raise ex
+        else:
+            self.setFilename(filename)
+            self.updateTitle()
+
+    def saveProject(self):
+        logging.info('Action: Save')
+
+        if self.project is None:
+            return
+
+        if self.isFileNameNotSet():
+            filename = self.getFileNameFromSaveDialog('Save')
+        else:
+            filename = self.filename
+
+        if len(filename) == 0:
+            return
+
+        try:
+            self.doSaveProject(filename)
+        except Exception as ex:
+            raise ex
+        else:
+            self.setFilename(filename)
+            self.updateTitle()
+
+    def openProject(self):
+        logging.info('Action: Open')
+        if not self.closeProject():
+            return
+
+        filename = self.getFileNameFromOpenDialog('Open')
+
+        if len(filename) == 0:
+            return
+
+        try:
+            self.doOpenProject(filename)
+        except Exception as ex:
+            print(ex)
+        else:
+            self.setFilename(filename)
+            self.updateTitle()
+
+        self.printStats()

@@ -12,3 +12,4 @@ from .folder import Folder
 from .diagram import Diagram
 from .project import Project
 from .project_storage import ProjectStorage
+from .data_model import DataModel
