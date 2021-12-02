@@ -14,8 +14,8 @@ class CompositionRoot:
 
         data_model = model.DataModel()
 
-        save_interactor = usecases.SaveInteractor(data_model)
-        interactors = usecases.Interactors(data_model, save_interactor)
+        project_interactor = usecases.ProjectInteractor(data_model)
+        interactors = usecases.Interactors(data_model, project_interactor)
 
         scene_logic = gui.SceneLogic()
         store = storage.ProjectStorageImpl()

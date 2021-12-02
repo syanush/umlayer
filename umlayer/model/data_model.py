@@ -13,8 +13,11 @@ class DataModel:
     def project(self) -> Project:
         return self._project
 
-    def set_project(self, project: Project) -> None:
-        self._project = project
+    def create_project(self) -> Project:
+        self._project = Project()
+
+    def delete_project(self) -> None:
+        self._project = None
 
     @property
     def filename(self) -> str:

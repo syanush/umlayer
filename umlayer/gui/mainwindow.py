@@ -50,13 +50,38 @@ class MainWindow(QMainWindow):
     def setDefaultFileName(self):
         self._data_model.set_filename(model.constants.DEFAULT_FILENAME)
 
+    def openProject(self):
+        logging.info('Action: Open')
+        self._interactors.project_interactor.open_project()
+
     def saveProject(self):
         logging.info('Action: Save')
-        self._interactors.save_interactor.saveProject()
+        self._interactors.project_interactor.save_project()
 
     def saveProjectAs(self):
         logging.info('Action: Save As')
-        self._interactors.save_interactor.saveProjectAs()
+        self._interactors.project_interactor.save_project_as()
+
+    def closeProject(self) -> bool:
+        logging.info('Action: Close')
+        return self._interactors.project_interactor.close_project()
+
+    def clearScene(self):
+        self.scene_logic.disableScene()
+        self.sti.clear()
+
+    def askToSaveModifiedFile(self):
+        reply = QMessageBox.question(
+            self,
+            'Warning \u2014 Umlayer',
+            'The current file has been modified.\nDo you want to save it?',
+            QMessageBox.Cancel | QMessageBox.Discard | QMessageBox.Save,
+            QMessageBox.Save)
+        if reply == QMessageBox.Cancel:
+            return model.constants.CANCEL
+        if reply == QMessageBox.Discard:
+            return model.constants.DISCARD
+        return model.constants.SAVE
 
     def writeSettings(self):
         settings = QSettings()
@@ -87,22 +112,9 @@ class MainWindow(QMainWindow):
 
     def updateTitle(self):
         # tested
-        title = MainWindow.build_window_title(self.filename, self.isDirty())
+        title = model.utils.build_window_title(self.filename, self.isDirty())
         # not tested
         self.setWindowTitle(title)
-
-    @staticmethod
-    def build_window_title(filename: str, is_dirty: bool):
-        title = 'UMLayer'
-
-        if filename:
-            if len(filename) >= 4 and filename.endswith(model.constants.EXTENSION):
-                filename = filename[:-4]
-
-            star = ' *' if is_dirty else ''
-            title = f'{filename}{star} \u2014 ' + title
-
-        return title
 
     def initGUI(self):
         logging.info('GUI initialization started')
@@ -372,7 +384,7 @@ class MainWindow(QMainWindow):
         self.treeView.setInitialState()
 
     def createNewProject(self):
-        self._interactors.create_project()
+        self._data_model.create_project()
         self.init_new_project()
         self.updateTreeDataModel()
         self.setDefaultFileName()
@@ -385,18 +397,6 @@ class MainWindow(QMainWindow):
             return
 
         self.createNewProject()
-
-    def closeProject(self) -> bool:
-        logging.info('Action: Close')
-        if not self.saveFileIfNeeded():
-            return False
-
-        self.scene_logic.disableScene()
-        self.sti.clear()
-        self._interactors.delete_project()
-        self._interactors.delete_filename()
-        self.updateTitle()
-        return True
 
     def printStats(self):
         if self.project is not None:
@@ -412,7 +412,7 @@ class MainWindow(QMainWindow):
         project_items: list = self.storage_load(filename)
         root = project_items[0]
 
-        self._interactors.create_project()
+        self._data_model.create_project()
         self.project.setRoot(root)
 
         for project_item in project_items:
@@ -673,42 +673,3 @@ class MainWindow(QMainWindow):
             '<p align=center>Copyright 2021 Serguei Yanush &lt;selforthis@gmail.com&gt;<p>'
             '<p align=center>MIT License</p>'
         )
-
-    def saveFileIfNeeded(self) -> bool:
-        logging.info('Try to save file if needed')
-        if not self.isDirty():
-            return True
-
-        reply = QMessageBox.question(
-            self,
-            'Warning \u2014 Umlayer',
-            'The current file has been modified.\nDo you want to save it?',
-            QMessageBox.Cancel | QMessageBox.Discard | QMessageBox.Save,
-            QMessageBox.Save)
-
-        if reply == QMessageBox.Save:
-            self.saveProject()
-
-        return reply != QMessageBox.Cancel
-
-
-
-    def openProject(self):
-        logging.info('Action: Open')
-        if not self.closeProject():
-            return
-
-        filename = self.getFileNameFromOpenDialog('Open')
-
-        if len(filename) == 0:
-            return
-
-        try:
-            self.doOpenProject(filename)
-        except Exception as ex:
-            print(ex)
-        else:
-            self.setFilename(filename)
-            self.updateTitle()
-
-        self.printStats()
