@@ -2,7 +2,10 @@ from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
-from . import *
+from . import Settings, SceneLogic, BaseElement
+
+from umlayer.gui import constants
+
 
 
 class GraphicsScene(QGraphicsScene):
@@ -51,7 +54,7 @@ class GraphicsScene(QGraphicsScene):
             self.lines.append(line)
 
         for line in self.lines:
-            line.setData(ITEM_TYPE, 'grid')
+            line.setData(constants.ITEM_TYPE, 'grid')
 
     def is_grid_visible(self):
         return self._is_grid_visible
@@ -83,7 +86,8 @@ class GraphicsScene(QGraphicsScene):
         return self._filter_elements(element.collidingItems())
 
     def selectedElements(self):
-        return self._filter_elements(self.selectedItems())
+        selected_items = self.selectedItems()
+        return self._filter_elements(selected_items)
 
     def elements(self):
         return self._filter_elements(self.items())
@@ -106,7 +110,7 @@ class GraphicsScene(QGraphicsScene):
 
     def printItems(self):
         items = [item for item in self.items()
-                 if item.data(ITEM_TYPE) != 'grid']
+                 if item.data(constants.ITEM_TYPE) != 'grid']
         for i, item in enumerate(items):
             print(i, item)
 

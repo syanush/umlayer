@@ -1,26 +1,26 @@
 # the order is important
-from .constants import *
-from .settings import Settings
-from .gui_utils import snap, snap_up
-from .base_element import BaseElement, Abilities
-from .text_item import TextItem
-from .text_element import TextElement
-from .actor_element import ActorElement
-from .package_element import PackageElement
-from .ellipse_element import EllipseElement
-from .note_element import NoteElement
-from .class_element import ClassElement
-from .handle_item import HandleItem
-from .tips import Tip, NoTip, ArrowTip, TriangleTip, HalfTriangleTip, DiamondTip
-from .line_element import LineElement
+from umlayer.gui.constants import *
+from umlayer.gui.settings import Settings
+from umlayer.gui.gui_utils import snap, snap_up
+from umlayer.gui.base_element import BaseElement, Abilities
+from umlayer.gui.text_item import TextItem
+from umlayer.gui.text_element import TextElement
+from umlayer.gui.actor_element import ActorElement
+from umlayer.gui.package_element import PackageElement
+from umlayer.gui.ellipse_element import EllipseElement
+from umlayer.gui.note_element import NoteElement
+from umlayer.gui.class_element import ClassElement
+from umlayer.gui.handle_item import HandleItem
+from umlayer.gui.tips import Tip, NoTip, ArrowTip, TriangleTip, HalfTriangleTip, DiamondTip
+from umlayer.gui.line_element import LineElement
 
-from .line_icons_proxy_stype import LineIconsProxyStyle
-from .scene_logic import SceneLogic
-from .graphics_scene import GraphicsScene
-from .graphics_view import GraphicsView
-from .standard_item_model import StandardItemModel
-from .tree_view import TreeView
-from .actions import Actions
+from umlayer.gui.line_icons_proxy_stype import LineIconsProxyStyle
+from umlayer.gui.scene_logic import SceneLogic
+from umlayer.gui.graphics_scene import GraphicsScene
+from umlayer.gui.graphics_view import GraphicsView
+from umlayer.gui.standard_item_model import StandardItemModel
+from umlayer.gui.tree_view import TreeView
+from umlayer.gui.actions import Actions
 
-from .mainwindow import MainWindow
-from .app import UMLayerApplication
+from umlayer.gui.mainwindow import MainWindow
+from umlayer.gui.app import UMLayerApplication

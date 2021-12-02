@@ -67,8 +67,8 @@ class MainWindow(QMainWindow):
         return self._interactors.project_interactor.close_project()
 
     def clearScene(self):
-        self.scene_logic.disableScene()
         self.sti.clear()
+        self.scene_logic.disableScene()
 
     def askToSaveModifiedFile(self):
         reply = QMessageBox.question(
@@ -342,7 +342,7 @@ class MainWindow(QMainWindow):
         self.move(qRect.topLeft())
 
     def closeEvent(self, event):
-        if self.saveFileIfNeeded():
+        if self._interactors.project_interactor.saveFileIfNeeded():
             self.writeSettings()
             logging.info('Main window closed')
             event.accept()

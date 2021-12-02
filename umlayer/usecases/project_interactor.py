@@ -88,7 +88,7 @@ class ProjectInteractor:
             self._window.updateTitle()
 
     def close_project(self) -> bool:
-        if not self._saveFileIfNeeded():
+        if not self.saveFileIfNeeded():
             return False
 
         self._window.clearScene()
@@ -100,7 +100,7 @@ class ProjectInteractor:
     def _isFileNameNotSet(self) -> bool:
         return self._filename is None or self._filename == model.constants.DEFAULT_FILENAME
 
-    def _saveFileIfNeeded(self) -> bool:
+    def saveFileIfNeeded(self) -> bool:
         if not self._window.isDirty():
             return True
 
