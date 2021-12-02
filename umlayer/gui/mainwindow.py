@@ -96,6 +96,7 @@ class MainWindow(QMainWindow):
 
     def updateToolbar(self):
         self.app_actions.saveAction.setEnabled(self.isDirty())
+        self.app_actions.saveAsAction.setEnabled(self.project is not None)
         self.app_actions.closeAction.setEnabled(self.project is not None)
 
     def writeSettings(self):
