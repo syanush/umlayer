@@ -27,6 +27,7 @@ def run():
     del composer
 
     # app.setStyle('Fusion')
+    main_window.initialize()
     app.setActiveWindow(main_window)
     main_window.show()
     logging.info('Main window displayed')

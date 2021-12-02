@@ -3,7 +3,7 @@
 
 from abc import ABC, abstractmethod
 
-from . import BaseItem
+from umlayer import model
 
 
 class ProjectStorage(ABC):
@@ -11,9 +11,9 @@ class ProjectStorage(ABC):
     """
 
     @abstractmethod
-    def save(self, elements: list[BaseItem], filename: str = None):
+    def save(self, elements: list[model.BaseItem], filename: str = None) -> None:
         raise NotImplementedError
 
     @abstractmethod
-    def load(self, filename: str = None) -> list[BaseItem]:
+    def load(self, filename: str = None) -> list[model.BaseItem]:
         raise NotImplementedError

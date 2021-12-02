@@ -3,8 +3,10 @@ from uuid import UUID
 from . import BaseItem
 
 class Project:
+    """Repository?"""
+
     def __init__(self):
-        self.project_items = {}
+        self.project_items = {}  # bad design
         self._root = None
         self._is_dirty = False
 
@@ -21,7 +23,7 @@ class Project:
     def dirty(self):
         return self._is_dirty
 
-    def setProjectDirty(self, dirty):
+    def setProjectDirty(self, dirty):  # bad design
         if self._is_dirty == dirty:
             return
 

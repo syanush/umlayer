@@ -6,10 +6,10 @@ import sqlalchemy.engine.cursor
 
 from sqlalchemy import create_engine, text
 
-from umlayer import model
+from umlayer import model, usecases
 
 
-class ProjectStorageImpl(model.ProjectStorage):
+class ProjectStorageImpl(usecases.ProjectStorage):
     def save(self, project_items: list[model.BaseItem], filepath: str = None):
         if os.path.exists(filepath):
             os.remove(filepath)

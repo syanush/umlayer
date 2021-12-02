@@ -18,20 +18,18 @@ class MainWindow(QMainWindow):
     def __init__(self, scene_logic, storage, data_model, interactors, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.scene_logic = scene_logic
-        self._storage: ProjectStorage = storage
+
         self._interactors = interactors
         self._data_model = data_model
 
         self.scene: GraphicsScene = None
         self.sceneView: GraphicsView = None
-
-        self.scene_logic.setWindow(self)
-
-        self.readSettings()
-        self.setDefaultFileName()
-        self.initGUI()
-
         self.element_with_text = None
+
+    def initialize(self):
+        self.scene_logic.setWindow(self)
+        self.readSettings()
+        self.initGUI()
         self.createNewProject()
 
     @property
@@ -43,12 +41,11 @@ class MainWindow(QMainWindow):
         return self._data_model.project
 
     def setDirty(self, dirty):
-        if self.project:
-            self.project.setProjectDirty(dirty)
-        self.updateTitle()
+        self._interactors.project_interactor.set_dirty(dirty)
 
-    def setDefaultFileName(self):
-        self._data_model.set_filename(model.constants.DEFAULT_FILENAME)
+    def createNewProject(self):
+        logging.info('Action: New project')
+        self._interactors.project_interactor.create_new_project()
 
     def openProject(self):
         logging.info('Action: Open')
@@ -70,7 +67,7 @@ class MainWindow(QMainWindow):
         self.sti.clear()
         self.scene_logic.disableScene()
 
-    def askToSaveModifiedFile(self):
+    def askToSaveModifiedProject(self):
         reply = QMessageBox.question(
             self,
             'Warning \u2014 Umlayer',
@@ -83,7 +80,7 @@ class MainWindow(QMainWindow):
             return model.constants.DISCARD
         return model.constants.SAVE
 
-    def criticalError(self, message):
+    def showCriticalError(self, message):
         QMessageBox.critical(self, 'Error!', message, QMessageBox.Abort)
 
     def isDirty(self):
@@ -342,7 +339,7 @@ class MainWindow(QMainWindow):
         self.move(qRect.topLeft())
 
     def closeEvent(self, event):
-        if self._interactors.project_interactor.saveFileIfNeeded():
+        if self._interactors.project_interactor.save_project_if_needed():
             self.writeSettings()
             logging.info('Main window closed')
             event.accept()
@@ -389,47 +386,10 @@ class MainWindow(QMainWindow):
         self.sti.updateItemModel(self.project)
         self.treeView.setInitialState()
 
-    def createNewProject(self):
-        self._data_model.create_project()
-        self.init_new_project()
-        self.updateTreeDataModel()
-        self.setDefaultFileName()
-        self.updateTitle()
-
-    def recreateProject(self):
-        """Close old and create new project"""
-        logging.info('Action: New project')
-        if not self.closeProject():
-            return
-
-        self.createNewProject()
-
     def printStats(self):
         if self.project is not None:
             print('number of elements', self.project.count())
             print('number of items', self.sti.count())
-
-    def load(self, filename: str):
-        """Loads project data and settings from a file
-
-        Throws exceptions in case of errors
-        """
-
-        project_items: list = self.storage_load(filename)
-        root = project_items[0]
-
-        self._data_model.create_project()
-        self.project.setRoot(root)
-
-        for project_item in project_items:
-            if project_item.id != root.id:
-                self.project.add(project_item, project_item.parent_id)
-
-        self.setDirty(False)
-
-    def doOpenProject(self, filename):
-        self.load(filename)
-        self.updateTreeDataModel()
 
     def selectedProjectItem(self):
         item = self.treeView.getSelectedItem()
@@ -452,12 +412,6 @@ class MainWindow(QMainWindow):
             return
         self.project.printProjectItems()
 
-    def init_new_project(self):
-        root = model.Folder("Root")
-        self.project.setRoot(root)
-        self.project.add(model.Diagram("Diagram 1"), root.id)
-        self.setDirty(False)
-
     def _add_project_item(self, element, parent_id):
         self.project.add(element, parent_id)
 
@@ -477,33 +431,8 @@ class MainWindow(QMainWindow):
             return
         self.project.remove(project_item_id)
 
-    def save(self, filename: str):
-        """Saves project data and settings to a file
-
-        Throws exceptions in case of errors
-        """
-
-        if filename is None:
-            raise ValueError('filename')
-
-        project_items = self.project.project_items.values()
-        self._storage.save(project_items, filename)
-        self.setDirty(False)
-
-    def storage_load(self, filename):
-        return self._storage.load(filename)
-
     def setFilename(self, filename):
         self._interactors.set_filename(filename)
-
-    def doSaveProject(self, filename):
-        """Really save project"""
-
-        if self.project is None:
-            return
-
-        self.scene_logic.storeScene()
-        self.save(filename)
 
     def getFileNameFromSaveDialog(self, caption=None):
         initial_filename = self.filename or model.constants.DEFAULT_FILENAME

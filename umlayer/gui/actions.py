@@ -15,7 +15,7 @@ class Actions:
             statusTip='Create new project',
             parent=self.window,
             shortcut=QKeySequence.New,
-            triggered=self.window.recreateProject)
+            triggered=self.window.createNewProject)
 
         self.openAction = QAction(
             icon=QIcon('icons:open.png'),
