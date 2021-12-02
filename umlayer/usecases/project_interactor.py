@@ -21,6 +21,9 @@ class ProjectInteractor:
     def set_window(self, window):
         self._window = window
 
+    def is_dirty(self):
+        return False if self._project is None else self._project.dirty()
+
     def open_project(self):
         if not self.close_project():
             return

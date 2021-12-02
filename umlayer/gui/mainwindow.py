@@ -86,6 +86,18 @@ class MainWindow(QMainWindow):
     def criticalError(self, message):
         QMessageBox.critical(self, 'Error!', message, QMessageBox.Abort)
 
+    def isDirty(self):
+        return self._interactors.project_interactor.is_dirty()
+
+    def updateTitle(self):
+        title = model.utils.build_window_title(self.filename, self.isDirty())
+        self.setWindowTitle(title)
+        self.updateToolbar()
+
+    def updateToolbar(self):
+        self.app_actions.saveAction.setEnabled(self.isDirty())
+        self.app_actions.closeAction.setEnabled(self.project is not None)
+
     def writeSettings(self):
         settings = QSettings()
         settings.beginGroup("MainWindow")
@@ -108,16 +120,6 @@ class MainWindow(QMainWindow):
         logging.info('Geometry set: {0}'.format(self.geometry()))
         settings.endGroup()
         logging.info('Settings loading finished')
-
-    def isDirty(self):
-        is_dirty = False if self.project is None else self.project.dirty()
-        return is_dirty
-
-    def updateTitle(self):
-        # tested
-        title = model.utils.build_window_title(self.filename, self.isDirty())
-        # not tested
-        self.setWindowTitle(title)
 
     def initGUI(self):
         logging.info('GUI initialization started')
