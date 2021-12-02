@@ -1,1 +1,1 @@
-from .project_storage_impl import ProjectStorageImpl
+from umlayer.storage.project_storage_impl import ProjectStorageImpl

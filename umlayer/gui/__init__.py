@@ -1,5 +1,5 @@
 # the order is important
-from umlayer.gui.constants import *
+from umlayer.gui import constants
 from umlayer.gui.settings import Settings
 from umlayer.gui.gui_utils import snap, snap_up
 from umlayer.gui.base_element import BaseElement, Abilities

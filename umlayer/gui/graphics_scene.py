@@ -2,10 +2,7 @@ from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
-from . import Settings, SceneLogic, BaseElement
-
-from umlayer.gui import constants
-
+from . import constants, Settings, SceneLogic, BaseElement
 
 
 class GraphicsScene(QGraphicsScene):

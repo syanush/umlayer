@@ -5,11 +5,11 @@ Also includes common abstractions.
 This file contains all package-wide definitions
 """
 
-from . import constants, utils
+from umlayer.model import constants, utils
 
-from .base_item import BaseItem
-from .folder import Folder
-from .diagram import Diagram
-from .project import Project
-from .project_storage import ProjectStorage
-from .data_model import DataModel
+from umlayer.model.base_item import BaseItem
+from umlayer.model.folder import Folder
+from umlayer.model.diagram import Diagram
+from umlayer.model.project import Project
+from umlayer.model.project_storage import ProjectStorage
+from umlayer.model.data_model import DataModel

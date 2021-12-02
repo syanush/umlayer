@@ -1,3 +1,3 @@
-from .project_interactor import ProjectInteractor
+from umlayer.usecases.project_interactor import ProjectInteractor
 
-from .interactors import Interactors
+from umlayer.usecases.interactors import Interactors
