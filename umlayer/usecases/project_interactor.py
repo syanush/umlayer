@@ -31,11 +31,12 @@ class ProjectInteractor:
             return
 
         try:
+            # raise Exception  # for debugging
             self._window.doOpenProject(filename)
         except Exception as ex:
             logging.error(ex)
             print(ex)
-            raise ex
+            self._window.criticalError('Unable to open project!')
         else:
             self._data_model.set_filename(filename)
             self._window.updateTitle()
@@ -57,7 +58,7 @@ class ProjectInteractor:
         except Exception as ex:
             logging.error(ex)
             print(ex)
-            raise ex
+            self._window.criticalError('Unable to save project!')
             return False
         else:
             self._data_model.set_filename(filename)
@@ -78,7 +79,7 @@ class ProjectInteractor:
         except Exception as ex:
             logging.error(ex)
             print(ex)
-            raise ex
+            self._window.criticalError('Unable to save project!')
         else:
             self._data_model.set_filename(filename)
             self._window.updateTitle()

@@ -83,6 +83,9 @@ class MainWindow(QMainWindow):
             return model.constants.DISCARD
         return model.constants.SAVE
 
+    def criticalError(self, message):
+        QMessageBox.critical(self, 'Error!', message, QMessageBox.Abort)
+
     def writeSettings(self):
         settings = QSettings()
         settings.beginGroup("MainWindow")
