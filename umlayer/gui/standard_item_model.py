@@ -2,50 +2,55 @@ from PySide6.QtCore import *
 from PySide6.QtGui import *
 
 from umlayer import model
+from . import ItemRoles
 
 
 class StandardItemModel(QStandardItemModel):
+    """
+    Item model
+
+    All methods must be called with model index (not proxy index).
+    """
     def __init__(self):
         super().__init__()
         self.setHorizontalHeaderLabels([''])
-        self.setSortRole(Qt.DisplayRole)
-        self._root_item = None
 
     def root_item(self):
-        return self._root_item  # self.item(0)
+        return self.item(0)
 
-    def updateItemModel(self, project):
-        self._root_item = self.itemize(project.root, project)
-        self.appendRow([self._root_item])
+    def initializeFromProject(self, project):
+        self.clear()
+        root_item = self.itemize(project.root, project)
+        self.appendRow([root_item])
 
     def count(self):
-        return 1 + self._countChildren(self.root_item().index())
+        root_model_index = self.root_item().index()
+        return 1 + self._countChildren(root_model_index)
 
-    def _countChildren(self, index) -> int:
-        count = rowCount = self.rowCount(index)
+    def _countChildren(self, model_index) -> int:
+        count = rowCount = self.rowCount(model_index)
         for i in range(rowCount):
-            count += self._countChildren(self.index(i, 0, index))
+            count += self._countChildren(self.index(i, 0, model_index))
         return count
 
-    @staticmethod
-    def makeItem(project_item: model.BaseItem):
-        project_item_type_to_icon_file = {
-            model.Folder: 'icons:folder.png',
-            model.Diagram: 'icons:diagram.png'
-        }
+    _item_type_to_icon = {
+        model.ProjectItemType.FOLDER: 'icons:folder.png',
+        model.ProjectItemType.DIAGRAM: 'icons:diagram.png',
+    }
 
+    def makeItem(self, project_item: model.BaseItem) -> QStandardItem:
+        item_type = project_item.item_type
         item = QStandardItem(project_item.name())
-        item.setData(project_item.id, Qt.UserRole)
-        element_type = type(project_item)
-        item.setIcon(QIcon(project_item_type_to_icon_file[element_type]))
+        item.setData(project_item.id, ItemRoles.IdRole)
+        item.setData(item_type, ItemRoles.TypeRole)
+        icon_name = self._item_type_to_icon[item_type]
+        item.setIcon(QIcon(icon_name))
         return item
 
-    @staticmethod
-    def itemize(element, project):
-        item = StandardItemModel.makeItem(element)
-
-        children = project.children(element.id)
+    def itemize(self, project_item, project):
+        item = self.makeItem(project_item)
+        children = project.children(project_item.id)
         for child in children:
-            child_item = StandardItemModel.itemize(child, project)
+            child_item = self.itemize(child, project)
             item.appendRow([child_item])
         return item

@@ -167,6 +167,7 @@ class SceneLogic:
 
     def on_select_project_item(self, project_item):
         logging.info(f'Project item selected: {project_item.name()}')
+        # print(f'Project item selected: {project_item.name()}')
         if isinstance(project_item, model.Diagram):
             self.enableScene()
             self.buildSceneFrom(project_item)

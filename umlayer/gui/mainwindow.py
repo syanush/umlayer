@@ -25,6 +25,7 @@ class MainWindow(QMainWindow):
         self.scene: GraphicsScene = None
         self.sceneView: GraphicsView = None
         self.element_with_text = None
+        self.treeView: TreeView = None
 
     def initialize(self):
         self.scene_logic.setWindow(self)
@@ -42,6 +43,14 @@ class MainWindow(QMainWindow):
 
     def setDirty(self, dirty):
         self._interactors.project_interactor.set_dirty(dirty)
+
+    def createFolder(self):
+        logging.info('Action: Create Folder')
+        self.createProjectItem(model.ProjectItemType.FOLDER)
+
+    def createDiagram(self):
+        logging.info('Action: Create Diagram')
+        self.createProjectItem(model.ProjectItemType.DIAGRAM)
 
     def createNewProject(self):
         logging.info('Action: New project')
@@ -62,10 +71,6 @@ class MainWindow(QMainWindow):
     def closeProject(self) -> bool:
         logging.info('Action: Close')
         return self._interactors.project_interactor.close_project()
-
-    def clearScene(self):
-        self.sti.clear()
-        self.scene_logic.disableScene()
 
     def askToSaveModifiedProject(self):
         reply = QMessageBox.question(
@@ -299,7 +304,7 @@ class MainWindow(QMainWindow):
         self.createMenu()
         self.createToolBar()
 
-        self.scene_logic.disableScene()
+        self.disableScene()
 
     def createMenu(self):
         self.fileMenu = self.menuBar().addMenu("&File")
@@ -353,49 +358,54 @@ class MainWindow(QMainWindow):
         if item is None:
             return
 
-        element = self.projectItemFromItem(item)
-
+        project_item = self.projectItemFromItem(item)
         menu = QMenu(self.treeView)
+        item_type = project_item.item_type
 
-        if type(element) is model.Folder:
+        if item_type is model.ProjectItemType.FOLDER:
             menu.addAction(self.app_actions.createDiagramAction)
             menu.addAction(self.app_actions.createFolderAction)
-            if element.id != self.project.root.id:
+            if project_item.id != self.project.root.id:
                 menu.addAction(self.app_actions.deleteProjectItemAction)
-        elif type(element) is model.Diagram:
+        elif item_type is model.ProjectItemType.DIAGRAM:
             menu.addAction(self.app_actions.deleteProjectItemAction)
 
         menu.exec(self.treeView.viewport().mapToGlobal(point))
 
     def projectItemFromItem(self, item):
-        id = item.data(Qt.UserRole)
+        id = item.data(ItemRoles.IdRole)
         return self.project.get(id)
 
-    def createProjectTree(self):
-        treeWindow = QDockWidget('Project', self)
-        self.treeView: TreeView = TreeView(self)
-        self.treeView.customContextMenuRequested.connect(self.onTreeViewCustomContextMenuRequested)
+    def _createTreeView(self):
+        treeView = TreeView(self)
+        treeView.customContextMenuRequested.connect(self.onTreeViewCustomContextMenuRequested)
+        proxyModel = TreeSortModel(self)
+        proxyModel.setSourceModel(StandardItemModel())
+        treeView.setModel(proxyModel)
+        return treeView
 
+    def createProjectTree(self):
+        self.treeView = self._createTreeView()
+        treeWindow = QDockWidget('Project', self)
         treeWindow.setWidget(self.treeView)
         self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, treeWindow)
 
-        self.sti = StandardItemModel()
-        self.treeView.setModel(self.sti)
+    def clearProjectTree(self):
+        self.treeView.itemModel.clear()
 
-    def updateTreeDataModel(self):
-        self.sti.updateItemModel(self.project)
-        self.treeView.setInitialState()
+    def disableScene(self):
+        self.scene_logic.disableScene()
 
     def printStats(self):
         if self.project is not None:
             print('number of elements', self.project.count())
-            print('number of items', self.sti.count())
+            print('number of items', self.treeView.itemModel.count())
 
     def selectedProjectItem(self):
         item = self.treeView.getSelectedItem()
         if item is None:
             return None
-        id = item.data(Qt.UserRole)
+        id = item.data(ItemRoles.IdRole)
         project_item = self.project.get(id)
         return project_item
 
@@ -410,6 +420,7 @@ class MainWindow(QMainWindow):
         if self.project is None:
             print('Project is None')
             return
+        self.printStats()
         self.project.printProjectItems()
 
     def _add_project_item(self, element, parent_id):
@@ -455,32 +466,26 @@ class MainWindow(QMainWindow):
                 selectedFilter="Umlayer project (*.ulr)")
         return filename
 
-    def createProjectItem(self, isDiagram=True):
+    def _createProjectItem(self, parent_id: int, item_type: model.ProjectItemType) -> model.BaseItem:
+        if item_type == model.ProjectItemType.FOLDER:
+            return self.create_folder(parent_id)
+        if item_type == model.ProjectItemType.DIAGRAM:
+            return self.create_diagram(parent_id)
+        raise ValueError('item_type')
+
+    def createProjectItem(self, item_type: model.ProjectItemType):
         parent_item: QStandardItem = self.treeView.getSelectedItem()
-        parent_index = parent_item.index()
-        self.treeView.expand(parent_index)
-        parent_id = parent_item.data(Qt.UserRole)
+        parent_model_index = parent_item.index()
+        parent_proxy_index = self.treeView.getProxyIndex(parent_model_index)
+        self.treeView.expand(parent_proxy_index)  # treeview must use proxy index!
+        parent_id = parent_item.data(ItemRoles.IdRole)
 
-        if isDiagram:
-            project_item = self.create_diagram(parent_id)
-        else:
-            project_item = self.create_folder(parent_id)
+        project_item = self._createProjectItem(parent_id, item_type)
 
-        item = StandardItemModel.makeItem(project_item)
-        parent_item.insertRow(0, [item])
+        item = self.treeView.itemModel.makeItem(project_item)
+        parent_item.appendRow([item])
         self.treeView.startEditName(item)
         self.updateTitle()
-
-    def projectItemsFromSelection(self, selection):
-        result = []
-        for index in selection.indexes():
-            item = self.sti.itemFromIndex(index)
-            if item is None:
-                continue
-            id = item.data(Qt.UserRole)
-            project_item = self.project.get(id)
-            result.append(project_item)
-        return tuple(result)
 
     def exportAsSvgImage(self, filename):
         tempScene = self.scene.getTempScene()
@@ -548,44 +553,42 @@ class MainWindow(QMainWindow):
         if filename is not None and len(filename.strip()) != 0:
             self.exportAsSvgImage(filename)
 
-    def createDiagram(self):
-        logging.info('Action: Create Diagram')
-        self.createProjectItem(True)
-
-    def createFolder(self):
-        logging.info('Action: Create Folder')
-        self.createProjectItem(False)
-
     def on_selection_changed(self, selected: QItemSelection, deselected: QItemSelection):
         # logging.info('Project selection changed')
         selected_project_items = self.projectItemsFromSelection(selected)
+        # print('selected:', selected_project_items)
         deselected_project_items = self.projectItemsFromSelection(deselected)
+        # print('deselected:', deselected_project_items)
         self.scene_logic.on_project_item_selection_changed(
             selected_project_items, deselected_project_items)
 
-    def finishNameEditing(self):
-        logging.info('Finish name editing')
-        item: QStandardItem = self.treeView.getSelectedItem()
-        if item is None:
-            return
-        id = item.data(Qt.UserRole)
+    def projectItemsFromSelection(self, selection):
+        result = []
+        for proxy_index in selection.indexes():
+            model_index = self.treeView.getModelIndex(proxy_index)
+            item = self.treeView.itemModel.itemFromIndex(model_index)
+            if item is None:
+                continue
+            id = item.data(ItemRoles.IdRole)
+            project_item = self.project.get(id)
+            result.append(project_item)
+        return tuple(result)
+
+    def setProjectItemName(self, id, name):
         project_item = self.project.get(id)
-        if project_item.name() != item.text():
-            project_item.setName(item.text())
+        if project_item.name() != name:
+            project_item.setName(name)
             self.setDirty(True)
-        parent_item = item.parent()
-        parent_item.sortChildren(0, Qt.SortOrder.AscendingOrder)
-        self.treeView.scrollTo(item.index())
 
     def deleteSelectedItem(self):
         logging.info('Action: Delete selected project item')
         item: QStandardItem = self.treeView.getSelectedItem()
         if item is None:
             return
-        id = item.data(Qt.UserRole)
+        id = item.data(ItemRoles.IdRole)
         self.delete_project_item(id)
-        index = item.index()
-        self.sti.removeRow(index.row(), index.parent())
+        model_index = item.index()
+        self.treeView.itemModel.removeRow(model_index.row(), model_index.parent())
         self.updateTitle()
 
     def aboutQtWindow(self):

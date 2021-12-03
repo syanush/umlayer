@@ -3,7 +3,7 @@
 
 from uuid import UUID
 
-from . import BaseItem
+from . import BaseItem, ProjectItemType
 
 
 class Diagram(BaseItem):
@@ -11,3 +11,7 @@ class Diagram(BaseItem):
         super().__init__(name, parent_id)
         self.dtos = []
         self.scroll_data = None
+
+    @property
+    def item_type(self) -> ProjectItemType:
+        return ProjectItemType.DIAGRAM

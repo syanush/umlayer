@@ -7,6 +7,7 @@ This file contains all package-wide definitions
 
 from umlayer.model import constants, utils
 
+from umlayer.model.project_item_type import ProjectItemType
 from umlayer.model.base_item import BaseItem
 from umlayer.model.folder import Folder
 from umlayer.model.diagram import Diagram

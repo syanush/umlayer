@@ -112,9 +112,12 @@ class ProjectInteractor:
         if not self.save_project_if_needed():
             return False
 
-        self._window.clearScene()
+        self._window.clearProjectTree()
+        self._window.disableScene()
+
         self._data_model.delete_project()
         self._data_model.set_filename(None)
+
         self._window.updateTitle()
         return True
 
@@ -156,9 +159,13 @@ class ProjectInteractor:
         self._storage.save(project_items, filename)
         self.set_dirty(False)
 
+    def _initializeTreeViewFromProject(self):
+        self._window.treeView.initializeFromProject(self._project)
+        self.set_dirty(False)
+
     def _do_open_project(self, filename) -> None:
         self._load(filename)
-        self._window.updateTreeDataModel()
+        self._initializeTreeViewFromProject()
 
     def _load(self, filename: str) -> None:
         """Loads project data and settings from a file
@@ -187,7 +194,7 @@ class ProjectInteractor:
         self.set_dirty(False)
         self._set_default_file_name()
         self._window.updateTitle()
-        self._window.updateTreeDataModel()
+        self._initializeTreeViewFromProject()
 
     def _set_default_file_name(self) -> None:
         self._data_model.set_filename(model.constants.DEFAULT_FILENAME)
