@@ -33,9 +33,12 @@ class SceneLogic:
         self.selectElement(element)
         self.setDirty()
 
-    def initialPosition(self) -> QRectF:
+    def initialPosition(self) -> QPointF:
         """Return scene coordinates of the initial position of new elements"""
-        return self.window.sceneView.mapToScene(20, 20)
+        pos = self.window.sceneView.mapToScene(20, 20)
+        grid_pos = QPointF(snap_up(pos.x()), snap_up(pos.y()))
+        # print(pos, grid_pos)
+        return grid_pos
 
     def addActorElement(self):
         element = ActorElement()
