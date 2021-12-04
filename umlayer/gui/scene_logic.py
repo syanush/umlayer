@@ -225,7 +225,7 @@ class SceneLogic:
             if element.zValue() >= z_value:
                 z_value = element.zValue() + 0.1
         selected_element.setZValue(z_value)
-        print(z_value)
+        # print(z_value)
         selected_element.update()
 
     def send_to_back(self):
@@ -240,5 +240,5 @@ class SceneLogic:
             if element.zValue() <= z_value:
                 z_value = element.zValue() - 0.1
         selected_element.setZValue(z_value)
-        print(z_value)
+        # print(z_value)
         selected_element.update()
