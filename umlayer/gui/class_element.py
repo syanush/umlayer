@@ -70,9 +70,8 @@ class ClassElement(QAbstractGraphicsShapeItem, BaseElement):
         return self._shape_path
 
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
-        text_pen = Settings.ELEMENT_TEXT_SELECTED_PEN if self.isSelected() else Settings.ELEMENT_TEXT_NORMAL_PEN
         for item in self._text_items:
-            item.setPen(text_pen)
+            item.setColor(self.textColor())
 
         pen = Settings.ELEMENT_SELECTED_PEN if self.isSelected() else Settings.ELEMENT_NORMAL_PEN
         painter.setPen(pen)
@@ -142,7 +141,7 @@ class ClassElement(QAbstractGraphicsShapeItem, BaseElement):
     def _getMaxWidth(self) -> float:
         """Return the maximal width of the text items"""
         n = len(self._texts)
-        width = 2.0 * self.padding if n == 0 else \
+        width = 2 * Settings.ELEMENT_PADDING if n == 0 else \
             max(self._get_rect(item).width() for item in self._text_items)
         return width
 
@@ -154,12 +153,15 @@ class ClassElement(QAbstractGraphicsShapeItem, BaseElement):
         for i in range(n):
             item = self._text_items[i]
             rect = self._get_rect(item)
-            compartment = QRectF(0, height, width, rect.height())
+            comp_height = rect.height()
+            if item.text() == "":
+                comp_height = Settings.CLASS_MIN_COMPARTMENT_HEIGHT
+            compartment = QRectF(0, height, width, comp_height)
 
             if i == 0:
-                height = rect.height()
+                height = compartment.height()
             else:
-                height += rect.height()
+                height += compartment.height()
 
             if i == n - 1:
                 compartment.adjust(0, 0, 0, self._dy)

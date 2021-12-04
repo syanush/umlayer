@@ -58,8 +58,7 @@ class TextElement(QGraphicsItem, BaseElement):
         return self._shape_path
 
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
-        text_pen = Settings.ELEMENT_TEXT_SELECTED_PEN if self.isSelected() else Settings.ELEMENT_TEXT_NORMAL_PEN
-        self._text_item.setPen(text_pen)
+        self._text_item.setColor(self.textColor())
 
         if self.isSelected():
             painter.setPen(Settings.ELEMENT_SHAPE_SELECTED_PEN)
@@ -77,7 +76,7 @@ class TextElement(QGraphicsItem, BaseElement):
         self.prepareGeometryChange()
         text = self._text or ''
         self._text_item.setText(text)
-        self._text_item.setCenter(self._center)
+        self._text_item.setCenter(self.center())
         self._rect = self._text_item.boundingRect()
         path = QPainterPath()
         path.addRect(self._rect)

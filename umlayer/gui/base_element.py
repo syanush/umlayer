@@ -6,6 +6,8 @@ from enum import Enum
 from PySide6.QtCore import *
 from PySide6.QtWidgets import *
 
+from . import *
+
 
 class Abilities(Enum):
     EDITABLE_TEXT = 1
@@ -22,6 +24,11 @@ class BaseElement(object):
 
     def getAbilities(self):
         return self._abilities
+
+    def textColor(self):
+        return Settings.ELEMENT_TEXT_SELECTED_COLOR \
+            if self.isSelected() \
+            else Settings.ELEMENT_TEXT_NORMAL_COLOR
 
     def toJson(self):
         dto = self.toDto()

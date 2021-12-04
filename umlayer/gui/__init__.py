@@ -2,7 +2,7 @@
 from umlayer.gui import constants
 from umlayer.gui.item_roles import ItemRoles
 from umlayer.gui.settings import Settings
-from umlayer.gui.gui_utils import snap, snap_up
+from umlayer.gui.gui_utils import snap, snap_up, snap_round
 from umlayer.gui.base_element import BaseElement, Abilities
 from umlayer.gui.text_item import TextItem
 from umlayer.gui.text_element import TextElement

@@ -58,8 +58,7 @@ class ActorElement(QGraphicsItem, BaseElement):
         pen = Settings.ELEMENT_SELECTED_PEN if self.isSelected() else Settings.ELEMENT_NORMAL_PEN
         self._setElementPen(pen)
 
-        text_pen = Settings.ELEMENT_TEXT_SELECTED_PEN if self.isSelected() else Settings.ELEMENT_TEXT_NORMAL_PEN
-        self._text_item.setPen(text_pen)
+        self._text_item.setColor(self.textColor())
 
         if self.isSelected():
             shape_pen = Settings.ELEMENT_SHAPE_SELECTED_PEN

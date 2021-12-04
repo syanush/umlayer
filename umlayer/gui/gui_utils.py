@@ -11,6 +11,10 @@ def snap_up(x: float) -> float:
     return math.ceil(x / Settings.BLOCK_SIZE) * Settings.BLOCK_SIZE
 
 
+def snap_round(x: float) -> float:
+    return round(x / Settings.BLOCK_SIZE) * Settings.BLOCK_SIZE
+
+
 def split_to_sections(text) -> list[str]:
     """"Return the list of text sections.
 

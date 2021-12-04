@@ -38,53 +38,53 @@ class SceneLogic:
         return self.window.sceneView.mapToScene(20, 20)
 
     def addActorElement(self):
-        item = ActorElement()
-        item.setText('Actor')
-        self.addElement(item)
+        element = ActorElement()
+        element.setText('Actor')
+        self.addElement(element)
 
     def addPackageElement(self):
-        item = PackageElement()
-        item.setText('Package 1\n--\nFunctional\nPerformant')
-        self.addElement(item)
+        element = PackageElement()
+        element.setText('GUI\n--\n+ Window\n+ Form\n# EventHandler')
+        self.addElement(element)
 
     def addEllipseElement(self):
-        item = EllipseElement()
-        item.setText('Use Case 1')
-        item.setWidth(150)
-        item.setHeight(50)
-        self.addElement(item)
+        element = EllipseElement()
+        element.setText('Use case 1')
+        element.setWidth(150)
+        element.setHeight(50)
+        self.addElement(element)
 
     def addNoteElement(self):
-        item = NoteElement()
-        item.setText('Note..')
-        self.addElement(item)
+        element = NoteElement()
+        element.setText('Note..')
+        self.addElement(element)
 
     def addTextElement(self):
-        item = TextElement()
-        item.setText('Left-aligned\ntext')
-        self.addElement(item)
+        element = TextElement()
+        element.setText('Left-aligned\ntext')
+        self.addElement(element)
 
     def addCenteredTextElement(self):
-        item = TextElement()
-        item.setText('Centered\ntext')
-        item.setCenter(True)
-        self.addElement(item)
+        element = TextElement()
+        element.setText('Centered\ntext')
+        element.setCenter(True)
+        self.addElement(element)
 
     def addSimpleClassElement(self):
-        item = ClassElement()
-        item.setText('SimpleClass')
-        self.addElement(item)
+        element = ClassElement()
+        element.setText('<b>SimpleClass</b>')
+        self.addElement(element)
 
     def addFatClassElement(self):
-        text = '''FatClass
+        text = '''<b>FatClass</b>
 --
--task_name
+- task_name
 --
-+set_task_name(name: string)\n+run_asynchronously(monitor: Monitor)'''
++ set_task_name(name: string)\n+ run_asynchronously(monitor: Monitor)'''
 
-        item = ClassElement()
-        item.setText(text)
-        self.addElement(item)
+        element = ClassElement()
+        element.setText(text)
+        self.addElement(element)
 
     def addLine(self, line_text):
         element = LineElement()

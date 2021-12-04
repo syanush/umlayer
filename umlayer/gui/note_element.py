@@ -80,8 +80,7 @@ class NoteElement(QAbstractGraphicsShapeItem, BaseElement):
         return self._shape_path
 
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
-        text_pen = Settings.ELEMENT_TEXT_SELECTED_PEN if self.isSelected() else Settings.ELEMENT_TEXT_NORMAL_PEN
-        self._text_item.setPen(text_pen)
+        self._text_item.setColor(self.textColor())
 
         pen = Settings.ELEMENT_SELECTED_PEN if self.isSelected() else Settings.ELEMENT_NORMAL_PEN
         painter.setPen(pen)

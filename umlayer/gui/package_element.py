@@ -71,9 +71,8 @@ class PackageElement(QAbstractGraphicsShapeItem, BaseElement):
         return self._shape_path
 
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
-        text_pen = Settings.ELEMENT_TEXT_SELECTED_PEN if self.isSelected() else Settings.ELEMENT_TEXT_NORMAL_PEN
-        self._text_item1.setPen(text_pen)
-        self._text_item2.setPen(text_pen)
+        self._text_item1.setColor(self.textColor())
+        self._text_item2.setColor(self.textColor())
 
         pen = Settings.ELEMENT_SELECTED_PEN if self.isSelected() else Settings.ELEMENT_NORMAL_PEN
         painter.setPen(pen)
@@ -104,25 +103,28 @@ class PackageElement(QAbstractGraphicsShapeItem, BaseElement):
         self._text_item2.setText(self._text2)
         self._text_item1.setPos(Settings.ELEMENT_PADDING, Settings.ELEMENT_PADDING)
         br1 = self._text_item1.boundingRect()
-        size1_x = br1.width() + 2 * Settings.ELEMENT_PADDING
-        size1_y = br1.height() + 2 * Settings.ELEMENT_PADDING
-        size1_x = snap_up(size1_x)
-        size1_y = snap_up(size1_y)
+        width1 = br1.width() + 2 * Settings.ELEMENT_PADDING
+        height1 = br1.height() + 2 * Settings.ELEMENT_PADDING
+        if not self._text_item1.text():
+            height1 = Settings.PACKAGE_EMPTY_HEIGHT1
 
-        self._size1 = QPointF(size1_x, size1_y)
-        self._text_item2.setPos(Settings.ELEMENT_PADDING, Settings.ELEMENT_PADDING + size1_y)
+        width1 = snap_up(width1)
+        height1 = snap_up(height1)
+
+        self._size1 = QPointF(width1, height1)
+        self._text_item2.setPos(Settings.ELEMENT_PADDING, Settings.ELEMENT_PADDING + height1)
         br2 = self._text_item2.boundingRect()
-        size2_x = max(br2.width() + 2 * Settings.ELEMENT_PADDING + self._dx, size1_x + Settings.PACKAGE_MIN2 + self._dx)
-        size2_y = br2.height() + 2 * Settings.ELEMENT_PADDING + self._dy
-        size2_x = snap_up(size2_x)
-        size2_y = snap_up(size2_y)
+        width2 = max(width1 + Settings.PACKAGE_DELTA_WIDTH1, br2.width() + 2 * Settings.ELEMENT_PADDING) + self._dx
+        height2 = br2.height() + 2 * Settings.ELEMENT_PADDING + self._dy
+        width2 = snap_up(width2)
+        height2 = snap_up(height2)
 
-        self._size2 = QPointF(size2_x, size2_y)
-        width = max(size1_x, size2_x)
-        height = size1_y + size2_y
+        self._size2 = QPointF(width2, height2)
+        width = max(width1, width2)
+        height = height1 + height2
         self._rect = QRectF(0, 0, width, height)
-        self._rect1 = QRectF(0, 0, size1_x, size1_y)
-        self._rect2 = QRectF(0, size1_y, size2_x, size2_y)
+        self._rect1 = QRectF(0, 0, width1, height1)
+        self._rect2 = QRectF(0, height1, width2, height2)
 
         x1 = self._size1.x()
         y1 = self._size1.y()
