@@ -27,9 +27,9 @@ class SceneLogic:
             element.setSelected(True)
 
     def addElement(self, element: BaseElement) -> None:
-        element.setPos(self.initialPosition())
         self.window.scene.deselectAll()
         self.window.scene.addItem(element)
+        element.setPos(self.initialPosition())
         self.selectElement(element)
         self.setDirty()
 
@@ -90,10 +90,7 @@ class SceneLogic:
         self.addElement(element)
 
     def addLine(self, line_text):
-        element = LineElement()
-        element.setPoint1(0, 0)
-        element.setPoint2(100, 0)
-        element.setText(line_text)
+        element = LineElement(0, 0, 100, 0, line_text)
         self.addElement(element)
 
     def storeScene(self):
@@ -151,7 +148,9 @@ class SceneLogic:
         ipos: QPointF = self.initialPosition() - topleft
 
         for element in elements:
-            element.setPos(ipos + element.pos())
+            new_pos = ipos + element.pos()
+            # print(element, new_pos)
+            element.setPos(new_pos)
             self.window.scene.addItem(element)
             self.selectElement(element)
 

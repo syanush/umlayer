@@ -21,6 +21,9 @@ class HandleItem(QGraphicsObject):
         self._shape_path = path
         self._is_live = False
 
+    def __str__(self):
+        return f'<Handle {self.size}: {self.pos().x()}, {self.pos().y()}>'
+
     def setLive(self, is_live):
         self._is_live = is_live
         self.update()
