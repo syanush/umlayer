@@ -183,8 +183,9 @@ class LineElement(QGraphicsItem, BaseElement):
 
         # pen = Settings.ELEMENT_SELECTED_PEN if self.isSelected() else Settings.ELEMENT_NORMAL_PEN
         # painter.setPen(pen)
+        # painter.setBrush(Settings.ELEMENT_NORMAL_TRANSPARENT_BRUSH)
         # painter.drawRect(self.boundingRect())
-
+        #
         # painter.drawPath(self.shape())
 
     def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
@@ -286,7 +287,14 @@ class LineElement(QGraphicsItem, BaseElement):
         self._tip2_figure = tip2_class()
         self._tip2_figure.recalculate(q2, q1)
 
-        extra = max(self._tip1_figure.tip_size, self._tip2_figure.tip_size)
+        max_size = max(
+            Settings.ELEMENT_PEN_SIZE,
+            Settings.ELEMENT_SHAPE_SIZE,
+            self._tip1_figure.tip_size,
+            self._tip2_figure.tip_size
+        )
+
+        extra = Settings.LINE_HANDLE_SIZE + max_size / 2
         final_rect = QRectF(q1, q2).normalized()
         self._bounding_rect = final_rect.adjusted(-extra, -extra, extra, extra)
 

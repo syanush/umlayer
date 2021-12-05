@@ -57,7 +57,6 @@ class Settings:
     NOTE_DELTA = 15
     LINE_HANDLE_SIZE = 15
     LINE_HALF_WIDTH = 10
-    LINE_RADIUS = 10
 
     element_font = QFont('Monospace', 10)
     element_font.setStyleHint(QFont.TypeWriter)
