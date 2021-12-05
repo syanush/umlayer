@@ -1,5 +1,3 @@
-import math
-from numpy import *
 from enum import Enum
 
 from PySide6.QtCore import *
@@ -62,7 +60,7 @@ class LineElement(QGraphicsItem, BaseElement):
             handle.selection_changed_signal.connect(self._handle_selection_changed)
 
         self.setLive(False)
-        #self._recalculate()
+        # self._recalculate()
 
     def on_scene_change(self, scene: QGraphicsScene):
         for handle in self._handle.values():
@@ -132,13 +130,6 @@ class LineElement(QGraphicsItem, BaseElement):
     def shape(self) -> QPainterPath:
         return self._shape_path
 
-    def calculateBoundingRect(self):
-        radius = Settings.LINE_RADIUS
-        x, y = array(self._line).transpose()
-        rect = [min(x) - radius, min(y) - radius, max(x) - min(x) + 2 * radius,
-                max(y) - min(y) + 2 * radius]
-        return QRectF(*rect)
-
     def calculateShape(self, point1, point2):
         line = QLineF(point1, point2)
         angle = line.angle()
@@ -154,40 +145,6 @@ class LineElement(QGraphicsItem, BaseElement):
         path.lineTo(line4.p2())
         path.lineTo(line1.p2())
         return path
-
-    def calculateShape1(self):
-        """
-        https://stackoverflow.com/questions/19528158/simplifying-a-qpainterpath-to-an-outline
-        """
-        path = QPainterPath()
-        path.setFillRule(Qt.WindingFill)
-
-        radius = Settings.LINE_RADIUS
-        rotation = array([[0, -1], [1, 0]])
-
-        points = zip(self._line[0:-1], self._line[1:])
-
-        for p0, pn in points:
-            (x0, y0), (xn, yn) = p0, pn
-            dx, dy = array(pn) - array(p0)
-
-            dV = array([dx, dy])
-            mag_dV = linalg.norm(dV)
-
-            v = dot(rotation, dV) * radius / mag_dV
-
-            # starting circle
-            path.addEllipse(QRectF(x0 - radius, y0 - radius, 2 * radius, 2 * radius))
-            # rectangular part
-            path.moveTo(QPointF(*p0 - v))
-            path.lineTo(QPointF(*pn - v))
-            path.lineTo(QPointF(*pn + v))
-            path.lineTo(QPointF(*p0 + v))
-
-        path.moveTo(QPointF(*pn))
-        path.addEllipse(QRectF(xn - radius, yn - radius, 2 * radius, 2 * radius))
-
-        return path.simplified()
 
     _pen_style_from_line_type = {
         LineType.Solid: Qt.SolidLine,
@@ -256,6 +213,7 @@ class LineElement(QGraphicsItem, BaseElement):
         self._is_live = is_really_live
         for handle in self._handle.values():
             handle.setLive(is_really_live)
+        # self.update()
 
     def _handle_selection_changed(self, is_selected):
         self.setLive(is_selected)
@@ -319,8 +277,6 @@ class LineElement(QGraphicsItem, BaseElement):
         self._point1 = q1
         self._point2 = q2
 
-        # self._line = [[q1.x(), q1.y()], [q2.x(), q2.y()]]
-        # self._shape_path = self.calculateShape1()
         self._shape_path = self.calculateShape(q1, q2)
 
         tip1_class = self._tip_class_from_tip_type[self._tip1]
@@ -333,7 +289,6 @@ class LineElement(QGraphicsItem, BaseElement):
         extra = max(self._tip1_figure.tip_size, self._tip2_figure.tip_size)
         final_rect = QRectF(q1, q2).normalized()
         self._bounding_rect = final_rect.adjusted(-extra, -extra, extra, extra)
-        # self._bounding_rect = self.calculateBoundingRect()
 
         self.update()
 
