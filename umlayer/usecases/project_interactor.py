@@ -135,7 +135,8 @@ class ProjectInteractor:
         return reply != model.constants.CANCEL
 
     def _isFileNameNotSet(self) -> bool:
-        return self._filename is None or self._filename == model.constants.DEFAULT_FILENAME
+        return self._filename is None or \
+            self._filename == model.constants.DEFAULT_FILENAME
 
     def _do_save_project(self, filename) -> None:
         """Really saves project"""

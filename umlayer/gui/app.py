@@ -1,8 +1,8 @@
 import os
 import logging
 
-from PySide6.QtCore import *
-from PySide6.QtWidgets import *
+from PySide6.QtCore import QDir, QCoreApplication
+from PySide6.QtWidgets import QApplication
 
 import umlayer
 

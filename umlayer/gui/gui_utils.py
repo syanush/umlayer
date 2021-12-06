@@ -1,6 +1,6 @@
 import math
 
-from . import *
+from . import Settings
 
 
 def snap(x: float) -> float:

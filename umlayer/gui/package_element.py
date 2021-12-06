@@ -1,8 +1,11 @@
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
+from PySide6.QtCore import Qt, QPointF, QRectF
+from PySide6.QtGui import QPainter, QPainterPath
+from PySide6.QtWidgets import (
+    QApplication, QAbstractGraphicsShapeItem, QGraphicsItem,
+    QStyleOptionGraphicsItem
+)
 
-from . import *
+from . import gui_utils, Abilities, BaseElement, Settings, TextItem
 
 
 class PackageElement(QAbstractGraphicsShapeItem, BaseElement):
@@ -108,16 +111,16 @@ class PackageElement(QAbstractGraphicsShapeItem, BaseElement):
         if not self._text_item1.text():
             height1 = Settings.PACKAGE_EMPTY_HEIGHT1
 
-        width1 = snap_up(width1)
-        height1 = snap_up(height1)
+        width1 = gui_utils.snap_up(width1)
+        height1 = gui_utils.snap_up(height1)
 
         self._size1 = QPointF(width1, height1)
         self._text_item2.setPos(Settings.ELEMENT_PADDING, Settings.ELEMENT_PADDING + height1)
         br2 = self._text_item2.boundingRect()
         width2 = max(width1 + Settings.PACKAGE_DELTA_WIDTH1, br2.width() + 2 * Settings.ELEMENT_PADDING) + self._dx
         height2 = br2.height() + 2 * Settings.ELEMENT_PADDING + self._dy
-        width2 = snap_up(width2)
-        height2 = snap_up(height2)
+        width2 = gui_utils.snap_up(width2)
+        height2 = gui_utils.snap_up(height2)
 
         self._size2 = QPointF(width2, height2)
         width = max(width1, width2)

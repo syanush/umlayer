@@ -1,8 +1,8 @@
 import abc
 import math
 
-from PySide6.QtCore import *
-from PySide6.QtGui import *
+from PySide6.QtCore import QPointF, QLineF
+from PySide6.QtGui import QPainter, QPainterPath
 
 
 class Tip(abc.ABC):
@@ -13,9 +13,6 @@ class Tip(abc.ABC):
 
     @abc.abstractmethod
     def recalculate(self, point1: QPointF, point2: QPointF):
-        pass
-
-    def paint(self, painter: QPainter):
         pass
 
     def paint(self, painter: QPainter):

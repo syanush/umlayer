@@ -1,4 +1,4 @@
-from PySide6.QtGui import *
+from PySide6.QtGui import QAction, QIcon, QKeySequence
 
 
 class Actions:
@@ -229,6 +229,58 @@ class Actions:
             statusTip='Print project data',
             parent=self.window,
             triggered=self.window.printProjectItems)
+
+        # line icon size: 110 x 40
+
+        self.lineActions = [
+            QAction(icon=QIcon('icons:a1.png'),
+                    text='Association',
+                    triggered=lambda: self.window.scene_logic.addLine('lt=-')),
+
+            QAction(icon=QIcon('icons:a4.png'),
+                    text='Directional association',
+                    triggered=lambda: self.window.scene_logic.addLine('lt=->')),
+
+            QAction(icon=QIcon('icons:a5.png'),
+                    text='Bidirectional association',
+                    triggered=lambda: self.window.scene_logic.addLine('lt=<->')),
+
+            QAction(icon=QIcon('icons:a7.png'),
+                    text='Aggregation',
+                    triggered=lambda: self.window.scene_logic.addLine('lt=->>>>')),
+
+            QAction(icon=QIcon('icons:a8.png'),
+                    text='Composition',
+                    triggered=lambda: self.window.scene_logic.addLine('lt=->>>>>')),
+
+            QAction(icon=QIcon('icons:a9.png'),
+                    text='Inheritance/Generalization',
+                    triggered=lambda: self.window.scene_logic.addLine('lt=->>')),
+
+            QAction(icon=QIcon('icons:a10.png'),
+                    text='Realization/Implementation',
+                    triggered=lambda: self.window.scene_logic.addLine('lt=.>>')),
+
+            QAction(icon=QIcon('icons:a11.png'),
+                    text='Dependency',
+                    triggered=lambda: self.window.scene_logic.addLine('lt=.>')),
+
+            QAction(icon=QIcon('icons:a2.png'),
+                    text='',
+                    triggered=lambda: self.window.scene_logic.addLine('lt=.')),
+
+            QAction(icon=QIcon('icons:a3.png'),
+                    text='Note connector',
+                    triggered=lambda: self.window.scene_logic.addLine('lt=..')),
+
+            QAction(icon=QIcon('icons:a6.png'),
+                    text='Synchronous message',
+                    triggered=lambda: self.window.scene_logic.addLine('lt=->>>')),
+
+            QAction(icon=QIcon('icons:a12.png'),
+                    text='Asynchronous message',
+                    triggered=lambda: self.window.scene_logic.addLine('lt=->>>>>>')),
+        ]
 
     def enableSceneActions(self, enable):
         self.exportAsSvgImageAction.setEnabled(enable)

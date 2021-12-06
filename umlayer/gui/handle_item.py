@@ -1,8 +1,10 @@
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
+from PySide6.QtCore import Qt, QPointF, QRectF, Signal
+from PySide6.QtGui import QPainter, QPainterPath
+from PySide6.QtWidgets import (
+    QApplication, QGraphicsItem, QStyleOptionGraphicsItem, QGraphicsObject
+)
 
-from . import *
+from . import gui_utils, Settings
 
 
 class HandleItem(QGraphicsObject):

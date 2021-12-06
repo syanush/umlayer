@@ -1,8 +1,6 @@
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
-
-from . import *
+from PySide6.QtWidgets import (
+    QGraphicsTextItem
+)
 
 
 class TextItem(QGraphicsTextItem):
@@ -38,13 +36,13 @@ class TextItem(QGraphicsTextItem):
     def _getHtml(self, text):
         alignment = 'center' if self.center() else 'left'
         return f"""
-                    <div align="{alignment}" 
-                    style="
-                    font-family: Segoe UI; 
-                    font-size: 15px; 
-                    white-space: pre; 
-                    ">{text}</div>
-                """
+<div align="{alignment}"
+style="
+font-family: Segoe UI;
+font-size: 15px;
+white-space: pre;
+">{text}</div>
+"""
 
     def _recalculate(self):
         self.prepareGeometryChange()

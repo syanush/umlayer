@@ -1,6 +1,7 @@
 from umlayer import model
 from . import ProjectInteractor
 
+
 class Interactors:
     """
     Stores links to interactors for external users

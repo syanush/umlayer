@@ -4,8 +4,9 @@ import logging
 import sys
 import traceback
 
+from PySide6.QtWidgets import QApplication, QMainWindow
+
 from umlayer import version
-from umlayer import model, gui, storage
 from .composition_root import CompositionRoot
 
 

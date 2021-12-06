@@ -1,8 +1,11 @@
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
+from PySide6.QtCore import Qt, QPointF, QRectF
+from PySide6.QtGui import QPainter, QPainterPath
+from PySide6.QtWidgets import (
+    QApplication, QAbstractGraphicsShapeItem, QGraphicsItem,
+    QStyleOptionGraphicsItem
+)
 
-from . import *
+from . import gui_utils, Abilities, BaseElement, Settings, TextItem
 
 
 class NoteElement(QAbstractGraphicsShapeItem, BaseElement):
@@ -107,8 +110,8 @@ class NoteElement(QAbstractGraphicsShapeItem, BaseElement):
         br = self._text_item.boundingRect()
         width = 2 * Settings.ELEMENT_PADDING + br.width() + self._dx + Settings.NOTE_DELTA
         height = 2 * Settings.ELEMENT_PADDING + br.height() + self._dy
-        width = snap_up(width)
-        height = snap_up(height)
+        width = gui_utils.snap_up(width)
+        height = gui_utils.snap_up(height)
         self._rect = QRectF(0, 0, width, height)
 
         br = self._rect

@@ -1,4 +1,4 @@
-from PySide6.QtGui import *
+from PySide6.QtGui import QFont, Qt, QPen, QColor, QBrush
 
 
 class Settings:

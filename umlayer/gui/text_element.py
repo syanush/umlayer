@@ -1,8 +1,11 @@
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
+from PySide6.QtCore import Qt, QPointF, QRectF
+from PySide6.QtGui import QPainter, QPainterPath
+from PySide6.QtWidgets import (
+    QApplication, QGraphicsItem,
+    QStyleOptionGraphicsItem
+)
 
-from . import *
+from . import gui_utils, Abilities, BaseElement, Settings, TextItem
 
 
 class TextElement(QGraphicsItem, BaseElement):

@@ -1,10 +1,15 @@
 from enum import Enum
 
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
+from PySide6.QtCore import Qt, QPointF, QRectF, QLineF
+from PySide6.QtGui import QPainter, QPainterPath, QPen
+from PySide6.QtWidgets import (
+    QApplication, QGraphicsItem, QGraphicsScene, QStyleOptionGraphicsItem
+)
 
-from . import *
+from . import (
+    gui_utils, Abilities, BaseElement, Settings,
+    NoTip, Tip, HandleItem, ArrowTip, TriangleTip, DiamondTip, HalfTriangleTip
+)
 
 
 class LineType(Enum):
@@ -207,10 +212,10 @@ class LineElement(QGraphicsItem, BaseElement):
 
     def setLive(self, is_live):
         """A line must stay live when the line or its handle were selected"""
-        is_really_live = is_live or \
-                         self.isSelected() or \
-                         self._handle[1].isSelected() or \
-                         self._handle[2].isSelected()
+        is_really_live = is_live \
+            or self.isSelected() \
+            or self._handle[1].isSelected() \
+            or self._handle[2].isSelected()
         self._is_live = is_really_live
         for handle in self._handle.values():
             handle.setLive(is_really_live)

@@ -1,9 +1,10 @@
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
+from PySide6.QtCore import Qt, QPointF, QRectF
+from PySide6.QtGui import QPainter, QPainterPath
+from PySide6.QtWidgets import (
+    QApplication, QAbstractGraphicsShapeItem, QGraphicsItem,
+    QStyleOptionGraphicsItem)
 
-from . import *
-from . import gui_utils
+from . import gui_utils, Abilities, BaseElement, Settings, TextItem
 
 
 class ClassElement(QAbstractGraphicsShapeItem, BaseElement):
@@ -99,7 +100,7 @@ class ClassElement(QAbstractGraphicsShapeItem, BaseElement):
         self._deleteTextItems()
         self._text_items = self._createTextItems()
         width = self._getMaxWidth()
-        width = snap_up(width)
+        width = gui_utils.snap_up(width)
 
         self._compartments = self._createCompartments(width)
         self._positionTextItems()
@@ -190,7 +191,7 @@ class ClassElement(QAbstractGraphicsShapeItem, BaseElement):
         height = 2.0 * Settings.ELEMENT_PADDING
         if n > 0:
             height = sum(compartment.height() for compartment in self._compartments)
-            height1 = snap_up(height)
+            height1 = gui_utils.snap_up(height)
             self._compartments[-1].adjust(0, 0, 0, height1 - height)
             height = height1
         return height

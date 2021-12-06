@@ -3,10 +3,10 @@ import importlib
 import json
 from enum import Enum
 
-from PySide6.QtCore import *
-from PySide6.QtWidgets import *
+from PySide6.QtCore import QPointF
+from PySide6.QtWidgets import QGraphicsItem
 
-from . import *
+from . import Settings
 
 
 class Abilities(Enum):

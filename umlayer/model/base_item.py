@@ -1,4 +1,3 @@
-import abc
 from abc import ABC
 from uuid import UUID, uuid4
 

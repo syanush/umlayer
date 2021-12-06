@@ -1,8 +1,10 @@
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
+from PySide6.QtCore import Qt, QPointF, QRectF
+from PySide6.QtGui import QPainter, QPainterPath
+from PySide6.QtWidgets import (
+    QApplication, QGraphicsItem, QStyleOptionGraphicsItem
+)
 
-from . import *
+from . import gui_utils, Abilities, BaseElement, Settings, TextItem
 
 
 class EllipseElement(QGraphicsItem, BaseElement):
@@ -94,8 +96,8 @@ class EllipseElement(QGraphicsItem, BaseElement):
         self._text_item.setText(text)
         br = self._text_item.boundingRect()
 
-        width = snap_up(max(self._width, br.width() * Settings.ELLIPSE_SCALE_WIDTH))
-        height = snap_up(max(self._height, br.height() * Settings.ELLIPSE_SCALE_HEIGHT))
+        width = gui_utils.snap_up(max(self._width, br.width() * Settings.ELLIPSE_SCALE_WIDTH))
+        height = gui_utils.snap_up(max(self._height, br.height() * Settings.ELLIPSE_SCALE_HEIGHT))
         self._rect = QRectF(0, 0, width, height)
 
         x = (self._rect.width() - br.width()) / 2

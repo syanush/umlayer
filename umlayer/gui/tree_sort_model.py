@@ -1,4 +1,4 @@
-from PySide6.QtCore import *
+from PySide6.QtCore import QSortFilterProxyModel, QModelIndex
 
 from . import ItemRoles
 

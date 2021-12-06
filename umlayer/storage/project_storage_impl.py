@@ -32,7 +32,7 @@ class ProjectStorageImpl(usecases.ProjectStorage):
         engine = create_engine("sqlite+pysqlite:///" + filepath, echo=True, future=True)
 
         with engine.begin() as conn:
-            sql = f"SELECT * FROM elements"
+            sql = "SELECT * FROM elements"
             result: sqlalchemy.engine.cursor.CursorResult = conn.execute(text(sql))
             project_items = [jsonpickle.decode(json_data) for _, json_data in result]
             return project_items

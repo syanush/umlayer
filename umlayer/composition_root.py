@@ -1,7 +1,9 @@
 import sys
-import logging
 
-import model, gui, storage, usecases
+import model
+import gui
+import storage
+import usecases
 
 
 class CompositionRoot:

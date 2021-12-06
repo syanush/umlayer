@@ -1,21 +1,36 @@
 import logging
-import pprint
 from uuid import UUID
 
-from PySide6.QtCore import *
-from PySide6.QtGui import *
+from PySide6.QtCore import (
+    Qt, QRect, QSettings, QDir, QItemSelection, QByteArray
+)
+
+from PySide6.QtGui import (
+    QImage, QPainter, QTextOption, QKeySequence, QShortcut,
+    QStandardItem
+)
+
+from PySide6.QtWidgets import (
+    QMainWindow, QMenu, QToolBar, QStatusBar,
+    QMessageBox, QFileDialog, QComboBox, QPushButton,
+    QLabel, QDockWidget, QPlainTextEdit, QVBoxLayout, QWidget
+)
 from PySide6.QtSvg import QSvgGenerator
-from PySide6.QtWidgets import *
 
 from umlayer import version, model
-from . import *
+from . import (
+    GraphicsScene, GraphicsView, TreeView, ItemRoles, LineIconsProxyStyle,
+    Settings, Actions, TreeSortModel, StandardItemModel, BaseElement,
+    Abilities,
+)
 
 
 class MainWindow(QMainWindow):
     """Main window of the UMLayer application
     """
 
-    def __init__(self, scene_logic, storage, data_model, interactors, *args, **kwargs):
+    def __init__(self, scene_logic, storage, data_model, interactors,
+                 *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.scene_logic = scene_logic
 
@@ -132,7 +147,11 @@ class MainWindow(QMainWindow):
     def initGUI(self):
         logging.info('GUI initialization started')
         self.setupComponents()
-        self.treeView.selectionModel().selectionChanged.connect(self.on_selection_changed)
+
+        self.treeView.selectionModel()\
+            .selectionChanged\
+            .connect(self.on_selection_changed)
+
         self.updateTitle()
         logging.info('GUI initialization finished')
 
@@ -192,31 +211,11 @@ class MainWindow(QMainWindow):
     def _createLineButton(self):
         lineButton = QPushButton('Lines')
         menu = QMenu(lineButton)
-        # line icon size: 110 x 40
-        menu.addAction(QAction(icon=QIcon('icons:a1.png'), text='Association', parent=lineButton,
-                               triggered=lambda: self.scene_logic.addLine('lt=-')))
-        menu.addAction(QAction(icon=QIcon('icons:a4.png'), text='Directional association', parent=lineButton,
-                               triggered=lambda: self.scene_logic.addLine('lt=->'))),
-        menu.addAction(QAction(icon=QIcon('icons:a5.png'), text='Bidirectional association', parent=lineButton,
-                               triggered=lambda: self.scene_logic.addLine('lt=<->')))
-        menu.addAction(QAction(icon=QIcon('icons:a7.png'), text='Aggregation', parent=lineButton,
-                               triggered=lambda: self.scene_logic.addLine('lt=->>>>')))
-        menu.addAction(QAction(icon=QIcon('icons:a8.png'), text='Composition', parent=lineButton,
-                               triggered=lambda: self.scene_logic.addLine('lt=->>>>>')))
-        menu.addAction(QAction(icon=QIcon('icons:a9.png'), text='Inheritance/Generalization', parent=lineButton,
-                               triggered=lambda: self.scene_logic.addLine('lt=->>')))
-        menu.addAction(QAction(icon=QIcon('icons:a10.png'), text='Realization/Implementation', parent=lineButton,
-                               triggered=lambda: self.scene_logic.addLine('lt=.>>')))
-        menu.addAction(QAction(icon=QIcon('icons:a11.png'), text='Dependency', parent=lineButton,
-                               triggered=lambda: self.scene_logic.addLine('lt=.>')))
-        menu.addAction(QAction(icon=QIcon('icons:a2.png'), text='', parent=lineButton,
-                               triggered=lambda: self.scene_logic.addLine('lt=.')))
-        menu.addAction(QAction(icon=QIcon('icons:a3.png'), text='Note connector', parent=lineButton,
-                               triggered=lambda: self.scene_logic.addLine('lt=..')))
-        menu.addAction(QAction(icon=QIcon('icons:a6.png'), text='Synchronous message', parent=lineButton,
-                               triggered=lambda: self.scene_logic.addLine('lt=->>>')))
-        menu.addAction(QAction(icon=QIcon('icons:a12.png'), text='Asynchronous message', parent=lineButton,
-                               triggered=lambda: self.scene_logic.addLine('lt=->>>>>>')))
+
+        for action in self.app_actions.lineActions:
+            action.setParent(lineButton)
+            menu.addAction(action)
+
         lineButton.setMenu(menu)
         myStyle = LineIconsProxyStyle()
         menu.setStyle(myStyle)
@@ -255,10 +254,15 @@ class MainWindow(QMainWindow):
         text = self.propertyView.toPlainText()
         self.element_with_text.setText(text)
 
+    def isEditable(self, item):
+        return isinstance(item, BaseElement) and \
+            Abilities.EDITABLE_TEXT in item.getAbilities()
+
     def on_scene_selection_changed(self):
-        elements_with_text = [item for item in self.scene.selectedItems()
-                             if isinstance(item, BaseElement) and
-                             Abilities.EDITABLE_TEXT in item.getAbilities()]
+        elements_with_text = [
+            item for item in self.scene.selectedItems()
+            if self.isEditable(item)
+        ]
         if len(elements_with_text) == 1:
             self.element_with_text = elements_with_text[0]
             self.propertyView.setPlainText(self.element_with_text.text())
@@ -271,22 +275,26 @@ class MainWindow(QMainWindow):
     def createCentralWidget(self):
         scene_size = 2000
         self.scene: GraphicsScene = \
-            GraphicsScene(self.scene_logic, -scene_size//2, -scene_size//2, scene_size, scene_size, parent=self)
+            GraphicsScene(
+                self.scene_logic,
+                -scene_size // 2,
+                -scene_size // 2,
+                scene_size,
+                scene_size,
+                parent=self)
 
         self.scene.selectionChanged.connect(self.on_scene_selection_changed)
 
         self.sceneView = GraphicsView(self.scene)
-        self.sceneView.setRenderHints(
-            QPainter.Antialiasing |
-            QPainter.TextAntialiasing |
-            QPainter.SmoothPixmapTransform |
-            QPainter.VerticalSubpixelPositioning
-        )
+        self.sceneView.setRenderHint(QPainter.Antialiasing)
+        self.sceneView.setRenderHint(QPainter.TextAntialiasing)
+        self.sceneView.setRenderHint(QPainter.SmoothPixmapTransform)
+        self.sceneView.setRenderHint(QPainter.VerticalSubpixelPositioning)
 
-        shortcut = QShortcut(QKeySequence.SelectAll,
-                             self.sceneView,
-                             context=Qt.ShortcutContext.WidgetShortcut,
-                             activated=self.scene_logic.selectAllElements)
+        _ = QShortcut(QKeySequence.SelectAll,
+                      self.sceneView,
+                      context=Qt.ShortcutContext.WidgetShortcut,
+                      activated=self.scene_logic.selectAllElements)
 
         vbox = QVBoxLayout()
         vbox.addWidget(self.sceneView)

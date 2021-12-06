@@ -1,8 +1,10 @@
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
+from PySide6.QtCore import Qt, QPointF, QRectF
+from PySide6.QtGui import QPainter, QPainterPath
+from PySide6.QtWidgets import (
+    QApplication, QGraphicsItem, QGraphicsEllipseItem, QGraphicsLineItem,
+    QStyleOptionGraphicsItem)
 
-from . import *
+from . import gui_utils, Settings, Abilities, BaseElement, TextItem
 
 
 class ActorElement(QGraphicsItem, BaseElement):

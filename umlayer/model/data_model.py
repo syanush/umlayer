@@ -1,5 +1,6 @@
 from . import Project
 
+
 class DataModel:
     """Entity. Application state. Holds links to the memory data: collections of other entities, etc
 

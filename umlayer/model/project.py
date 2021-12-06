@@ -2,6 +2,7 @@ from uuid import UUID
 
 from . import BaseItem
 
+
 class Project:
     """Repository?"""
 
@@ -14,7 +15,8 @@ class Project:
     def root(self):
         return self._root
 
-    def setRoot(self, root):
+    def setRoot(self, root: BaseItem):
+        self._add(root)
         self._root = root
 
     def __str__(self):
@@ -28,10 +30,6 @@ class Project:
             return
 
         self._is_dirty = dirty
-
-    def setRoot(self, root: BaseItem):
-        self._add(root)
-        self._root = root
 
     def remove(self, project_item_id: UUID = None):
         if project_item_id not in self.project_items.keys():

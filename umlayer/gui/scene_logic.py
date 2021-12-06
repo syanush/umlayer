@@ -1,10 +1,14 @@
 import logging
 
-from PySide6.QtCore import *
-from PySide6.QtGui import *
+from PySide6.QtCore import QPointF
+
+from . import (
+    gui_utils, BaseElement, LineElement, ActorElement,
+    PackageElement, EllipseElement, NoteElement, TextElement,
+    ClassElement
+)
 
 from umlayer import model
-from . import *
 
 
 class SceneLogic:
@@ -12,7 +16,7 @@ class SceneLogic:
         """Do not use window here"""
         self.temp_list = []
         self._grid_enabled = False
-        self.window: MainWindow = None
+        self.window = None
 
     def setWindow(self, window):
         self.window = window
@@ -36,7 +40,7 @@ class SceneLogic:
     def initialPosition(self) -> QPointF:
         """Return scene coordinates of the initial position of new elements"""
         pos = self.window.sceneView.mapToScene(20, 20)
-        grid_pos = QPointF(snap_up(pos.x()), snap_up(pos.y()))
+        grid_pos = QPointF(gui_utils.snap_up(pos.x()), gui_utils.snap_up(pos.y()))
         # print(pos, grid_pos)
         return grid_pos
 
@@ -130,7 +134,7 @@ class SceneLogic:
 
     def paste_elements(self):
         """Pasted elements are appeared at the top left corner"""
-        elements: list[Element] = [BaseElement.fromJson(json_dto) for json_dto in self.temp_list]
+        elements: list[BaseElement] = [BaseElement.fromJson(json_dto) for json_dto in self.temp_list]
         if not elements:
             return
 

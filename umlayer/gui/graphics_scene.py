@@ -1,6 +1,6 @@
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QKeyEvent, QBrush, QPainter
+from PySide6.QtWidgets import QGraphicsScene
 
 from . import constants, Settings, SceneLogic, BaseElement
 
