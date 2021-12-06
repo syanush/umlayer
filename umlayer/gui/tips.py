@@ -8,12 +8,19 @@ from PySide6.QtGui import *
 class Tip(abc.ABC):
     tip_size = 0
 
+    def __init__(self):
+        self._path = None
+
     @abc.abstractmethod
     def recalculate(self, point1: QPointF, point2: QPointF):
         pass
 
     def paint(self, painter: QPainter):
         pass
+
+    def paint(self, painter: QPainter):
+        if self._path is not None:
+            painter.drawPath(self._path)
 
     def point(self):
         return self._point
@@ -23,11 +30,10 @@ class Tip(abc.ABC):
 
 
 class NoTip(Tip):
+    tip_size = 0
+
     def recalculate(self, point1: QPointF, point2: QPointF):
         self.setPoint(QPointF(point1))
-
-    def paint(self, painter: QPainter):
-        pass
 
 
 class ArrowTip(Tip):
@@ -45,9 +51,6 @@ class ArrowTip(Tip):
         path.lineTo(point1)
         path.lineTo(line2.p2())
         self._path = path
-
-    def paint(self, painter: QPainter):
-        painter.drawPath(self._path)
 
 
 class TriangleTip(Tip):
@@ -68,9 +71,6 @@ class TriangleTip(Tip):
         path.lineTo(point1)
         self._path = path
 
-    def paint(self, painter: QPainter):
-        painter.drawPath(self._path)
-
 
 class HalfTriangleTip(Tip):
     tip_size = 15
@@ -89,9 +89,6 @@ class HalfTriangleTip(Tip):
         path.lineTo(line3.center())
         path.lineTo(point1)
         self._path = path
-
-    def paint(self, painter: QPainter):
-        painter.drawPath(self._path)
 
 
 class DiamondTip(Tip):
@@ -112,6 +109,3 @@ class DiamondTip(Tip):
         path.lineTo(line2.p2())
         path.lineTo(point1)
         self._path = path
-
-    def paint(self, painter: QPainter):
-        painter.drawPath(self._path)
