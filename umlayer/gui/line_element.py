@@ -199,7 +199,7 @@ class LineElement(QGraphicsItem, BaseElement):
         if change == QGraphicsItem.ItemSceneChange:
             self.on_scene_change(value)
         if change == QGraphicsItem.ItemZValueHasChanged:
-            self.on_zvalue_change(value)
+            self.on_zvalue_change()
         if change == QGraphicsItem.ItemSelectedHasChanged:
             is_selected = bool(value)
             self.setLive(is_selected)

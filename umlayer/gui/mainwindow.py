@@ -97,9 +97,14 @@ class MainWindow(QMainWindow):
         self.updateToolbar()
 
     def updateToolbar(self):
-        self.app_actions.saveAction.setEnabled(self.isDirty())
-        self.app_actions.saveAsAction.setEnabled(self.project is not None)
-        self.app_actions.closeAction.setEnabled(self.project is not None)
+        is_dirty = self.isDirty()
+        self.app_actions.saveAction.setEnabled(is_dirty)
+
+        project_is_open = self.project is not None
+        self.app_actions.saveAsAction.setEnabled(project_is_open)
+        self.app_actions.closeAction.setEnabled(project_is_open)
+        self.app_actions.bringToFrontAction.setEnabled(project_is_open)
+        self.app_actions.sendToBackAction.setEnabled(project_is_open)
 
     def writeSettings(self):
         settings = QSettings()
