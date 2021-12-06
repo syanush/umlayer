@@ -6,8 +6,8 @@ from . import *
 
 
 class ActorElement(QGraphicsItem, BaseElement):
-    actor_width = 30
-    actor_height = 65
+    actor_width = 6 * Settings.ACTOR_BASE_SIZE
+    actor_height = 13 * Settings.ACTOR_BASE_SIZE
 
     def __init__(self, text: str = '', parent=None):
         super().__init__(parent=parent)
@@ -24,12 +24,14 @@ class ActorElement(QGraphicsItem, BaseElement):
 
         self._text_item = TextItem(self._text, center=True, parent=self)
 
+        m = Settings.ACTOR_BASE_SIZE
+
         self.items = (
-            QGraphicsEllipseItem(5, 0, 20, 20, parent=self),  # head
-            QGraphicsLineItem(15, 20, 15, 45, parent=self),  # vertical line
-            QGraphicsLineItem(0, 25, 30, 25, parent=self),  # horizontal line
-            QGraphicsLineItem(15, 45, 0, 65, parent=self),  # left leg
-            QGraphicsLineItem(15, 45, 30, 65, parent=self),  # right leg
+            QGraphicsEllipseItem(m, 0, 4 * m, 4 * m, parent=self),  # head
+            QGraphicsLineItem(3 * m, 4 * m, 3 * m, 9 * m, parent=self),  # vertical line
+            QGraphicsLineItem(0, 5 * m, self.actor_width, 5 * m, parent=self),  # horizontal line
+            QGraphicsLineItem(3 * m, 9 * m, 0, self.actor_height, parent=self),  # left leg
+            QGraphicsLineItem(3 * m, 9 * m, self.actor_width, self.actor_height, parent=self),  # right leg
         )
 
         self._recalculate()
