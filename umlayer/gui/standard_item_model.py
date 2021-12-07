@@ -1,6 +1,8 @@
 import logging
+from uuid import UUID
 
-from PySide6.QtGui import QIcon, QStandardItemModel, QStandardItem
+from PySide6.QtGui import Qt, QIcon, QStandardItemModel, QStandardItem
+
 from umlayer import model
 from . import ItemRoles
 
@@ -12,25 +14,25 @@ class StandardItemModel(QStandardItemModel):
     All methods must be called with model index (not proxy index).
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.setHorizontalHeaderLabels([""])
 
-    def root_item(self):
+    def root_item(self) -> QStandardItem:
         return self.item(0)
 
-    def initializeFromProject(self, project):
+    def initializeFromProject(self, project: model.Project) -> None:
         self.clear()
         root_item = self.itemize(project.root, project)
         self.appendRow([root_item])
 
-    def count(self):
+    def count(self) -> int:
         root_model_index = self.root_item().index()
         return 1 + self._countChildren(root_model_index)
 
     def _countChildren(self, model_index) -> int:
-        count = rowCount = self.rowCount(model_index)
-        for i in range(rowCount):
+        count = row_count = self.rowCount(model_index)
+        for i in range(row_count):
             count += self._countChildren(self.index(i, 0, model_index))
         return count
 
@@ -48,7 +50,7 @@ class StandardItemModel(QStandardItemModel):
         item.setIcon(QIcon(icon_name))
         return item
 
-    def itemize(self, project_item, project):
+    def itemize(self, project_item, project) -> QStandardItem:
         item = self.makeItem(project_item)
         children = project.children(project_item.id)
         for child in children:
@@ -56,11 +58,11 @@ class StandardItemModel(QStandardItemModel):
             item.appendRow([child_item])
         return item
 
-    def getId(self, item):
+    def getId(self, item: QStandardItem) -> UUID:
         if item is None:
             raise ValueError("item")
-        id = item.data(ItemRoles.IdRole)
-        if id is None:
+        item_id: UUID = item.data(ItemRoles.IdRole)
+        if item_id is None:
             logging.error(f"Item {item.data(Qt.DisplayRole)} has no id!")
             raise Exception("Bad item")
-        return id
+        return item_id

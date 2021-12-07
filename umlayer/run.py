@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import logging
+import os
 import sys
 import traceback
 
@@ -57,9 +58,6 @@ def main():
 
 
 if __name__ == "__main__":
-    import os
-    import sys
-
-    print(sys.path[0])
+    # print(sys.path[0])
     sys.path.append(os.path.join(sys.path[0], ".."))
     main()
