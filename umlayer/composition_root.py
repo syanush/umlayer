@@ -21,7 +21,9 @@ class CompositionRoot:
         interactors = usecases.Interactors(data_model, project_interactor)
 
         scene_logic = gui.SceneLogic()
-        self._main_window = gui.MainWindow(scene_logic, project_storage, data_model, interactors)
+        self._main_window = gui.MainWindow(
+            scene_logic, project_storage, data_model, interactors
+        )
         interactors.set_window(self._main_window)
 
     @property

@@ -1,8 +1,12 @@
 from PySide6.QtCore import Qt, QPointF, QRectF
 from PySide6.QtGui import QPainter, QPainterPath
 from PySide6.QtWidgets import (
-    QApplication, QGraphicsItem, QGraphicsEllipseItem, QGraphicsLineItem,
-    QStyleOptionGraphicsItem)
+    QApplication,
+    QGraphicsItem,
+    QGraphicsEllipseItem,
+    QGraphicsLineItem,
+    QStyleOptionGraphicsItem,
+)
 
 from . import gui_utils, Settings, Abilities, BaseElement, TextItem
 
@@ -11,7 +15,7 @@ class ActorElement(QGraphicsItem, BaseElement):
     actor_width = 6 * Settings.ACTOR_BASE_SIZE
     actor_height = 13 * Settings.ACTOR_BASE_SIZE
 
-    def __init__(self, text: str = '', parent=None):
+    def __init__(self, text: str = "", parent=None):
         super().__init__(parent=parent)
         BaseElement.__init__(self)
         self._abilities = set([Abilities.EDITABLE_TEXT])
@@ -21,7 +25,7 @@ class ActorElement(QGraphicsItem, BaseElement):
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges, True)
 
         # serializable data
-        self._text = text or ''
+        self._text = text or ""
         # end of serializable data
 
         self._text_item = TextItem(self._text, center=True, parent=self)
@@ -31,9 +35,15 @@ class ActorElement(QGraphicsItem, BaseElement):
         self.items = (
             QGraphicsEllipseItem(m, 0, 4 * m, 4 * m, parent=self),  # head
             QGraphicsLineItem(3 * m, 4 * m, 3 * m, 9 * m, parent=self),  # vertical line
-            QGraphicsLineItem(0, 5 * m, self.actor_width, 5 * m, parent=self),  # horizontal line
-            QGraphicsLineItem(3 * m, 9 * m, 0, self.actor_height, parent=self),  # left leg
-            QGraphicsLineItem(3 * m, 9 * m, self.actor_width, self.actor_height, parent=self),  # right leg
+            QGraphicsLineItem(
+                0, 5 * m, self.actor_width, 5 * m, parent=self
+            ),  # horizontal line
+            QGraphicsLineItem(
+                3 * m, 9 * m, 0, self.actor_height, parent=self
+            ),  # left leg
+            QGraphicsLineItem(
+                3 * m, 9 * m, self.actor_width, self.actor_height, parent=self
+            ),  # right leg
         )
 
         self._recalculate()
@@ -58,8 +68,14 @@ class ActorElement(QGraphicsItem, BaseElement):
         path.addRect(self.rect())
         return path
 
-    def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
-        pen = Settings.ELEMENT_SELECTED_PEN if self.isSelected() else Settings.ELEMENT_NORMAL_PEN
+    def paint(
+        self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None
+    ) -> None:
+        pen = (
+            Settings.ELEMENT_SELECTED_PEN
+            if self.isSelected()
+            else Settings.ELEMENT_NORMAL_PEN
+        )
         self._setElementPen(pen)
 
         self._text_item.setColor(self.textColor())
@@ -71,25 +87,27 @@ class ActorElement(QGraphicsItem, BaseElement):
 
     def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
         self.positionNotify(change)
-        if self.scene() and \
-                change == QGraphicsItem.ItemPositionChange and \
-                QApplication.mouseButtons() == Qt.LeftButton:
+        if (
+            self.scene()
+            and change == QGraphicsItem.ItemPositionChange
+            and QApplication.mouseButtons() == Qt.LeftButton
+        ):
             return QPointF(gui_utils.snap(value.x()), gui_utils.snap(value.y()))
         return super().itemChange(change, value)
 
     def toDto(self):
         dto = super().toDto()
-        dto['text'] = self.text()
+        dto["text"] = self.text()
         return dto
 
     def setFromDto(self, dto: dict):
         super().setFromDto(dto)
-        self.setText(dto['text'])
+        self.setText(dto["text"])
 
     def _recalculate(self):
         self.prepareGeometryChange()
 
-        self._text_item.setText(self._text or '')
+        self._text_item.setText(self._text or "")
 
         br = self._text_item.boundingRect()
         text_width = br.width()

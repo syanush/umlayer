@@ -20,7 +20,7 @@ class Project:
         self._root = root
 
     def __str__(self):
-        return f'<Project root={self._root}>'
+        return f"<Project root={self._root}>"
 
     def dirty(self):
         return self._is_dirty
@@ -44,9 +44,9 @@ class Project:
 
     def add(self, project_item: BaseItem, parent_id: UUID):
         if parent_id not in self.project_items:
-            print(f'Add: item {parent_id} does not belong to {self}')
+            print(f"Add: item {parent_id} does not belong to {self}")
             self.printProjectItems()
-            raise AttributeError('parent_id')
+            raise AttributeError("parent_id")
         self._add(project_item, parent_id)
         self.setProjectDirty(True)
 
@@ -58,8 +58,11 @@ class Project:
         return self.project_items.get(project_item_id)
 
     def children(self, parent_id: UUID) -> set[BaseItem]:
-        return set(project_item for project_item in self.project_items.values()
-                   if project_item.parent_id == parent_id)
+        return set(
+            project_item
+            for project_item in self.project_items.values()
+            if project_item.parent_id == parent_id
+        )
 
     def count(self):
         return len(self.project_items)
@@ -68,7 +71,9 @@ class Project:
         """Debugging feature"""
         print(self)
         for id, project_item in self.project_items.items():
-            print(f'{project_item.name():15s} id={project_item.id} par={project_item.parent_id}')
+            print(
+                f"{project_item.name():15s} id={project_item.id} par={project_item.parent_id}"
+            )
             if project_item.id != id:
-                print('Bad item')
+                print("Bad item")
         print()

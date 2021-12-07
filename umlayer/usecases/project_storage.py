@@ -7,8 +7,7 @@ from umlayer import model
 
 
 class ProjectStorage(ABC):
-    """It supports Save/Load operations for a project
-    """
+    """It supports Save/Load operations for a project"""
 
     @abstractmethod
     def save(self, elements: list[model.BaseItem], filename: str = None) -> None:

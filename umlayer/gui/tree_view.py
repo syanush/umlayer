@@ -2,12 +2,14 @@ import logging
 
 from PySide6.QtCore import Qt, QItemSelectionModel
 
-from PySide6.QtGui import (
-    QStandardItem, QFocusEvent
-)
+from PySide6.QtGui import QStandardItem, QFocusEvent
 
 from PySide6.QtWidgets import (
-    QTreeView, QAbstractItemView, QFrame, QAbstractItemDelegate, QItemDelegate
+    QTreeView,
+    QAbstractItemView,
+    QFrame,
+    QAbstractItemDelegate,
+    QItemDelegate,
 )
 
 from . import ItemRoles
@@ -19,10 +21,13 @@ class TreeView(QTreeView):
 
     All methods must be called with proxy index (not model index)
     """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.setSelectionMode(QAbstractItemView.SingleSelection)  # disable light blue selection
+        self.setSelectionMode(
+            QAbstractItemView.SingleSelection
+        )  # disable light blue selection
         self.setSortingEnabled(True)
         self.setHeaderHidden(True)
         self.setUniformRowHeights(True)
@@ -72,7 +77,9 @@ class TreeView(QTreeView):
         root_item = self.itemModel.root_item()
         model_index = root_item.index()
         proxy_index = self.getProxyIndex(model_index)
-        self.selectionModel().select(proxy_index, QItemSelectionModel.SelectionFlag.Select)
+        self.selectionModel().select(
+            proxy_index, QItemSelectionModel.SelectionFlag.Select
+        )
 
     def startEditName(self, item):
         model_index = item.index()
@@ -83,7 +90,7 @@ class TreeView(QTreeView):
 
     def onCloseEditor(self, editor: QAbstractItemDelegate, hint):
         """Set element name after editing"""
-        logging.info('Finish name editing')
+        logging.info("Finish name editing")
         item: QStandardItem = self.getSelectedItem()
         if item is None:
             return
@@ -106,4 +113,6 @@ class TreeView(QTreeView):
         super().focusOutEvent(event)
 
     def onFocused(self, is_focused: bool) -> None:
-        self.setFrameStyle(QFrame.Panel | (QFrame.Plain if is_focused else QFrame.Sunken))
+        self.setFrameStyle(
+            QFrame.Panel | (QFrame.Plain if is_focused else QFrame.Sunken)
+        )

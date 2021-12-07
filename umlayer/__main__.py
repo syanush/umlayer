@@ -11,16 +11,15 @@ from .composition_root import CompositionRoot
 
 
 def init_logging():
-    logging.basicConfig(filename='umlayer.log', filemode='w', level=logging.INFO)
-    logging.info(f'UMLayer {version.__version__}')
+    logging.basicConfig(filename="umlayer.log", filemode="w", level=logging.INFO)
+    logging.info(f"UMLayer {version.__version__}")
 
 
 def run():
-    """Construct and run the UMLayer application
-    """
+    """Construct and run the UMLayer application"""
     init_logging()
 
-    logging.info('Application started')
+    logging.info("Application started")
     composer = CompositionRoot()
     composer.compose()
     app: QApplication = composer.app
@@ -31,19 +30,18 @@ def run():
     main_window.initialize()
     app.setActiveWindow(main_window)
     main_window.show()
-    logging.info('Main window displayed')
+    logging.info("Main window displayed")
     del main_window
 
     result_code = app.exec()
-    logging.info('Application finished')
+    logging.info("Application finished")
     del app
 
     return result_code
 
 
 def main():
-    """Start function
-    """
+    """Start function"""
 
     try:
         errcode = run()
@@ -57,5 +55,5 @@ def main():
     sys.exit(errcode)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

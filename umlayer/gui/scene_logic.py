@@ -3,9 +3,15 @@ import logging
 from PySide6.QtCore import QPointF
 
 from . import (
-    gui_utils, BaseElement, LineElement, ActorElement,
-    PackageElement, EllipseElement, NoteElement, TextElement,
-    ClassElement
+    gui_utils,
+    BaseElement,
+    LineElement,
+    ActorElement,
+    PackageElement,
+    EllipseElement,
+    NoteElement,
+    TextElement,
+    ClassElement,
 )
 
 from umlayer import model
@@ -46,48 +52,48 @@ class SceneLogic:
 
     def addActorElement(self):
         element = ActorElement()
-        element.setText('Actor')
+        element.setText("Actor")
         self.addElement(element)
 
     def addPackageElement(self):
         element = PackageElement()
-        element.setText('GUI\n--\n+ Window\n+ Form\n# EventHandler')
+        element.setText("GUI\n--\n+ Window\n+ Form\n# EventHandler")
         self.addElement(element)
 
     def addEllipseElement(self):
         element = EllipseElement()
-        element.setText('Use case 1')
+        element.setText("Use case 1")
         element.setWidth(150)
         element.setHeight(50)
         self.addElement(element)
 
     def addNoteElement(self):
         element = NoteElement()
-        element.setText('Note..')
+        element.setText("Note..")
         self.addElement(element)
 
     def addTextElement(self):
         element = TextElement()
-        element.setText('Left-aligned\ntext')
+        element.setText("Left-aligned\ntext")
         self.addElement(element)
 
     def addCenteredTextElement(self):
         element = TextElement()
-        element.setText('Centered\ntext')
+        element.setText("Centered\ntext")
         element.setCenter(True)
         self.addElement(element)
 
     def addSimpleClassElement(self):
         element = ClassElement()
-        element.setText('<b>SimpleClass</b>')
+        element.setText("<b>SimpleClass</b>")
         self.addElement(element)
 
     def addFatClassElement(self):
-        text = '''<b>FatClass</b>
+        text = """<b>FatClass</b>
 --
 - task_name
 --
-+ set_task_name(name: string)\n+ run_asynchronously(monitor: Monitor)'''
++ set_task_name(name: string)\n+ run_asynchronously(monitor: Monitor)"""
 
         element = ClassElement()
         element.setText(text)
@@ -102,7 +108,7 @@ class SceneLogic:
             self.storeSceneTo(self.window.selectedProjectItem())
 
     def storeSceneTo(self, diagram: model.Diagram):
-        logging.info(f'Store scene to {diagram.name()}')
+        logging.info(f"Store scene to {diagram.name()}")
         diagram.dtos.clear()
         for item in self.window.scene.elements():
             json_dto = item.toJson()
@@ -134,7 +140,9 @@ class SceneLogic:
 
     def paste_elements(self):
         """Pasted elements are appeared at the top left corner"""
-        elements: list[BaseElement] = [BaseElement.fromJson(json_dto) for json_dto in self.temp_list]
+        elements: list[BaseElement] = [
+            BaseElement.fromJson(json_dto) for json_dto in self.temp_list
+        ]
         if not elements:
             return
 
@@ -172,7 +180,7 @@ class SceneLogic:
         return self.window.centralWidget.isEnabled()
 
     def on_select_project_item(self, project_item):
-        logging.info(f'Project item selected: {project_item.name()}')
+        logging.info(f"Project item selected: {project_item.name()}")
         # print(f'Project item selected: {project_item.name()}')
         if isinstance(project_item, model.Diagram):
             self.enableScene()
@@ -208,10 +216,11 @@ class SceneLogic:
 
     def refreshGrid(self):
         self.window.scene.set_grid_visible(
-            self._grid_enabled and self.window.isDiagramSelected())
+            self._grid_enabled and self.window.isDiagramSelected()
+        )
 
     def selectAllElements(self):
-        logging.info('Action: Select all elements')
+        logging.info("Action: Select all elements")
 
         if not self.isEnabled():
             return

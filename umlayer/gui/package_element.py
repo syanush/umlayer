@@ -1,15 +1,19 @@
 from PySide6.QtCore import Qt, QPointF, QRectF
 from PySide6.QtGui import QPainter, QPainterPath
 from PySide6.QtWidgets import (
-    QApplication, QAbstractGraphicsShapeItem, QGraphicsItem,
-    QStyleOptionGraphicsItem
+    QApplication,
+    QAbstractGraphicsShapeItem,
+    QGraphicsItem,
+    QStyleOptionGraphicsItem,
 )
 
 from . import gui_utils, Abilities, BaseElement, Settings, TextItem
 
 
 class PackageElement(QAbstractGraphicsShapeItem, BaseElement):
-    def __init__(self, text: str = None, dx: float = 0, dy: float = 0, parent=None) -> None:
+    def __init__(
+        self, text: str = None, dx: float = 0, dy: float = 0, parent=None
+    ) -> None:
         super().__init__(parent)
         BaseElement.__init__(self)
         self._abilities = {Abilities.EDITABLE_TEXT}
@@ -19,7 +23,7 @@ class PackageElement(QAbstractGraphicsShapeItem, BaseElement):
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges, True)
 
         # serializable data
-        self._text = text or ''
+        self._text = text or ""
         self._dx = dx  # must be non-negative
         self._dy = dy
         # end of serializable data
@@ -55,16 +59,16 @@ class PackageElement(QAbstractGraphicsShapeItem, BaseElement):
 
     def toDto(self):
         dto = super().toDto()
-        dto['text'] = self.text()
-        dto['dx'] = self.deltaX()
-        dto['dy'] = self.deltaY()
+        dto["text"] = self.text()
+        dto["dx"] = self.deltaX()
+        dto["dy"] = self.deltaY()
         return dto
 
     def setFromDto(self, dto: dict):
         super().setFromDto(dto)
-        self.setText(dto['text'])
-        self.setDeltaX(dto['dx'])
-        self.setDeltaY(dto['dy'])
+        self.setText(dto["text"])
+        self.setDeltaX(dto["dx"])
+        self.setDeltaY(dto["dy"])
 
     def boundingRect(self) -> QRectF:
         extra = max(Settings.ELEMENT_PEN_SIZE, Settings.ELEMENT_SHAPE_SIZE) / 2
@@ -73,11 +77,17 @@ class PackageElement(QAbstractGraphicsShapeItem, BaseElement):
     def shape(self) -> QPainterPath:
         return self._shape_path
 
-    def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
+    def paint(
+        self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None
+    ) -> None:
         self._text_item1.setColor(self.textColor())
         self._text_item2.setColor(self.textColor())
 
-        pen = Settings.ELEMENT_SELECTED_PEN if self.isSelected() else Settings.ELEMENT_NORMAL_PEN
+        pen = (
+            Settings.ELEMENT_SELECTED_PEN
+            if self.isSelected()
+            else Settings.ELEMENT_NORMAL_PEN
+        )
         painter.setPen(pen)
         painter.drawRect(self._rect1)
         painter.drawRect(self._rect2)
@@ -89,9 +99,11 @@ class PackageElement(QAbstractGraphicsShapeItem, BaseElement):
 
     def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
         self.positionNotify(change)
-        if self.scene() and \
-                change == QGraphicsItem.ItemPositionChange and \
-                QApplication.mouseButtons() == Qt.LeftButton:
+        if (
+            self.scene()
+            and change == QGraphicsItem.ItemPositionChange
+            and QApplication.mouseButtons() == Qt.LeftButton
+        ):
             return QPointF(gui_utils.snap(value.x()), gui_utils.snap(value.y()))
         return super().itemChange(change, value)
 
@@ -99,7 +111,7 @@ class PackageElement(QAbstractGraphicsShapeItem, BaseElement):
         self.prepareGeometryChange()
 
         # TODO: improve parsing
-        self._text = self._text or ''
+        self._text = self._text or ""
         self._text1, self._text2 = gui_utils.split_to_two_sections(self._text)
 
         self._text_item1.setText(self._text1)
@@ -115,9 +127,17 @@ class PackageElement(QAbstractGraphicsShapeItem, BaseElement):
         height1 = gui_utils.snap_up(height1)
 
         self._size1 = QPointF(width1, height1)
-        self._text_item2.setPos(Settings.ELEMENT_PADDING, Settings.ELEMENT_PADDING + height1)
+        self._text_item2.setPos(
+            Settings.ELEMENT_PADDING, Settings.ELEMENT_PADDING + height1
+        )
         br2 = self._text_item2.boundingRect()
-        width2 = max(width1 + Settings.PACKAGE_DELTA_WIDTH1, br2.width() + 2 * Settings.ELEMENT_PADDING) + self._dx
+        width2 = (
+            max(
+                width1 + Settings.PACKAGE_DELTA_WIDTH1,
+                br2.width() + 2 * Settings.ELEMENT_PADDING,
+            )
+            + self._dx
+        )
         height2 = br2.height() + 2 * Settings.ELEMENT_PADDING + self._dy
         width2 = gui_utils.snap_up(width2)
         height2 = gui_utils.snap_up(height2)

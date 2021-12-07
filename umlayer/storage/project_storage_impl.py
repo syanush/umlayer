@@ -20,7 +20,9 @@ class ProjectStorageImpl(usecases.ProjectStorage):
         engine = create_engine("sqlite+pysqlite:///" + filepath, echo=True, future=True)
 
         with engine.begin() as conn:
-            conn.execute(text("CREATE TABLE elements (id text PRIMARY KEY, json_data text)"))
+            conn.execute(
+                text("CREATE TABLE elements (id text PRIMARY KEY, json_data text)")
+            )
 
             for project_item in project_items:
                 json_data = jsonpickle.encode(project_item)

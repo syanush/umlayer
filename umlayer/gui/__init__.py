@@ -12,7 +12,14 @@ from umlayer.gui.ellipse_element import EllipseElement
 from umlayer.gui.note_element import NoteElement
 from umlayer.gui.class_element import ClassElement
 from umlayer.gui.handle_item import HandleItem
-from umlayer.gui.tips import Tip, NoTip, ArrowTip, TriangleTip, HalfTriangleTip, DiamondTip
+from umlayer.gui.tips import (
+    Tip,
+    NoTip,
+    ArrowTip,
+    TriangleTip,
+    HalfTriangleTip,
+    DiamondTip,
+)
 from umlayer.gui.line_element import LineElement
 
 from umlayer.gui.line_icons_proxy_stype import LineIconsProxyStyle

@@ -4,9 +4,7 @@
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QMouseEvent, QFocusEvent, QWheelEvent
-from PySide6.QtWidgets import (
-    QFrame, QScrollBar, QGraphicsView
-)
+from PySide6.QtWidgets import QFrame, QScrollBar, QGraphicsView
 
 
 class GraphicsView(QGraphicsView):
@@ -58,14 +56,26 @@ class GraphicsView(QGraphicsView):
         if event.button() == self.panMouseButton:
             # Must precede fake event handling
             self.setPanning()
-            fake = QMouseEvent(event.type(), event.pos(), Qt.LeftButton, event.buttons(), event.modifiers())
+            fake = QMouseEvent(
+                event.type(),
+                event.pos(),
+                Qt.LeftButton,
+                event.buttons(),
+                event.modifiers(),
+            )
             super().mousePressEvent(fake)
             return
         super().mousePressEvent(event)
 
     def mouseReleaseEvent(self, event):
         if event.button() == self.panMouseButton:
-            fake = QMouseEvent(event.type(), event.pos(), Qt.LeftButton, event.buttons(), event.modifiers())
+            fake = QMouseEvent(
+                event.type(),
+                event.pos(),
+                Qt.LeftButton,
+                event.buttons(),
+                event.modifiers(),
+            )
             super().mouseReleaseEvent(fake)
             # Must follow fake event handling
             self.setRubberBandSelection()
@@ -81,7 +91,9 @@ class GraphicsView(QGraphicsView):
         super().focusOutEvent(event)
 
     def onFocused(self, is_focused: bool) -> None:
-        self.setFrameStyle(QFrame.Panel | (QFrame.Plain if is_focused else QFrame.Sunken))
+        self.setFrameStyle(
+            QFrame.Panel | (QFrame.Plain if is_focused else QFrame.Sunken)
+        )
 
     def scale_changed(self, scale):
         new_scale = int(scale[:-1]) / 100.0

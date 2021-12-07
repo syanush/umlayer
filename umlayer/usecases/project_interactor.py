@@ -43,7 +43,7 @@ class ProjectInteractor:
         if not self.close_project():
             return
 
-        filename = self._window.getFileNameFromOpenDialog('Open')
+        filename = self._window.getFileNameFromOpenDialog("Open")
 
         if len(filename) == 0:
             return
@@ -54,7 +54,7 @@ class ProjectInteractor:
         except Exception as ex:
             logging.error(ex)
             print(ex)
-            self._window.showCriticalError('Unable to open project!')
+            self._window.showCriticalError("Unable to open project!")
         else:
             self._data_model.set_filename(filename)
             self._window.updateTitle()
@@ -65,7 +65,7 @@ class ProjectInteractor:
             return True
 
         if self._isFileNameNotSet():
-            filename = self._window.getFileNameFromSaveDialog('Save')
+            filename = self._window.getFileNameFromSaveDialog("Save")
         else:
             filename = self._filename
 
@@ -77,7 +77,7 @@ class ProjectInteractor:
         except Exception as ex:
             logging.error(ex)
             print(ex)
-            self._window.showCriticalError('Unable to save project!')
+            self._window.showCriticalError("Unable to save project!")
             return False
         else:
             self._data_model.set_filename(filename)
@@ -88,7 +88,7 @@ class ProjectInteractor:
         if self._project is None:
             return
 
-        filename = self._window.getFileNameFromSaveDialog('Save as...')
+        filename = self._window.getFileNameFromSaveDialog("Save as...")
 
         if len(filename) == 0:
             return
@@ -98,7 +98,7 @@ class ProjectInteractor:
         except Exception as ex:
             logging.error(ex)
             print(ex)
-            self._window.showCriticalError('Unable to save project!')
+            self._window.showCriticalError("Unable to save project!")
         else:
             self._data_model.set_filename(filename)
             self._window.updateTitle()
@@ -135,8 +135,9 @@ class ProjectInteractor:
         return reply != model.constants.CANCEL
 
     def _isFileNameNotSet(self) -> bool:
-        return self._filename is None or \
-            self._filename == model.constants.DEFAULT_FILENAME
+        return (
+            self._filename is None or self._filename == model.constants.DEFAULT_FILENAME
+        )
 
     def _do_save_project(self, filename) -> None:
         """Really saves project"""
@@ -154,7 +155,7 @@ class ProjectInteractor:
         """
 
         if filename is None:
-            raise ValueError('filename')
+            raise ValueError("filename")
 
         project_items = self._project.project_items.values()
         self._storage.save(project_items, filename)

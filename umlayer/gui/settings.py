@@ -26,16 +26,34 @@ class Settings:
 
     ELEMENT_PEN_SIZE = 2
     ELEMENT_SHAPE_SIZE = 4
-    ELEMENT_NORMAL_PEN = QPen(_ELEMENT_NORMAL_COLOR, ELEMENT_PEN_SIZE, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin)
-    ELEMENT_SELECTED_PEN = QPen(_ELEMENT_SELECTED_COLOR, ELEMENT_PEN_SIZE, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin)
-    ELEMENT_SHAPE_SELECTED_PEN = QPen(_ELEMENT_SHAPE_SELECTED_COLOR, ELEMENT_SHAPE_SIZE, Qt.DotLine, Qt.RoundCap, Qt.RoundJoin)
+    ELEMENT_NORMAL_PEN = QPen(
+        _ELEMENT_NORMAL_COLOR, ELEMENT_PEN_SIZE, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin
+    )
+    ELEMENT_SELECTED_PEN = QPen(
+        _ELEMENT_SELECTED_COLOR,
+        ELEMENT_PEN_SIZE,
+        Qt.SolidLine,
+        Qt.RoundCap,
+        Qt.RoundJoin,
+    )
+    ELEMENT_SHAPE_SELECTED_PEN = QPen(
+        _ELEMENT_SHAPE_SELECTED_COLOR,
+        ELEMENT_SHAPE_SIZE,
+        Qt.DotLine,
+        Qt.RoundCap,
+        Qt.RoundJoin,
+    )
 
-    LINE_SELECTED_PEN = QPen(_LINE_SELECTED_COLOR, ELEMENT_PEN_SIZE, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin)
+    LINE_SELECTED_PEN = QPen(
+        _LINE_SELECTED_COLOR, ELEMENT_PEN_SIZE, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin
+    )
 
     ELEMENT_NORMAL_BRUSH = QBrush(_ELEMENT_NORMAL_BRUSH_COLOR)
     ELEMENT_SELECTED_BRUSH = QBrush(_ELEMENT_SELECTED_BRUSH_COLOR)
     ELEMENT_NORMAL_TRANSPARENT_BRUSH = QBrush(_ELEMENT_NORMAL_TRANSPARENT_BRUSH_COLOR)
-    ELEMENT_SELECTED_TRANSPARENT_BRUSH = QBrush(_ELEMENT_SELECTED_TRANSPARENT_BRUSH_COLOR)
+    ELEMENT_SELECTED_TRANSPARENT_BRUSH = QBrush(
+        _ELEMENT_SELECTED_TRANSPARENT_BRUSH_COLOR
+    )
 
     LINE_SELECTED_BRUSH = QBrush(_LINE_SELECTED_COLOR)
 
@@ -60,5 +78,5 @@ class Settings:
     LINE_HANDLE_SIZE = 15
     LINE_HALF_WIDTH = 10
 
-    element_font = QFont('Monospace', 10)
+    element_font = QFont("Monospace", 10)
     element_font.setStyleHint(QFont.TypeWriter)

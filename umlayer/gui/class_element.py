@@ -1,14 +1,19 @@
 from PySide6.QtCore import Qt, QPointF, QRectF
 from PySide6.QtGui import QPainter, QPainterPath
 from PySide6.QtWidgets import (
-    QApplication, QAbstractGraphicsShapeItem, QGraphicsItem,
-    QStyleOptionGraphicsItem)
+    QApplication,
+    QAbstractGraphicsShapeItem,
+    QGraphicsItem,
+    QStyleOptionGraphicsItem,
+)
 
 from . import gui_utils, Abilities, BaseElement, Settings, TextItem
 
 
 class ClassElement(QAbstractGraphicsShapeItem, BaseElement):
-    def __init__(self, text: str = '', dx: float = 0, dy: float = 0, parent=None) -> None:
+    def __init__(
+        self, text: str = "", dx: float = 0, dy: float = 0, parent=None
+    ) -> None:
         super().__init__(parent)
         BaseElement.__init__(self)
         self._abilities = {Abilities.EDITABLE_TEXT}
@@ -18,7 +23,7 @@ class ClassElement(QAbstractGraphicsShapeItem, BaseElement):
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges, True)
 
         # serializable data
-        self._text = text or ''
+        self._text = text or ""
         self._dx = dx  # must be non-negative
         self._dy = dy
         # end of serializable data
@@ -52,16 +57,16 @@ class ClassElement(QAbstractGraphicsShapeItem, BaseElement):
 
     def toDto(self):
         dto = super().toDto()
-        dto['text'] = self.text()
-        dto['dx'] = self.deltaX()
-        dto['dy'] = self.deltaY()
+        dto["text"] = self.text()
+        dto["dx"] = self.deltaX()
+        dto["dy"] = self.deltaY()
         return dto
 
     def setFromDto(self, dto: dict):
         super().setFromDto(dto)
-        self.setText(dto['text'])
-        self.setDeltaX(dto['dx'])
-        self.setDeltaY(dto['dy'])
+        self.setText(dto["text"])
+        self.setDeltaX(dto["dx"])
+        self.setDeltaY(dto["dy"])
 
     def boundingRect(self) -> QRectF:
         extra = max(Settings.ELEMENT_PEN_SIZE, Settings.ELEMENT_SHAPE_SIZE) / 2
@@ -70,11 +75,17 @@ class ClassElement(QAbstractGraphicsShapeItem, BaseElement):
     def shape(self) -> QPainterPath:
         return self._shape_path
 
-    def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
+    def paint(
+        self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None
+    ) -> None:
         for item in self._text_items:
             item.setColor(self.textColor())
 
-        pen = Settings.ELEMENT_SELECTED_PEN if self.isSelected() else Settings.ELEMENT_NORMAL_PEN
+        pen = (
+            Settings.ELEMENT_SELECTED_PEN
+            if self.isSelected()
+            else Settings.ELEMENT_NORMAL_PEN
+        )
         painter.setPen(pen)
         for compartment in self._compartments:
             painter.drawRect(compartment)
@@ -86,9 +97,11 @@ class ClassElement(QAbstractGraphicsShapeItem, BaseElement):
 
     def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
         self.positionNotify(change)
-        if self.scene() and \
-                change == QGraphicsItem.ItemPositionChange and \
-                QApplication.mouseButtons() == Qt.LeftButton:
+        if (
+            self.scene()
+            and change == QGraphicsItem.ItemPositionChange
+            and QApplication.mouseButtons() == Qt.LeftButton
+        ):
             return QPointF(gui_utils.snap(value.x()), gui_utils.snap(value.y()))
         return super().itemChange(change, value)
 
@@ -142,8 +155,11 @@ class ClassElement(QAbstractGraphicsShapeItem, BaseElement):
     def _getMaxWidth(self) -> float:
         """Return the maximal width of the text items"""
         n = len(self._texts)
-        width = 2 * Settings.ELEMENT_PADDING if n == 0 else \
-            max(self._get_rect(item).width() for item in self._text_items)
+        width = (
+            2 * Settings.ELEMENT_PADDING
+            if n == 0
+            else max(self._get_rect(item).width() for item in self._text_items)
+        )
         return width
 
     def _createCompartments(self, width: float) -> list[QRectF]:
@@ -178,7 +194,10 @@ class ClassElement(QAbstractGraphicsShapeItem, BaseElement):
             compartment: QRectF = self._compartments[i]
             if i == 0:
                 # Center first text item. The padding is already included in compartment.width().
-                x = compartment.x() + (compartment.width() - item.boundingRect().width()) / 2
+                x = (
+                    compartment.x()
+                    + (compartment.width() - item.boundingRect().width()) / 2
+                )
             else:
                 # Left-align other items
                 x = compartment.x() + Settings.ELEMENT_PADDING

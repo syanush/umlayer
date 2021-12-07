@@ -16,21 +16,21 @@ def snap_round(x: float) -> float:
 
 
 def split_to_sections(text) -> list[str]:
-    """"Return the list of text sections.
+    """ "Return the list of text sections.
 
     The separator of the sections is '--\n' line in the original text
     """
-    lines = text.split('\n')
+    lines = text.split("\n")
     sections = []
     section_lines = []
     for line in lines:
-        if line == '--':
-            section = '\n'.join(section_lines)
+        if line == "--":
+            section = "\n".join(section_lines)
             sections.append(section)
             section_lines.clear()
         else:
             section_lines.append(line)
-    section = '\n'.join(section_lines)
+    section = "\n".join(section_lines)
     sections.append(section)
     section_lines.clear()
     return sections
@@ -44,5 +44,5 @@ def split_to_sections(text) -> list[str]:
 def split_to_two_sections(text: str) -> list[str]:
     sections = split_to_sections(text)
     text1 = sections[0]
-    text2 = '\n--\n'.join(sections[1:]) if len(sections) > 1 else ''
+    text2 = "\n--\n".join(sections[1:]) if len(sections) > 1 else ""
     return [text1, text2]

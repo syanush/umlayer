@@ -32,7 +32,9 @@ class GraphicsScene(QGraphicsScene):
         height = int(self.sceneRect().height())
         num_blocks_x = int(width / Settings.BLOCK_SIZE)
         num_blocks_y = int(height / Settings.BLOCK_SIZE)
-        self.setItemIndexMethod(QGraphicsScene.NoIndex)  # Is it devastating for the app?
+        self.setItemIndexMethod(
+            QGraphicsScene.NoIndex
+        )  # Is it devastating for the app?
 
         pen = Settings.GRID_PEN
 
@@ -51,7 +53,7 @@ class GraphicsScene(QGraphicsScene):
             self.lines.append(line)
 
         for line in self.lines:
-            line.setData(constants.ITEM_TYPE, 'grid')
+            line.setData(constants.ITEM_TYPE, "grid")
 
     def is_grid_visible(self):
         return self._is_grid_visible
@@ -106,14 +108,14 @@ class GraphicsScene(QGraphicsScene):
         return tempScene
 
     def printItems(self):
-        items = [item for item in self.items()
-                 if item.data(constants.ITEM_TYPE) != 'grid']
+        items = [
+            item for item in self.items() if item.data(constants.ITEM_TYPE) != "grid"
+        ]
         for i, item in enumerate(items):
             print(i, item)
 
     def _filter_elements(self, items):
-        return [item for item in items
-                if isinstance(item, BaseElement)]
+        return [item for item in items if isinstance(item, BaseElement)]
 
     def drawBackground(self, painter: QPainter, rect) -> None:
         super().drawBackground(painter, rect)

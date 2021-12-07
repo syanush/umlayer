@@ -21,6 +21,8 @@ class UMLayerApplication(QApplication):
         QCoreApplication.setApplicationName("UMLayer")
 
         # So that we can write: QIcon('icons:icon1.png')
-        QDir.addSearchPath('icons', os.path.join(umlayer.__path__[0], 'resources', 'icons'))
+        QDir.addSearchPath(
+            "icons", os.path.join(umlayer.__path__[0], "resources", "icons")
+        )
 
         logging.info("Application constructor finished")

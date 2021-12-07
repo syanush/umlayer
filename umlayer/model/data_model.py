@@ -6,6 +6,7 @@ class DataModel:
 
     Does not contain logic
     """
+
     def __init__(self) -> None:
         self._project: Project = None
         self._filename: str = None

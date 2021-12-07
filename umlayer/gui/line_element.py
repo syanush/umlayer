@@ -3,12 +3,24 @@ from enum import Enum
 from PySide6.QtCore import Qt, QPointF, QRectF, QLineF
 from PySide6.QtGui import QPainter, QPainterPath, QPen
 from PySide6.QtWidgets import (
-    QApplication, QGraphicsItem, QGraphicsScene, QStyleOptionGraphicsItem
+    QApplication,
+    QGraphicsItem,
+    QGraphicsScene,
+    QStyleOptionGraphicsItem,
 )
 
 from . import (
-    gui_utils, Abilities, BaseElement, Settings,
-    NoTip, Tip, HandleItem, ArrowTip, TriangleTip, DiamondTip, HalfTriangleTip
+    gui_utils,
+    Abilities,
+    BaseElement,
+    Settings,
+    NoTip,
+    Tip,
+    HandleItem,
+    ArrowTip,
+    TriangleTip,
+    DiamondTip,
+    HalfTriangleTip,
 )
 
 
@@ -29,7 +41,15 @@ class TipType(Enum):
 
 
 class LineElement(QGraphicsItem, BaseElement):
-    def __init__(self, x1: float = 0, y1: float = 0, x2: float = 0, y2: float = 0, text: str = None, parent=None):
+    def __init__(
+        self,
+        x1: float = 0,
+        y1: float = 0,
+        x2: float = 0,
+        y2: float = 0,
+        text: str = None,
+        parent=None,
+    ):
         super().__init__(parent)
         BaseElement.__init__(self)
         self._abilities = {Abilities.EDITABLE_TEXT}
@@ -38,7 +58,7 @@ class LineElement(QGraphicsItem, BaseElement):
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges, True)
 
-        self._text = text or ''
+        self._text = text or ""
 
         self._line_type = LineType.Solid
         self._tip1: TipType = TipType.Empty
@@ -116,18 +136,18 @@ class LineElement(QGraphicsItem, BaseElement):
 
     def toDto(self):
         dto = super().toDto()
-        dto['x1'] = self.point1().x()
-        dto['y1'] = self.point1().y()
-        dto['x2'] = self.point2().x()
-        dto['y2'] = self.point2().y()
-        dto['text'] = self.text()
+        dto["x1"] = self.point1().x()
+        dto["y1"] = self.point1().y()
+        dto["x2"] = self.point2().x()
+        dto["y2"] = self.point2().y()
+        dto["text"] = self.text()
         return dto
 
     def setFromDto(self, dto: dict):
         super().setFromDto(dto)
-        self.setPoint1(dto['x1'], dto['y1'])
-        self.setPoint2(dto['x2'], dto['y2'])
-        self.setText(dto['text'])
+        self.setPoint1(dto["x1"], dto["y1"])
+        self.setPoint2(dto["x2"], dto["y2"])
+        self.setText(dto["text"])
 
     def boundingRect(self) -> QRectF:
         return self._bounding_rect
@@ -138,10 +158,18 @@ class LineElement(QGraphicsItem, BaseElement):
     def calculateShape(self, point1, point2):
         line = QLineF(point1, point2)
         angle = line.angle()
-        line1 = QLineF.fromPolar(Settings.LINE_HALF_WIDTH, angle + 90).translated(point1)
-        line2 = QLineF.fromPolar(Settings.LINE_HALF_WIDTH, angle - 90).translated(point1)
-        line3 = QLineF.fromPolar(Settings.LINE_HALF_WIDTH, angle - 90).translated(point2)
-        line4 = QLineF.fromPolar(Settings.LINE_HALF_WIDTH, angle + 90).translated(point2)
+        line1 = QLineF.fromPolar(Settings.LINE_HALF_WIDTH, angle + 90).translated(
+            point1
+        )
+        line2 = QLineF.fromPolar(Settings.LINE_HALF_WIDTH, angle - 90).translated(
+            point1
+        )
+        line3 = QLineF.fromPolar(Settings.LINE_HALF_WIDTH, angle - 90).translated(
+            point2
+        )
+        line4 = QLineF.fromPolar(Settings.LINE_HALF_WIDTH, angle + 90).translated(
+            point2
+        )
 
         path = QPainterPath()
         path.moveTo(line1.p2())
@@ -157,12 +185,26 @@ class LineElement(QGraphicsItem, BaseElement):
         LineType.Dot: Qt.DotLine,
     }
 
-    def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None) -> None:
+    def paint(
+        self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None
+    ) -> None:
         def get_tip_brush(tip_type):
-            if tip_type in [TipType.FullTriangle, TipType.FullDiamond, TipType.FullHalfTriangle]:
-                brush = Settings.LINE_SELECTED_BRUSH if self.isSelected() else Settings.ELEMENT_NORMAL_BRUSH
+            if tip_type in [
+                TipType.FullTriangle,
+                TipType.FullDiamond,
+                TipType.FullHalfTriangle,
+            ]:
+                brush = (
+                    Settings.LINE_SELECTED_BRUSH
+                    if self.isSelected()
+                    else Settings.ELEMENT_NORMAL_BRUSH
+                )
             else:
-                brush = Settings.ELEMENT_SELECTED_TRANSPARENT_BRUSH if self.isSelected() else Settings.ELEMENT_NORMAL_TRANSPARENT_BRUSH
+                brush = (
+                    Settings.ELEMENT_SELECTED_TRANSPARENT_BRUSH
+                    if self.isSelected()
+                    else Settings.ELEMENT_NORMAL_TRANSPARENT_BRUSH
+                )
             return brush
 
         x1 = self._tip1_figure.point().x()
@@ -170,7 +212,11 @@ class LineElement(QGraphicsItem, BaseElement):
         x2 = self._tip2_figure.point().x()
         y2 = self._tip2_figure.point().y()
 
-        pen = Settings.LINE_SELECTED_PEN if self.isSelected() else Settings.ELEMENT_NORMAL_PEN
+        pen = (
+            Settings.LINE_SELECTED_PEN
+            if self.isSelected()
+            else Settings.ELEMENT_NORMAL_PEN
+        )
 
         line_pen = QPen(pen)
         line_pen_style = self._pen_style_from_line_type[self._line_type]
@@ -195,9 +241,11 @@ class LineElement(QGraphicsItem, BaseElement):
 
     def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
         self.positionNotify(change)
-        if self.scene() and \
-                change == QGraphicsItem.ItemPositionChange and \
-                QApplication.mouseButtons() == Qt.LeftButton:
+        if (
+            self.scene()
+            and change == QGraphicsItem.ItemPositionChange
+            and QApplication.mouseButtons() == Qt.LeftButton
+        ):
             return QPointF(gui_utils.snap(value.x()), gui_utils.snap(value.y()))
         if change == QGraphicsItem.ItemPositionHasChanged:
             self.on_item_move(value)
@@ -212,10 +260,12 @@ class LineElement(QGraphicsItem, BaseElement):
 
     def setLive(self, is_live):
         """A line must stay live when the line or its handle were selected"""
-        is_really_live = is_live \
-            or self.isSelected() \
-            or self._handle[1].isSelected() \
+        is_really_live = (
+            is_live
+            or self.isSelected()
+            or self._handle[1].isSelected()
             or self._handle[2].isSelected()
+        )
         self._is_live = is_really_live
         for handle in self._handle.values():
             handle.setLive(is_really_live)
@@ -265,7 +315,7 @@ class LineElement(QGraphicsItem, BaseElement):
         TipType.FullTriangle: TriangleTip,
         TipType.HollowDiamond: DiamondTip,
         TipType.FullDiamond: DiamondTip,
-        TipType.FullHalfTriangle: HalfTriangleTip
+        TipType.FullHalfTriangle: HalfTriangleTip,
     }
 
     def _recalculate(self):
@@ -296,7 +346,7 @@ class LineElement(QGraphicsItem, BaseElement):
             Settings.ELEMENT_PEN_SIZE,
             Settings.ELEMENT_SHAPE_SIZE,
             self._tip1_figure.tip_size,
-            self._tip2_figure.tip_size
+            self._tip2_figure.tip_size,
         )
 
         extra = Settings.LINE_HANDLE_SIZE + max_size / 2
@@ -312,38 +362,48 @@ class LineElement(QGraphicsItem, BaseElement):
 
         """
         label_lines = []
-        lines = self.text().split('\n')
+        lines = self.text().split("\n")
         for line in lines:
-            if len(line) >= 4 and line[:3] == 'lt=':
+            if len(line) >= 4 and line[:3] == "lt=":
                 self.set_line_type_from_text(line[3:])
             else:
                 label_lines.append(line)
-        self._label_text = '\n'.join(label_lines)
+        self._label_text = "\n".join(label_lines)
 
-    _tip_types = [TipType.Empty, TipType.Arrow, TipType.HollowTriangle,
-                  TipType.FullTriangle, TipType.HollowDiamond, TipType.FullDiamond,
-                  TipType.FullHalfTriangle]
+    _tip_types = [
+        TipType.Empty,
+        TipType.Arrow,
+        TipType.HollowTriangle,
+        TipType.FullTriangle,
+        TipType.HollowDiamond,
+        TipType.FullDiamond,
+        TipType.FullHalfTriangle,
+    ]
 
-    _tip1_type_from_txt = dict(zip(['', '<', '<<', '<<<', '<<<<', '<<<<<', '<<<<<<'], _tip_types))
-    _tip2_type_from_txt = dict(zip(['', '>', '>>', '>>>', '>>>>', '>>>>>', '>>>>>>'], _tip_types))
+    _tip1_type_from_txt = dict(
+        zip(["", "<", "<<", "<<<", "<<<<", "<<<<<", "<<<<<<"], _tip_types)
+    )
+    _tip2_type_from_txt = dict(
+        zip(["", ">", ">>", ">>>", ">>>>", ">>>>>", ">>>>>>"], _tip_types)
+    )
 
     _lt_from_splitter = {
-        '-': LineType.Solid,
-        '.': LineType.Dash,
-        '..': LineType.Dot,
+        "-": LineType.Solid,
+        ".": LineType.Dash,
+        "..": LineType.Dot,
     }
 
     def set_line_type_from_text(self, txt: str):
         """Parse line type"""
 
-        if txt.find('-') >= 0:
-            splitter = '-'
-        elif txt.find('..') >= 0:
-            splitter = '..'
-        elif txt.find('.') >= 0:
-            splitter = '.'
+        if txt.find("-") >= 0:
+            splitter = "-"
+        elif txt.find("..") >= 0:
+            splitter = ".."
+        elif txt.find(".") >= 0:
+            splitter = "."
         else:
-            splitter = '-'
+            splitter = "-"
 
         self._line_type = self._lt_from_splitter[splitter]
 

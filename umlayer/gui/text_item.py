@@ -1,6 +1,4 @@
-from PySide6.QtWidgets import (
-    QGraphicsTextItem
-)
+from PySide6.QtWidgets import QGraphicsTextItem
 
 
 class TextItem(QGraphicsTextItem):
@@ -8,7 +6,7 @@ class TextItem(QGraphicsTextItem):
         super().__init__(parent)
 
         # serializable data
-        self._text = text or ''
+        self._text = text or ""
         self._center = center
         # end of serializable data
 
@@ -34,7 +32,7 @@ class TextItem(QGraphicsTextItem):
         self.setDefaultTextColor(color)
 
     def _getHtml(self, text):
-        alignment = 'center' if self.center() else 'left'
+        alignment = "center" if self.center() else "left"
         return f"""
 <div align="{alignment}"
 style="

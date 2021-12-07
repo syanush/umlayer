@@ -9,9 +9,10 @@ class StandardItemModel(QStandardItemModel):
 
     All methods must be called with model index (not proxy index).
     """
+
     def __init__(self):
         super().__init__()
-        self.setHorizontalHeaderLabels([''])
+        self.setHorizontalHeaderLabels([""])
 
     def root_item(self):
         return self.item(0)
@@ -32,8 +33,8 @@ class StandardItemModel(QStandardItemModel):
         return count
 
     _item_type_to_icon = {
-        model.ProjectItemType.FOLDER: 'icons:folder.png',
-        model.ProjectItemType.DIAGRAM: 'icons:diagram.png',
+        model.ProjectItemType.FOLDER: "icons:folder.png",
+        model.ProjectItemType.DIAGRAM: "icons:diagram.png",
     }
 
     def makeItem(self, project_item: model.BaseItem) -> QStandardItem:

@@ -1,36 +1,54 @@
 import logging
 from uuid import UUID
 
-from PySide6.QtCore import (
-    Qt, QRect, QSettings, QDir, QItemSelection, QByteArray
-)
+from PySide6.QtCore import Qt, QRect, QSettings, QDir, QItemSelection, QByteArray
 
 from PySide6.QtGui import (
-    QImage, QPainter, QTextOption, QKeySequence, QShortcut,
-    QStandardItem
+    QImage,
+    QPainter,
+    QTextOption,
+    QKeySequence,
+    QShortcut,
+    QStandardItem,
 )
 
 from PySide6.QtWidgets import (
-    QMainWindow, QMenu, QToolBar, QStatusBar,
-    QMessageBox, QFileDialog, QComboBox, QPushButton,
-    QLabel, QDockWidget, QPlainTextEdit, QVBoxLayout, QWidget
+    QMainWindow,
+    QMenu,
+    QToolBar,
+    QStatusBar,
+    QMessageBox,
+    QFileDialog,
+    QComboBox,
+    QPushButton,
+    QLabel,
+    QDockWidget,
+    QPlainTextEdit,
+    QVBoxLayout,
+    QWidget,
 )
 from PySide6.QtSvg import QSvgGenerator
 
 from umlayer import version, model
 from . import (
-    GraphicsScene, GraphicsView, TreeView, ItemRoles, LineIconsProxyStyle,
-    Settings, Actions, TreeSortModel, StandardItemModel, BaseElement,
+    GraphicsScene,
+    GraphicsView,
+    TreeView,
+    ItemRoles,
+    LineIconsProxyStyle,
+    Settings,
+    Actions,
+    TreeSortModel,
+    StandardItemModel,
+    BaseElement,
     Abilities,
 )
 
 
 class MainWindow(QMainWindow):
-    """Main window of the UMLayer application
-    """
+    """Main window of the UMLayer application"""
 
-    def __init__(self, scene_logic, storage, data_model, interactors,
-                 *args, **kwargs):
+    def __init__(self, scene_logic, storage, data_model, interactors, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.scene_logic = scene_logic
 
@@ -60,40 +78,41 @@ class MainWindow(QMainWindow):
         self._interactors.project_interactor.set_dirty(dirty)
 
     def createFolder(self):
-        logging.info('Action: Create Folder')
+        logging.info("Action: Create Folder")
         self.createProjectItem(model.ProjectItemType.FOLDER)
 
     def createDiagram(self):
-        logging.info('Action: Create Diagram')
+        logging.info("Action: Create Diagram")
         self.createProjectItem(model.ProjectItemType.DIAGRAM)
 
     def createNewProject(self):
-        logging.info('Action: New project')
+        logging.info("Action: New project")
         self._interactors.project_interactor.create_new_project()
 
     def openProject(self):
-        logging.info('Action: Open')
+        logging.info("Action: Open")
         self._interactors.project_interactor.open_project()
 
     def saveProject(self):
-        logging.info('Action: Save')
+        logging.info("Action: Save")
         self._interactors.project_interactor.save_project()
 
     def saveProjectAs(self):
-        logging.info('Action: Save As')
+        logging.info("Action: Save As")
         self._interactors.project_interactor.save_project_as()
 
     def closeProject(self) -> bool:
-        logging.info('Action: Close')
+        logging.info("Action: Close")
         return self._interactors.project_interactor.close_project()
 
     def askToSaveModifiedProject(self):
         reply = QMessageBox.question(
             self,
-            'Warning \u2014 Umlayer',
-            'The current file has been modified.\nDo you want to save it?',
+            "Warning \u2014 Umlayer",
+            "The current file has been modified.\nDo you want to save it?",
             QMessageBox.Cancel | QMessageBox.Discard | QMessageBox.Save,
-            QMessageBox.Save)
+            QMessageBox.Save,
+        )
         if reply == QMessageBox.Cancel:
             return model.constants.CANCEL
         if reply == QMessageBox.Discard:
@@ -101,7 +120,7 @@ class MainWindow(QMainWindow):
         return model.constants.SAVE
 
     def showCriticalError(self, message):
-        QMessageBox.critical(self, 'Error!', message, QMessageBox.Abort)
+        QMessageBox.critical(self, "Error!", message, QMessageBox.Abort)
 
     def isDirty(self):
         return self._interactors.project_interactor.is_dirty()
@@ -128,7 +147,7 @@ class MainWindow(QMainWindow):
         settings.endGroup()
 
     def readSettings(self):
-        logging.info('Settings loading started')
+        logging.info("Settings loading started")
         settings = QSettings()
         settings.beginGroup("MainWindow")
         geometry_array = settings.value("geometry", QByteArray())
@@ -140,20 +159,20 @@ class MainWindow(QMainWindow):
         else:
             self.restoreGeometry(geometry_array)
 
-        logging.info('Geometry set: {0}'.format(self.geometry()))
+        logging.info("Geometry set: {0}".format(self.geometry()))
         settings.endGroup()
-        logging.info('Settings loading finished')
+        logging.info("Settings loading finished")
 
     def initGUI(self):
-        logging.info('GUI initialization started')
+        logging.info("GUI initialization started")
         self.setupComponents()
 
-        self.treeView.selectionModel()\
-            .selectionChanged\
-            .connect(self.on_selection_changed)
+        self.treeView.selectionModel().selectionChanged.connect(
+            self.on_selection_changed
+        )
 
         self.updateTitle()
-        logging.info('GUI initialization finished')
+        logging.info("GUI initialization finished")
 
     def setScaleIndex(self, index):
         self._scene_scale_combo.setCurrentIndex(index)
@@ -169,13 +188,14 @@ class MainWindow(QMainWindow):
         min_scale = 50
         max_scale = 250
         scene_scale_combo.addItems(
-            [f'{scale}%' for scale in range(min_scale, max_scale + 10, 10)])
+            [f"{scale}%" for scale in range(min_scale, max_scale + 10, 10)]
+        )
         scene_scale_combo.currentTextChanged.connect(self.scene_scale_changed)
         scene_scale_combo.setCurrentIndex(5)  # 100%
         return scene_scale_combo
 
     def createToolBar(self):
-        self.aToolBar: QToolBar = self.addToolBar('Main')
+        self.aToolBar: QToolBar = self.addToolBar("Main")
         self.aToolBar.addAction(self.app_actions.newAction)
         self.aToolBar.addAction(self.app_actions.openAction)
         self.aToolBar.addAction(self.app_actions.saveAction)
@@ -209,7 +229,7 @@ class MainWindow(QMainWindow):
         self._scene_scale_combo.setEnabled(isEnabled)
 
     def _createLineButton(self):
-        lineButton = QPushButton('Lines')
+        lineButton = QPushButton("Lines")
         menu = QMenu(lineButton)
 
         for action in self.app_actions.lineActions:
@@ -225,8 +245,7 @@ class MainWindow(QMainWindow):
         self.sceneView.scale_changed(scale)
 
     def createStatusBar(self):
-        """Create Status Bar
-        """
+        """Create Status Bar"""
 
         self.aStatusBar = QStatusBar(self)
         self.aStatusLabel = QLabel(self.aStatusBar)
@@ -234,12 +253,12 @@ class MainWindow(QMainWindow):
         self.setStatusBar(self.aStatusBar)
 
     def createElementsWindow(self):
-        elementsWindow = QDockWidget('Elements', self)
+        elementsWindow = QDockWidget("Elements", self)
         elementsWindow.setMinimumHeight(150)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, elementsWindow)
 
     def createPropertyEditor(self):
-        propertyWindow = QDockWidget('Property editor', self)
+        propertyWindow = QDockWidget("Property editor", self)
         self.propertyView = QPlainTextEdit()
         self.propertyView.textChanged.connect(self.on_text_changed)
         self.propertyView.setFont(Settings.element_font)
@@ -255,13 +274,14 @@ class MainWindow(QMainWindow):
         self.element_with_text.setText(text)
 
     def isEditable(self, item):
-        return isinstance(item, BaseElement) and \
-            Abilities.EDITABLE_TEXT in item.getAbilities()
+        return (
+            isinstance(item, BaseElement)
+            and Abilities.EDITABLE_TEXT in item.getAbilities()
+        )
 
     def on_scene_selection_changed(self):
         elements_with_text = [
-            item for item in self.scene.selectedItems()
-            if self.isEditable(item)
+            item for item in self.scene.selectedItems() if self.isEditable(item)
         ]
         if len(elements_with_text) == 1:
             self.element_with_text = elements_with_text[0]
@@ -274,14 +294,14 @@ class MainWindow(QMainWindow):
 
     def createCentralWidget(self):
         scene_size = 2000
-        self.scene: GraphicsScene = \
-            GraphicsScene(
-                self.scene_logic,
-                -scene_size // 2,
-                -scene_size // 2,
-                scene_size,
-                scene_size,
-                parent=self)
+        self.scene: GraphicsScene = GraphicsScene(
+            self.scene_logic,
+            -scene_size // 2,
+            -scene_size // 2,
+            scene_size,
+            scene_size,
+            parent=self,
+        )
 
         self.scene.selectionChanged.connect(self.on_scene_selection_changed)
 
@@ -291,10 +311,12 @@ class MainWindow(QMainWindow):
         self.sceneView.setRenderHint(QPainter.SmoothPixmapTransform)
         self.sceneView.setRenderHint(QPainter.VerticalSubpixelPositioning)
 
-        _ = QShortcut(QKeySequence.SelectAll,
-                      self.sceneView,
-                      context=Qt.ShortcutContext.WidgetShortcut,
-                      activated=self.scene_logic.selectAllElements)
+        _ = QShortcut(
+            QKeySequence.SelectAll,
+            self.sceneView,
+            context=Qt.ShortcutContext.WidgetShortcut,
+            activated=self.scene_logic.selectAllElements,
+        )
 
         vbox = QVBoxLayout()
         vbox.addWidget(self.sceneView)
@@ -304,8 +326,7 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.centralWidget)
 
     def setupComponents(self):
-        """ Initialize visual components
-        """
+        """Initialize visual components"""
 
         self.createStatusBar()  # used in actions
         self.createProjectTree()
@@ -348,8 +369,7 @@ class MainWindow(QMainWindow):
         self.helpMenu.addAction(self.app_actions.aboutQtAction)
 
     def center(self):
-        """Center the main window
-        """
+        """Center the main window"""
 
         qRect = self.frameGeometry()
         centerPoint = self.screen().availableGeometry().center()
@@ -359,7 +379,7 @@ class MainWindow(QMainWindow):
     def closeEvent(self, event):
         if self._interactors.project_interactor.save_project_if_needed():
             self.writeSettings()
-            logging.info('Main window closed')
+            logging.info("Main window closed")
             event.accept()
         else:
             event.ignore()
@@ -391,7 +411,9 @@ class MainWindow(QMainWindow):
 
     def _createTreeView(self):
         treeView = TreeView(self)
-        treeView.customContextMenuRequested.connect(self.onTreeViewCustomContextMenuRequested)
+        treeView.customContextMenuRequested.connect(
+            self.onTreeViewCustomContextMenuRequested
+        )
         proxyModel = TreeSortModel(self)
         proxyModel.setSourceModel(StandardItemModel())
         treeView.setModel(proxyModel)
@@ -399,7 +421,7 @@ class MainWindow(QMainWindow):
 
     def createProjectTree(self):
         self.treeView = self._createTreeView()
-        treeWindow = QDockWidget('Project', self)
+        treeWindow = QDockWidget("Project", self)
         treeWindow.setWidget(self.treeView)
         self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, treeWindow)
 
@@ -411,8 +433,8 @@ class MainWindow(QMainWindow):
 
     def printStats(self):
         if self.project is not None:
-            print('number of elements', self.project.count())
-            print('number of items', self.treeView.itemModel.count())
+            print("number of elements", self.project.count())
+            print("number of items", self.treeView.itemModel.count())
 
     def selectedProjectItem(self):
         item = self.treeView.getSelectedItem()
@@ -431,7 +453,7 @@ class MainWindow(QMainWindow):
     def printProjectItems(self):
         """Debugging feature"""
         if self.project is None:
-            print('Project is None')
+            print("Project is None")
             return
         self.printStats()
         self.project.printProjectItems()
@@ -460,31 +482,33 @@ class MainWindow(QMainWindow):
 
     def getFileNameFromSaveDialog(self, caption=None):
         initial_filename = self.filename or model.constants.DEFAULT_FILENAME
-        filename, selected_filter = \
-            QFileDialog.getSaveFileName(
-                parent=self,
-                caption=caption,
-                dir=QDir.currentPath() + '/' + initial_filename,
-                filter="All (*);;Umlayer project (*.ulr)",
-                selectedFilter="Umlayer project (*.ulr)")
+        filename, selected_filter = QFileDialog.getSaveFileName(
+            parent=self,
+            caption=caption,
+            dir=QDir.currentPath() + "/" + initial_filename,
+            filter="All (*);;Umlayer project (*.ulr)",
+            selectedFilter="Umlayer project (*.ulr)",
+        )
         return filename
 
     def getFileNameFromOpenDialog(self, caption=None):
-        filename, selected_filter = \
-            QFileDialog.getOpenFileName(
-                parent=self,
-                caption=caption,
-                dir=QDir.currentPath(),
-                filter="All (*);;Umlayer project (*.ulr)",
-                selectedFilter="Umlayer project (*.ulr)")
+        filename, selected_filter = QFileDialog.getOpenFileName(
+            parent=self,
+            caption=caption,
+            dir=QDir.currentPath(),
+            filter="All (*);;Umlayer project (*.ulr)",
+            selectedFilter="Umlayer project (*.ulr)",
+        )
         return filename
 
-    def _createProjectItem(self, parent_id: int, item_type: model.ProjectItemType) -> model.BaseItem:
+    def _createProjectItem(
+        self, parent_id: int, item_type: model.ProjectItemType
+    ) -> model.BaseItem:
         if item_type == model.ProjectItemType.FOLDER:
             return self.create_folder(parent_id)
         if item_type == model.ProjectItemType.DIAGRAM:
             return self.create_diagram(parent_id)
-        raise ValueError('item_type')
+        raise ValueError("item_type")
 
     def createProjectItem(self, item_type: model.ProjectItemType):
         parent_item: QStandardItem = self.treeView.getSelectedItem()
@@ -515,7 +539,7 @@ class MainWindow(QMainWindow):
         tempScene.render(painter)
         painter.end()
         tempScene.clear()
-        logging.info('The scene was exported as SVG image')
+        logging.info("The scene was exported as SVG image")
 
     def exportAsRasterImage(self, filename):
         tempScene = self.scene.getTempScene()
@@ -528,30 +552,29 @@ class MainWindow(QMainWindow):
         tempScene.render(painter)
         painter.end()
         image.save(filename)
-        logging.info('The scene was exported as raster image')
+        logging.info("The scene was exported as raster image")
 
     def getFileNameForRasterImageDialog(self):
         initial_filename = model.constants.DEFAULT_RASTER_FILENAME
-        filename, selected_filter = \
-            QFileDialog.getSaveFileName(
-                parent=self,
-                caption='Export diagram as raster image',
-                dir=QDir.currentPath() + '/' + initial_filename,
-                filter='PNG (*.png);;JPG (*.jpg);;JPEG (*.jpeg);;BMP (*.bmp);;PPM (*.ppm);;XBM (*.xbm);;XPM (*.xpm);;All (*)',
-                selectedFilter='PNG (*.png)'
-            )
+        filename, selected_filter = QFileDialog.getSaveFileName(
+            parent=self,
+            caption="Export diagram as raster image",
+            dir=QDir.currentPath() + "/" + initial_filename,
+            filter="PNG (*.png);;JPG (*.jpg);;JPEG (*.jpeg);;BMP (*.bmp);;PPM (*.ppm);;XBM (*.xbm);;XPM (*.xpm);;All (*)",
+            selectedFilter="PNG (*.png)",
+        )
         return filename
 
     def getFileNameForSvgImageDialog(self):
         initial_filename = model.constants.DEFAULT_SVG_FILENAME
 
-        filename, selected_filter = \
-            QFileDialog.getSaveFileName(
-                parent=self,
-                caption='Export diagram as SVG image',
-                dir=QDir.currentPath() + '/' + initial_filename,
-                filter='SVG image (*.svg);;All (*)',
-                selectedFilter='SVG image (*.svg)')
+        filename, selected_filter = QFileDialog.getSaveFileName(
+            parent=self,
+            caption="Export diagram as SVG image",
+            dir=QDir.currentPath() + "/" + initial_filename,
+            filter="SVG image (*.svg);;All (*)",
+            selectedFilter="SVG image (*.svg)",
+        )
         return filename
 
     def exportAsRasterImageHandler(self):
@@ -566,14 +589,17 @@ class MainWindow(QMainWindow):
         if filename is not None and len(filename.strip()) != 0:
             self.exportAsSvgImage(filename)
 
-    def on_selection_changed(self, selected: QItemSelection, deselected: QItemSelection):
+    def on_selection_changed(
+        self, selected: QItemSelection, deselected: QItemSelection
+    ):
         # logging.info('Project selection changed')
         selected_project_items = self.projectItemsFromSelection(selected)
         # print('selected:', selected_project_items)
         deselected_project_items = self.projectItemsFromSelection(deselected)
         # print('deselected:', deselected_project_items)
         self.scene_logic.on_project_item_selection_changed(
-            selected_project_items, deselected_project_items)
+            selected_project_items, deselected_project_items
+        )
 
     def projectItemsFromSelection(self, selection):
         result = []
@@ -594,7 +620,7 @@ class MainWindow(QMainWindow):
             self.setDirty(True)
 
     def deleteSelectedItem(self):
-        logging.info('Action: Delete selected project item')
+        logging.info("Action: Delete selected project item")
         item: QStandardItem = self.treeView.getSelectedItem()
         if item is None:
             return
@@ -605,22 +631,22 @@ class MainWindow(QMainWindow):
         self.updateTitle()
 
     def aboutQtWindow(self):
-        logging.info('Action: About Qt window')
+        logging.info("Action: About Qt window")
         QMessageBox.aboutQt(self)
 
     def exitApp(self):
-        logging.info('Action: Exit app')
+        logging.info("Action: Exit app")
         self.close()
 
     def aboutWindow(self):
-        logging.info('Action: About window')
+        logging.info("Action: About window")
         QMessageBox.about(
             self,
-            'About UMLayer',
-            f'<h3 align=center>UMLayer</h3>'
-            f'<p align=center>{version.__version__}</p>'
-            '<p align=center>UML diagram editor</p>'
+            "About UMLayer",
+            f"<h3 align=center>UMLayer</h3>"
+            f"<p align=center>{version.__version__}</p>"
+            "<p align=center>UML diagram editor</p>"
             '<p align=center><a href="https://github.com/selforthis/umlayer">https://github.com/selforthis/umlayer</a></p>'
-            '<p align=center>Copyright 2021 Serguei Yanush &lt;selforthis@gmail.com&gt;<p>'
-            '<p align=center>MIT License</p>'
+            "<p align=center>Copyright 2021 Serguei Yanush &lt;selforthis@gmail.com&gt;<p>"
+            "<p align=center>MIT License</p>",
         )
