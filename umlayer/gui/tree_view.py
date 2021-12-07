@@ -25,9 +25,10 @@ class TreeView(QTreeView):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.setSelectionMode(
-            QAbstractItemView.SingleSelection
-        )  # disable light blue selection
+
+        # also disable light blue selection
+        self.setSelectionMode(QAbstractItemView.SingleSelection)
+
         self.setSortingEnabled(True)
         self.setHeaderHidden(True)
         self.setUniformRowHeights(True)
@@ -57,7 +58,15 @@ class TreeView(QTreeView):
     def getModelIndex(self, proxy_index):
         return self.proxyModel.mapToSource(proxy_index)
 
+    def isSelected(self):
+        indexes = self.selectedIndexes()
+        if not indexes:
+            return False
+        proxy_index = indexes[0]
+        return proxy_index.isValid()
+
     def getSelectedItem(self):
+        """Returns first (and only) selected item or None"""
         indexes = self.selectedIndexes()
         if not indexes:
             return None
@@ -69,6 +78,12 @@ class TreeView(QTreeView):
         model_index = self.getModelIndex(proxy_index)
         item = self.itemModel.itemFromIndex(model_index)
         return item
+
+    def getSelectedItemId(self):
+        item = self.getSelectedItem()
+        if item is None:
+            return None
+        return self.itemModel.getId(item)
 
     def initializeFromProject(self, project):
         self.itemModel.initializeFromProject(project)
@@ -94,9 +109,10 @@ class TreeView(QTreeView):
         item: QStandardItem = self.getSelectedItem()
         if item is None:
             return
-        id = item.data(ItemRoles.IdRole)
+        id = self.itemModel.getId(item)
 
-        self.window.setProjectItemName(id, item.text())
+        name = item.text()
+        self.window.setProjectItemName(id, name)
 
         parent_item = item.parent()
         parent_item.sortChildren(0, Qt.SortOrder.AscendingOrder)
@@ -116,3 +132,9 @@ class TreeView(QTreeView):
         self.setFrameStyle(
             QFrame.Panel | (QFrame.Plain if is_focused else QFrame.Sunken)
         )
+
+    def deleteItem(self, item):
+        model_index = item.index()
+        row = model_index.row()
+        parent_index = model_index.parent()
+        self.itemModel.removeRow(row, parent_index)

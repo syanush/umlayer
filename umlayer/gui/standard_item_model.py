@@ -1,3 +1,5 @@
+import logging
+
 from PySide6.QtGui import QIcon, QStandardItemModel, QStandardItem
 from umlayer import model
 from . import ItemRoles
@@ -53,3 +55,12 @@ class StandardItemModel(QStandardItemModel):
             child_item = self.itemize(child, project)
             item.appendRow([child_item])
         return item
+
+    def getId(self, item):
+        if item is None:
+            raise ValueError("item")
+        id = item.data(ItemRoles.IdRole)
+        if id is None:
+            logging.error(f"Item {item.data(Qt.DisplayRole)} has no id!")
+            raise Exception("Bad item")
+        return id

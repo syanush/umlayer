@@ -113,7 +113,7 @@ class Actions:
 
         self.deleteProjectItemAction = QAction(
             icon=QIcon("icons:delete.png"),
-            text="Delete project item",
+            text="Delete",
             shortcut=QKeySequence.Delete,
             parent=self.window.treeView,
             statusTip="Delete project item",

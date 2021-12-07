@@ -23,13 +23,27 @@ class ProjectInteractor:
     def set_window(self, window) -> None:
         self._window = window
 
+    def is_project_open(self):
+        return self._project is not None
+
     def is_dirty(self) -> bool:
-        return False if self._project is None else self._project.dirty()
+        if not self.is_project_open():
+            return False
+        return self._project.dirty()
 
     def set_dirty(self, dirty: bool) -> None:
-        if self._project:
+        if self.is_project_open():
             self._project.setProjectDirty(dirty)
         self._window.updateTitle()
+
+    def set_project_item_name(self, id, name):
+        if not self.is_project_open():
+            return
+
+        project_item = self._project.get(id)
+        if project_item.name() != name:
+            project_item.setName(name)
+            self.set_dirty(True)
 
     def create_new_project(self):
         """Close old and create new project"""
@@ -61,10 +75,10 @@ class ProjectInteractor:
 
     def save_project(self) -> bool:
         """Saves project. Shows dialog for selecting file name, if it is not set."""
-        if self._project is None:
+        if not self.is_project_open():
             return True
 
-        if self._isFileNameNotSet():
+        if self._is_filename_unset():
             filename = self._window.getFileNameFromSaveDialog("Save")
         else:
             filename = self._filename
@@ -85,7 +99,7 @@ class ProjectInteractor:
         return True
 
     def save_project_as(self) -> None:
-        if self._project is None:
+        if not self.is_project_open():
             return
 
         filename = self._window.getFileNameFromSaveDialog("Save as...")
@@ -134,16 +148,13 @@ class ProjectInteractor:
 
         return reply != model.constants.CANCEL
 
-    def _isFileNameNotSet(self) -> bool:
+    def _is_filename_unset(self) -> bool:
         return (
             self._filename is None or self._filename == model.constants.DEFAULT_FILENAME
         )
 
     def _do_save_project(self, filename) -> None:
-        """Really saves project"""
-
-        if self._project is None:
-            return
+        """Actually saves the project"""
 
         self._window.scene_logic.storeScene()
         self._save(filename)
