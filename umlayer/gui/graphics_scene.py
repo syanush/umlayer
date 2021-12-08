@@ -1,6 +1,6 @@
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QKeyEvent, QBrush, QPainter
-from PySide6.QtWidgets import QGraphicsScene
+from PySide6.QtWidgets import QGraphicsScene, QGraphicsItem
 
 from . import constants, Settings, SceneLogic, BaseElement
 
@@ -20,7 +20,7 @@ class GraphicsScene(QGraphicsScene):
 
     def init_grid(self):
         self.lines = []
-        self.draw_grid()
+        # self.draw_grid()
         self._is_grid_visible = True
         self.set_grid_visible(False)
         # self.delete_grid()
@@ -84,14 +84,14 @@ class GraphicsScene(QGraphicsScene):
     def collidingElements(self, element):
         return self._filter_elements(element.collidingItems())
 
-    def selectedElements(self):
+    def selectedElements(self) -> list[BaseElement]:
         selected_items = self.selectedItems()
         return self._filter_elements(selected_items)
 
-    def elements(self):
+    def elements(self) -> list[BaseElement]:
         return self._filter_elements(self.items())
 
-    def clearElements(self):
+    def clearElements(self) -> None:
         for element in self.elements():
             self.removeItem(element)
 
@@ -114,7 +114,7 @@ class GraphicsScene(QGraphicsScene):
         for i, item in enumerate(items):
             print(i, item)
 
-    def _filter_elements(self, items):
+    def _filter_elements(self, items: list[QGraphicsItem]) -> list[BaseElement]:
         return [item for item in items if isinstance(item, BaseElement)]
 
     def drawBackground(self, painter: QPainter, rect) -> None:

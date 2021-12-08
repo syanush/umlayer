@@ -104,8 +104,10 @@ class SceneLogic:
         self.addElement(element)
 
     def storeScene(self):
-        if self.window.isDiagramSelected():
-            self.storeSceneTo(self.window.getSelectedProjectItem())
+        if not self.window.isDiagramSelected():
+            return
+        diagram: model.Diagram = self.window.getSelectedProjectItem()
+        self.storeSceneTo(diagram)
 
     def storeSceneTo(self, diagram: model.Diagram):
         logging.info(f"Store scene to {diagram.name()}")
@@ -192,10 +194,11 @@ class SceneLogic:
         if selected_items:
             self.on_select_project_item(selected_items[0])
 
-    def on_deselect_project_item(self, project_item):
-        if isinstance(project_item, model.Diagram):
+    def on_deselect_project_item(self, project_item: model.BaseItem) -> None:
+        if project_item.item_type == model.ProjectItemType.DIAGRAM:
             self.storeSceneTo(project_item)
-            self.window.scene.clearElements()
+            logging.debug(f"The scene was stored to diagram {project_item.name()}")
+        self.window.scene.clearElements()
 
     def _remove_elements(self, elements):
         for element in elements:
@@ -253,5 +256,4 @@ class SceneLogic:
             if element.zValue() <= z_value:
                 z_value = element.zValue() - 0.1
         selected_element.setZValue(z_value)
-        # print(z_value)
         selected_element.update()

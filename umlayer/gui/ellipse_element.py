@@ -5,12 +5,11 @@ from PySide6.QtWidgets import QApplication, QGraphicsItem, QStyleOptionGraphicsI
 from . import gui_utils, Abilities, BaseElement, Settings, TextItem
 
 
-class EllipseElement(QGraphicsItem, BaseElement):
+class EllipseElement(BaseElement):
     def __init__(
         self, width: int = 10, height: int = 10, text: str = None, parent=None
     ) -> None:
-        super().__init__(parent)
-        BaseElement.__init__(self)
+        super().__init__(parent=parent)
         self._abilities = {Abilities.EDITABLE_TEXT}
 
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)

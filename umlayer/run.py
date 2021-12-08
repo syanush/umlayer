@@ -36,7 +36,7 @@ def run():
 
 
 def init_logging():
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.DEBUG)
     from umlayer import version
 
     logging.info(f"UMLayer {version.__version__}")

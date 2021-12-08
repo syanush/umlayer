@@ -2,7 +2,9 @@ import abc
 import importlib
 import json
 from enum import Enum
+from typing import Optional
 
+import PySide6.QtWidgets
 from PySide6.QtCore import QPointF
 from PySide6.QtWidgets import QGraphicsItem
 
@@ -13,13 +15,16 @@ class Abilities(Enum):
     EDITABLE_TEXT = 1
 
 
-class BaseElement(object):
+class BaseElement(QGraphicsItem):
+    def __init__(self, parent=None) -> None:
+        super().__init__(parent)
+
     def positionNotify(self, change):
         if self.scene() and change == QGraphicsItem.ItemPositionHasChanged:
             self.notify()
 
     def notify(self):
-        if self.scene():
+        if self.scene() is not None:
             self.scene().notify()
 
     def getAbilities(self):

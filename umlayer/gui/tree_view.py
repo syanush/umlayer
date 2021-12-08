@@ -1,6 +1,7 @@
 import logging
+from uuid import UUID
 
-from PySide6.QtCore import Qt, QItemSelectionModel
+from PySide6.QtCore import Qt, QItemSelectionModel, QModelIndex
 
 from PySide6.QtGui import QStandardItem, QFocusEvent
 
@@ -12,7 +13,7 @@ from PySide6.QtWidgets import (
     QItemDelegate,
 )
 
-from . import ItemRoles
+from umlayer import model, adapters
 
 
 class TreeView(QTreeView):
@@ -36,88 +37,82 @@ class TreeView(QTreeView):
         # self.setStyleSheet("""""")
 
         # used to provide custom display features and editor widgets
-        delegate: QItemDelegate = self.itemDelegate()
+        delegate: QAbstractItemDelegate = self.itemDelegate()
         delegate.closeEditor.connect(self.onCloseEditor)
         self.onFocused(True)  # Because TreeView has focus
 
     @property
-    def proxyModel(self):
+    def proxyModel(self) -> adapters.TreeSortModel:
         return self.model()
 
     @property
-    def itemModel(self):
+    def itemModel(self) -> adapters.StandardItemModel:
         return self.proxyModel.sourceModel()
 
     @property
     def window(self):
         return self.parent().parent()
 
-    def getProxyIndex(self, model_index):
+    def getProxyIndex(self, model_index: QModelIndex) -> QModelIndex:
         return self.proxyModel.mapFromSource(model_index)
 
-    def getModelIndex(self, proxy_index):
+    def getModelIndex(self, proxy_index: QModelIndex) -> QModelIndex:
         return self.proxyModel.mapToSource(proxy_index)
 
-    def isSelected(self):
-        indexes = self.selectedIndexes()
-        if not indexes:
-            return False
-        proxy_index = indexes[0]
-        return proxy_index.isValid()
+    def itemsFromProxyIndexes(self, proxy_indexes) -> list[adapters.StandardItem]:
+        return [
+            self.itemModel.itemFromIndex(self.getModelIndex(proxy_index))
+            for proxy_index in proxy_indexes
+            if proxy_index.isValid()
+        ]
 
-    def getSelectedItem(self):
-        """Returns first (and only) selected item or None"""
-        indexes = self.selectedIndexes()
-        if not indexes:
-            return None
+    def getSelectedItems(self) -> list[adapters.StandardItem]:
+        return self.itemsFromProxyIndexes(self.selectedIndexes())
 
-        proxy_index = indexes[0]
-        if not proxy_index.isValid():
-            return None
+    def isSelected(self) -> bool:
+        return bool(self.getSelectedItems())
 
-        model_index = self.getModelIndex(proxy_index)
-        item = self.itemModel.itemFromIndex(model_index)
-        return item
+    def getSelectedItem(self) -> adapters.StandardItem:
+        """Returns selected item or throws Exception"""
+        return self.getSelectedItems()[0]
 
-    def getSelectedItemId(self):
-        item = self.getSelectedItem()
-        if item is None:
-            return None
-        return self.itemModel.getId(item)
+    def getSelectedItemId(self) -> UUID:
+        """Returns selected item id or throws Exception"""
+        return self.getSelectedItem().itemId()
 
-    def initializeFromProject(self, project):
+    def initializeFromProject(self, project: model.Project) -> None:
         self.itemModel.initializeFromProject(project)
         self.sortByColumn(0, Qt.SortOrder.AscendingOrder)
         self.expandAll()
-        root_item = self.itemModel.root_item()
-        model_index = root_item.index()
-        proxy_index = self.getProxyIndex(model_index)
+        root_item = self.itemModel.rootItem()
+        model_index: QModelIndex = root_item.index()
+        proxy_index: QModelIndex = self.getProxyIndex(model_index)
         self.selectionModel().select(
             proxy_index, QItemSelectionModel.SelectionFlag.Select
         )
 
-    def startEditName(self, item):
-        model_index = item.index()
-        proxy_index = self.getProxyIndex(model_index)
+    def startEditName(self, item: adapters.StandardItem) -> None:
+        model_index: QModelIndex = item.index()
+        proxy_index: QModelIndex = self.getProxyIndex(model_index)
         self.scrollTo(proxy_index)
         self.setCurrentIndex(proxy_index)
         self.edit(proxy_index)
 
-    def onCloseEditor(self, editor: QAbstractItemDelegate, hint):
+    def onCloseEditor(self, editor: QAbstractItemDelegate, hint) -> None:
         """Set element name after editing"""
-        logging.info("Finish name editing")
-        item: QStandardItem = self.getSelectedItem()
-        if item is None:
+        logging.debug("Finish name editing")
+        if not self.isSelected():
             return
-        id = self.itemModel.getId(item)
+        item: adapters.StandardItem = self.getSelectedItem()
+        item_id: UUID = item.itemId()
 
-        name = item.text()
-        self.window.setProjectItemName(id, name)
+        name: str = item.text()
+        self.window.setProjectItemName(item_id, name)
 
-        parent_item = item.parent()
+        parent_item: adapters.StandardItem = item.parent()
         parent_item.sortChildren(0, Qt.SortOrder.AscendingOrder)
-        model_index = item.index()
-        proxy_index = self.getProxyIndex(model_index)
+        model_index: QModelIndex = item.index()
+        proxy_index: QModelIndex = self.getProxyIndex(model_index)
         self.scrollTo(proxy_index)
 
     def focusInEvent(self, event: QFocusEvent) -> None:
@@ -133,8 +128,8 @@ class TreeView(QTreeView):
             QFrame.Panel | (QFrame.Plain if is_focused else QFrame.Sunken)
         )
 
-    def deleteItem(self, item):
-        model_index = item.index()
-        row = model_index.row()
-        parent_index = model_index.parent()
+    def deleteItem(self, item: adapters.StandardItem) -> None:
+        model_index: QModelIndex = item.index()
+        row: int = model_index.row()
+        parent_index: QModelIndex = model_index.parent()
         self.itemModel.removeRow(row, parent_index)

@@ -10,12 +10,11 @@ from PySide6.QtWidgets import (
 from . import gui_utils, Abilities, BaseElement, Settings, TextItem
 
 
-class NoteElement(QAbstractGraphicsShapeItem, BaseElement):
+class NoteElement(BaseElement):
     def __init__(
         self, text: str = None, center=False, dx: float = 0, dy: float = 0, parent=None
     ) -> None:
-        super().__init__(parent)
-        BaseElement.__init__(self)
+        super().__init__(parent=parent)
         self._abilities = {Abilities.EDITABLE_TEXT}
 
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)

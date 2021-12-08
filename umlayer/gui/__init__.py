@@ -1,6 +1,5 @@
 # the order is important
 from umlayer.gui import constants
-from umlayer.gui.item_roles import ItemRoles
 from umlayer.gui.settings import Settings
 from umlayer.gui.gui_utils import snap, snap_up, snap_round
 from umlayer.gui.base_element import BaseElement, Abilities
@@ -26,8 +25,6 @@ from umlayer.gui.line_icons_proxy_stype import LineIconsProxyStyle
 from umlayer.gui.scene_logic import SceneLogic
 from umlayer.gui.graphics_scene import GraphicsScene
 from umlayer.gui.graphics_view import GraphicsView
-from umlayer.gui.standard_item_model import StandardItemModel
-from umlayer.gui.tree_sort_model import TreeSortModel
 from umlayer.gui.tree_view import TreeView
 from umlayer.gui.actions import Actions
 

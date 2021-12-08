@@ -5,10 +5,9 @@ from PySide6.QtWidgets import QApplication, QGraphicsItem, QStyleOptionGraphicsI
 from . import gui_utils, Abilities, BaseElement, Settings, TextItem
 
 
-class TextElement(QGraphicsItem, BaseElement):
+class TextElement(BaseElement):
     def __init__(self, text: str = None, center: bool = False, parent=None) -> None:
-        super().__init__(parent)
-        BaseElement.__init__(self)
+        super().__init__(parent=parent)
         self._abilities = {Abilities.EDITABLE_TEXT}
 
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)

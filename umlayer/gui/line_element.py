@@ -40,7 +40,7 @@ class TipType(Enum):
     FullHalfTriangle = 6
 
 
-class LineElement(QGraphicsItem, BaseElement):
+class LineElement(BaseElement):
     def __init__(
         self,
         x1: float = 0,
@@ -50,8 +50,7 @@ class LineElement(QGraphicsItem, BaseElement):
         text: str = None,
         parent=None,
     ):
-        super().__init__(parent)
-        BaseElement.__init__(self)
+        super().__init__(parent=parent)
         self._abilities = {Abilities.EDITABLE_TEXT}
 
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)

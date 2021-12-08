@@ -11,13 +11,12 @@ from PySide6.QtWidgets import (
 from . import gui_utils, Settings, Abilities, BaseElement, TextItem
 
 
-class ActorElement(QGraphicsItem, BaseElement):
+class ActorElement(BaseElement):
     actor_width = 6 * Settings.ACTOR_BASE_SIZE
     actor_height = 13 * Settings.ACTOR_BASE_SIZE
 
     def __init__(self, text: str = "", parent=None):
         super().__init__(parent=parent)
-        BaseElement.__init__(self)
         self._abilities = set([Abilities.EDITABLE_TEXT])
 
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
