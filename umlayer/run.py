@@ -36,7 +36,7 @@ def run():
 
 
 def init_logging():
-    logging.basicConfig(filename="umlayer.log", filemode="w", level=logging.INFO)
+    logging.basicConfig(level=logging.INFO)
     from umlayer import version
 
     logging.info(f"UMLayer {version.__version__}")
@@ -58,6 +58,5 @@ def main():
 
 
 if __name__ == "__main__":
-    # print(sys.path[0])
     sys.path.append(os.path.join(sys.path[0], ".."))
     main()
