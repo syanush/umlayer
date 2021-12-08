@@ -22,7 +22,7 @@ class GraphicsScene(QGraphicsScene):
 
     def init_grid(self):
         self.lines = []
-        # self.draw_grid()
+        self.draw_grid()
         self._is_grid_visible = True
         self.set_grid_visible(False)
         # self.delete_grid()
