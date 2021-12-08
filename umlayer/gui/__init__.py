@@ -24,6 +24,8 @@ from umlayer.gui.line_element import LineElement
 from umlayer.gui.line_icons_proxy_stype import LineIconsProxyStyle
 from umlayer.gui.scene_logic import SceneLogic
 from umlayer.gui.graphics_scene import GraphicsScene
+from umlayer.gui.export_scene import ExportScene
+
 from umlayer.gui.graphics_view import GraphicsView
 from umlayer.gui.tree_view import TreeView
 from umlayer.gui.actions import Actions

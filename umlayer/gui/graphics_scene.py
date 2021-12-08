@@ -1,5 +1,7 @@
+import logging
+
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QKeyEvent, QBrush, QPainter
+from PySide6.QtGui import QKeyEvent, QPainter
 from PySide6.QtWidgets import QGraphicsScene, QGraphicsItem
 
 from . import constants, Settings, SceneLogic, BaseElement
@@ -32,9 +34,7 @@ class GraphicsScene(QGraphicsScene):
         height = int(self.sceneRect().height())
         num_blocks_x = int(width / Settings.BLOCK_SIZE)
         num_blocks_y = int(height / Settings.BLOCK_SIZE)
-        self.setItemIndexMethod(
-            QGraphicsScene.NoIndex
-        )  # Is it devastating for the app?
+        self.setItemIndexMethod(QGraphicsScene.NoIndex)
 
         pen = Settings.GRID_PEN
 
@@ -94,18 +94,6 @@ class GraphicsScene(QGraphicsScene):
     def clearElements(self) -> None:
         for element in self.elements():
             self.removeItem(element)
-
-    def getTempScene(self):
-        sceneRect = self.sceneRect()
-        tempScene = QGraphicsScene(sceneRect)
-        tempScene.setBackgroundBrush(QBrush(Qt.transparent))
-        tempScene.setItemIndexMethod(QGraphicsScene.BspTreeIndex)
-        for element in self.elements():
-            tempScene.addItem(element.clone())
-        newSceneRect = tempScene.itemsBoundingRect()
-        tempScene.setSceneRect(newSceneRect)
-        tempScene.clearSelection()
-        return tempScene
 
     def printItems(self):
         items = [

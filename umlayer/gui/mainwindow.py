@@ -1,10 +1,9 @@
 import logging
 from uuid import UUID
 
-from PySide6.QtCore import Qt, QRect, QSettings, QDir, QItemSelection, QByteArray
+from PySide6.QtCore import Qt, QSettings, QDir, QItemSelection, QByteArray
 
 from PySide6.QtGui import (
-    QImage,
     QPainter,
     QTextOption,
     QKeySequence,
@@ -26,12 +25,12 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-from PySide6.QtSvg import QSvgGenerator
 
 from umlayer import version, model, adapters
 
 from . import (
     GraphicsScene,
+    ExportScene,
     GraphicsView,
     TreeView,
     LineIconsProxyStyle,
@@ -520,36 +519,6 @@ class MainWindow(QMainWindow):
         self.treeView.startEditName(item)
         self.updateTitle()
 
-    def exportAsSvgImage(self, filename) -> None:
-        tempScene = self.scene.getTempScene()
-        newSceneRect = tempScene.itemsBoundingRect()
-        sceneSize = newSceneRect.size().toSize()
-        generator = QSvgGenerator()
-        generator.setFileName(filename)
-        generator.setSize(sceneSize)
-        generator.setViewBox(QRect(0, 0, sceneSize.width(), sceneSize.height()))
-        generator.setDescription("UML diagram")
-        generator.setTitle(filename)
-        painter = QPainter()
-        painter.begin(generator)
-        tempScene.render(painter)
-        painter.end()
-        tempScene.clear()
-        logging.info("The scene was exported as SVG image")
-
-    def exportAsRasterImage(self, filename: str) -> None:
-        tempScene = self.scene.getTempScene()
-        newSceneRect = tempScene.itemsBoundingRect()
-        sceneSize = newSceneRect.size().toSize()
-        image = QImage(sceneSize, QImage.Format_ARGB32)
-        image.fill(Qt.transparent)
-        painter = QPainter()
-        painter.begin(image)
-        tempScene.render(painter)
-        painter.end()
-        image.save(filename)
-        logging.info("The scene was exported as raster image")
-
     def getFileNameForRasterImageDialog(self) -> str:
         initial_filename = model.constants.DEFAULT_RASTER_FILENAME
         filename, selected_filter = QFileDialog.getSaveFileName(
@@ -575,15 +544,17 @@ class MainWindow(QMainWindow):
 
     def exportAsRasterImageHandler(self) -> None:
         filename = self.getFileNameForRasterImageDialog()
-
-        if filename is not None and len(filename.strip()) != 0:
-            self.exportAsRasterImage(filename)
+        if filename is None or len(filename.strip()) == 0:
+            return
+        export_scene = ExportScene(self.scene)
+        export_scene.exportAsRasterImage(filename)
 
     def exportAsSvgImageHandler(self) -> None:
         filename = self.getFileNameForSvgImageDialog()
-
-        if filename is not None and len(filename.strip()) != 0:
-            self.exportAsSvgImage(filename)
+        if filename is None or len(filename.strip()) == 0:
+            return
+        export_scene = ExportScene(self.scene)
+        export_scene.exportAsSvgImage(filename)
 
     def on_selection_changed(
         self, selected: QItemSelection, deselected: QItemSelection
