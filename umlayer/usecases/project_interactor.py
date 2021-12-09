@@ -1,4 +1,5 @@
 import logging
+import traceback
 
 from umlayer import model
 from .project_storage import ProjectStorage
@@ -86,17 +87,7 @@ class ProjectInteractor:
         if len(filename) == 0:
             return False
 
-        try:
-            self._do_save_project(filename)
-        except Exception as ex:
-            logging.error(ex)
-            print(ex)
-            self._window.showCriticalError("Unable to save project!")
-            return False
-        else:
-            self._data_model.set_filename(filename)
-            self._window.updateTitle()
-        return True
+        return self._save_project_as_filename(filename)
 
     def save_project_as(self) -> None:
         if not self.is_project_open():
@@ -107,15 +98,7 @@ class ProjectInteractor:
         if len(filename) == 0:
             return
 
-        try:
-            self._do_save_project(filename)
-        except Exception as ex:
-            logging.error(ex)
-            print(ex)
-            self._window.showCriticalError("Unable to save project!")
-        else:
-            self._data_model.set_filename(filename)
-            self._window.updateTitle()
+        self._save_project_as_filename(filename)
 
     def close_project(self) -> bool:
         """
@@ -136,7 +119,10 @@ class ProjectInteractor:
         return True
 
     def save_project_if_needed(self) -> bool:
-        """Asks about saving modified project, and save it if needed"""
+        """Asks about saving modified project, and save it if needed
+
+        Returns True if the project was saved successfully
+        """
         if not self.is_dirty():
             return True
 
@@ -152,6 +138,17 @@ class ProjectInteractor:
         return (
             self._filename is None or self._filename == model.constants.DEFAULT_FILENAME
         )
+
+    def _save_project_as_filename(self, filename):
+        try:
+            self._do_save_project(filename)
+            self._data_model.set_filename(filename)
+            self._window.updateTitle()
+            return True
+        except Exception:
+            logging.exception(traceback.format_exc())
+            self._window.showCriticalError("Unable to save project!")
+            return False
 
     def _do_save_project(self, filename) -> None:
         """Actually saves the project"""

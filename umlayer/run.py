@@ -15,6 +15,7 @@ def run():
     init_logging()
 
     from umlayer import version
+
     logging.info("")
     logging.info(f"UMLayer {version.__version__}")
 
@@ -40,7 +41,9 @@ def run():
 
 
 def init_logging():
-    log_formatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
+    log_formatter = logging.Formatter(
+        "%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s"
+    )
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.DEBUG)
 
@@ -48,7 +51,9 @@ def init_logging():
     file_handler.setFormatter(log_formatter)
     root_logger.addHandler(file_handler)
 
-    console_handler = logging.StreamHandler(sys.stdout)  # sys.stderr (default), sys.stdout
+    console_handler = logging.StreamHandler(
+        sys.stdout
+    )  # sys.stderr (default), sys.stdout
     console_handler.setFormatter(log_formatter)
     root_logger.addHandler(console_handler)
 

@@ -533,7 +533,6 @@ class MainWindow(QMainWindow):
 
     def getFileNameForSvgImageDialog(self) -> str:
         initial_filename = model.constants.DEFAULT_SVG_FILENAME
-
         filename, selected_filter = QFileDialog.getSaveFileName(
             parent=self,
             caption="Export diagram as SVG image",
