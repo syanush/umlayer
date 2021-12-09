@@ -20,7 +20,6 @@ class ExportScene(QGraphicsScene):
         self.clearSelection()
 
     def exportAsSvgImage(self, filename) -> None:
-
         generator = QSvgGenerator()
         generator.setFileName(filename)
         generator.setSize(self.scene_size)
@@ -32,8 +31,6 @@ class ExportScene(QGraphicsScene):
         painter.begin(generator)
         self.render(painter)
         painter.end()
-        self.clear()
-        # logging.info("The scene was exported as SVG image")
 
     def exportAsRasterImage(self, filename: str) -> None:
         image = QImage(self.scene_size, QImage.Format_ARGB32)
@@ -43,4 +40,3 @@ class ExportScene(QGraphicsScene):
         self.render(painter)
         painter.end()
         image.save(filename)
-        # logging.info("The scene was exported as raster image")

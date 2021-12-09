@@ -1,4 +1,5 @@
 import logging
+import traceback
 from uuid import UUID
 
 from PySide6.QtCore import Qt, QSettings, QDir, QItemSelection, QByteArray
@@ -546,15 +547,25 @@ class MainWindow(QMainWindow):
         filename = self.getFileNameForRasterImageDialog()
         if filename is None or len(filename.strip()) == 0:
             return
-        export_scene = ExportScene(self.scene)
-        export_scene.exportAsRasterImage(filename)
+        try:
+            export_scene = ExportScene(self.scene)
+            export_scene.exportAsRasterImage(filename)
+            logging.info("The scene was exported as raster image")
+        except Exception:
+            logging.exception(traceback.format_exc())
+            self.showCriticalError("Unable to export scene content as raster image!")
 
     def exportAsSvgImageHandler(self) -> None:
         filename = self.getFileNameForSvgImageDialog()
         if filename is None or len(filename.strip()) == 0:
             return
-        export_scene = ExportScene(self.scene)
-        export_scene.exportAsSvgImage(filename)
+        try:
+            export_scene = ExportScene(self.scene)
+            export_scene.exportAsSvgImage(filename)
+            logging.info("The scene was exported as SVG image")
+        except Exception:
+            logging.exception(traceback.format_exc())
+            self.showCriticalError("Unable to export scene content as SVG image!")
 
     def on_selection_changed(
         self, selected: QItemSelection, deselected: QItemSelection
