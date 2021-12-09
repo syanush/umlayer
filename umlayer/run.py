@@ -14,11 +14,15 @@ def run():
 
     init_logging()
 
+    from umlayer import version
+    logging.info("")
+    logging.info(f"UMLayer {version.__version__}")
+
     logging.info("Application started")
     composer = CompositionRoot()
     composer.compose()
-    app: QApplication = composer.app
-    main_window: QMainWindow = composer.main_window
+    app = composer.app
+    main_window = composer.main_window
     del composer
 
     # app.setStyle('Fusion')
@@ -36,10 +40,17 @@ def run():
 
 
 def init_logging():
-    logging.basicConfig(level=logging.DEBUG)
-    from umlayer import version
+    log_formatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging.DEBUG)
 
-    logging.info(f"UMLayer {version.__version__}")
+    file_handler = logging.FileHandler("umlayer.log")
+    file_handler.setFormatter(log_formatter)
+    root_logger.addHandler(file_handler)
+
+    console_handler = logging.StreamHandler(sys.stdout)  # sys.stderr (default), sys.stdout
+    console_handler.setFormatter(log_formatter)
+    root_logger.addHandler(console_handler)
 
 
 def main():
@@ -52,7 +63,7 @@ def main():
     except Exception as ex:
         logging.exception(traceback.format_exc())
         errcode = 1
-        raise ex  # TODO: comment it in release version
+        raise ex  # TODO: comment this in release version
 
     sys.exit(errcode)
 
