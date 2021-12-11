@@ -2,19 +2,18 @@ from PySide6.QtCore import Qt, QPointF, QRectF
 from PySide6.QtGui import QPainter, QPainterPath
 from PySide6.QtWidgets import (
     QApplication,
-    QAbstractGraphicsShapeItem,
     QGraphicsItem,
     QStyleOptionGraphicsItem,
 )
 
-from . import gui_utils, Abilities, BaseElement, Settings, TextItem
+from . import gui_utils, Abilities, Settings, TextItem, ResizableElement
 
 
-class PackageElement(BaseElement):
+class PackageElement(ResizableElement):
     def __init__(
         self, text: str = None, dx: float = 0, dy: float = 0, parent=None
     ) -> None:
-        super().__init__(parent=parent)
+        super().__init__(dx=dx, dy=dy, parent=parent)
         self._abilities = {Abilities.EDITABLE_TEXT}
 
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
@@ -23,13 +22,11 @@ class PackageElement(BaseElement):
 
         # serializable data
         self._text = text or ""
-        self._dx = dx  # must be non-negative
-        self._dy = dy
         # end of serializable data
 
         self._text_item1 = TextItem(parent=self)
         self._text_item2 = TextItem(parent=self)
-        self._recalculate()
+        self.recalculate()
 
     def text(self):
         return self._text
@@ -37,37 +34,20 @@ class PackageElement(BaseElement):
     def setText(self, text: str):
         if self._text != text:
             self._text = text
-            self._recalculate()
+            self.recalculate()
             self.notify()
 
-    def deltaX(self):
-        return self._dx
-
-    def setDeltaX(self, dx):
-        if self._dx != dx:
-            self._dx = dx
-            self._recalculate()
-
-    def deltaY(self):
-        return self._dy
-
-    def setDeltaY(self, dy):
-        if self._dy != dy:
-            self._dy = dy
-            self._recalculate()
+    def rect(self) -> QRectF:
+        return self._rect
 
     def toDto(self):
         dto = super().toDto()
         dto["text"] = self.text()
-        dto["dx"] = self.deltaX()
-        dto["dy"] = self.deltaY()
         return dto
 
     def setFromDto(self, dto: dict):
         super().setFromDto(dto)
         self.setText(dto["text"])
-        self.setDeltaX(dto["dx"])
-        self.setDeltaY(dto["dy"])
 
     def boundingRect(self) -> QRectF:
         extra = max(Settings.ELEMENT_PEN_SIZE, Settings.ELEMENT_SHAPE_SIZE) / 2
@@ -106,7 +86,8 @@ class PackageElement(BaseElement):
             return QPointF(gui_utils.snap(value.x()), gui_utils.snap(value.y()))
         return super().itemChange(change, value)
 
-    def _recalculate(self):
+    def recalculate(self):
+        self.notify()
         self.prepareGeometryChange()
 
         # TODO: improve parsing
@@ -135,9 +116,9 @@ class PackageElement(BaseElement):
                 width1 + Settings.PACKAGE_DELTA_WIDTH1,
                 br2.width() + 2 * Settings.ELEMENT_PADDING,
             )
-            + self._dx
+            + self.deltaX()
         )
-        height2 = br2.height() + 2 * Settings.ELEMENT_PADDING + self._dy
+        height2 = br2.height() + 2 * Settings.ELEMENT_PADDING + self.deltaY()
         width2 = gui_utils.snap_up(width2)
         height2 = gui_utils.snap_up(height2)
 
@@ -162,5 +143,4 @@ class PackageElement(BaseElement):
         path.lineTo(0, 0)
         self._shape_path = path
 
-        self.update()
-        self.notify()
+        self.updateHandlePositions()
