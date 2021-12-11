@@ -62,8 +62,6 @@ class SceneLogic:
     def addEllipseElement(self):
         element = EllipseElement()
         element.setText("Use case 1")
-        element.setWidth(150)
-        element.setHeight(50)
         self.addElement(element)
 
     def addNoteElement(self):
