@@ -15,15 +15,13 @@ class ResizeHandleItem(QGraphicsObject):
     position_changed_signal = Signal(QPointF)
     selection_changed_signal = Signal(bool)
 
-    def __init__(self, size: int, item: BaseElement, parent=None):
+    def __init__(self, size: int, calculate, parent=None):
         super().__init__(parent)
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges, True)
         self.size = size
-        if item is None:
-            raise ValueError("item")
-        self._item = item
+        self._calculate = calculate
         self._bounding_rect = QRectF(
             -self.size, -self.size, 2 * self.size, 2 * self.size
         )
@@ -72,13 +70,15 @@ class ResizeHandleItem(QGraphicsObject):
             and QApplication.mouseButtons() == Qt.LeftButton
         ):
             snapped_value = QPointF(
-                gui_utils.snap(value.x()), gui_utils.snap(value.y())
+                gui_utils.snap(value.x()),
+                gui_utils.snap(value.y())
             )
-            value = self.calculatePosition(snapped_value)
+            value = (
+                snapped_value
+                if not self.isSelected() or self.is_resizing
+                else self._calculate(snapped_value, self)
+            )
         if change == QGraphicsItem.GraphicsItemChange.ItemSelectedHasChanged:
             is_selected = bool(value)
             self.selection_changed_signal.emit(is_selected)
         return super().itemChange(change, value)
-
-    def calculatePosition(self, value):
-        return self._item.calculateResizeHandlePosition(value, self)

@@ -36,10 +36,10 @@ class NoteElement(BaseElement):
         # end of serializable data
 
         self._handler = Handler(item=self)
-        for i in range(1, 4 + 1):
-            self._handler.handle[i] = ResizeHandleItem(
-                size=Settings.RESIZE_HANDLE_SIZE, item=self
-            )
+        self._handler.handle[1] = ResizeHandleItem(Settings.RESIZE_HANDLE_SIZE, self.topLeftResize)
+        self._handler.handle[2] = ResizeHandleItem(Settings.RESIZE_HANDLE_SIZE, self.topRightResize)
+        self._handler.handle[3] = ResizeHandleItem(Settings.RESIZE_HANDLE_SIZE, self.bottomRightResize)
+        self._handler.handle[4] = ResizeHandleItem(Settings.RESIZE_HANDLE_SIZE, self.bottomLeftResize)
 
         self._handler.on_zvalue_change()
 
@@ -49,7 +49,7 @@ class NoteElement(BaseElement):
         self.setLive(False)
 
         self._text_item = TextItem(center=center, parent=self)
-        self._recalculate()
+        self.recalculate()
 
     def text(self):
         return self._text
@@ -57,7 +57,7 @@ class NoteElement(BaseElement):
     def setText(self, text: str):
         if self._text != text:
             self._text = text
-            self._recalculate()
+            self.recalculate()
 
     def center(self):
         return self._center
@@ -65,7 +65,7 @@ class NoteElement(BaseElement):
     def setCenter(self, center: bool):
         if self._center != center:
             self._center = center
-            self._recalculate()
+            self.recalculate()
 
     def deltaX(self):
         return self._dx
@@ -73,7 +73,7 @@ class NoteElement(BaseElement):
     def setDeltaX(self, dx):
         if self._dx != dx:
             self._dx = dx
-            self._recalculate()
+            # self.recalculate()
 
     def deltaY(self):
         return self._dy
@@ -81,7 +81,12 @@ class NoteElement(BaseElement):
     def setDeltaY(self, dy):
         if self._dy != dy:
             self._dy = dy
-            self._recalculate()
+            # self.recalculate()
+
+    def rect(self):
+        x1 = self.pos().x()
+        y1 = self.pos().y()
+        return QRectF(x1, y1, self._rect.width(), self._rect.height())
 
     def toDto(self):
         dto = super().toDto()
@@ -145,7 +150,7 @@ class NoteElement(BaseElement):
     def _handle_selection_changed(self, is_selected):
         self.setLive(is_selected)
 
-    def _recalculate(self):
+    def recalculate(self):
         self.prepareGeometryChange()
         text = self._text or ""
         self._text_item.setText(text)
@@ -195,11 +200,12 @@ class NoteElement(BaseElement):
         self._handler.handle[4].setPos(x1, y2)
 
     def _getCoordinates(self):
-        pos = self.pos()
-        x1 = pos.x()
-        y1 = pos.y()
-        x2 = x1 + self._rect.width()
-        y2 = y1 + self._rect.height()
+        p1 = self.rect().topLeft()
+        p2 = self.rect().bottomRight()
+        x1 = p1.x()
+        y1 = p1.y()
+        x2 = p2.x()
+        y2 = p2.y()
         return x1, y1, x2, y2
 
     def setLive(self, is_live):
@@ -211,53 +217,61 @@ class NoteElement(BaseElement):
         self._handler.setLive(is_really_live)
 
     def _on_item_move(self, position):
-        self._recalculate()
+        self.recalculate()
 
-    def calculateResizeHandlePosition(self, point: QPointF, handle: ResizeHandleItem):
-        if not handle.isSelected() or handle.is_resizing or not self.isResizing():
-            return point
+    def leftX(self, point):
+        dx = max(0.0, self.deltaX() - point.x() + self.rect().topLeft().x())
+        return dx, self.deltaX() - dx
 
-        x1, y1, x2, y2 = self._getCoordinates()
-        new_dx = self._dx
-        new_dy = self._dy
-        delta_dx = 0.0
-        delta_dy = 0.0
+    def rightX(self, point):
+        dx = max(0.0, self.deltaX() + point.x() - self.rect().bottomRight().x())
+        return dx, 0.0
 
-        if handle == self._handler.handle[1]:
-            shift_x = point.x() - x1
-            shift_y = point.y() - y1
-            new_dx = max(0.0, self._dx - shift_x)
-            new_dy = max(0.0, self._dy - shift_y)
-            delta_dx = new_dx - self._dx
-            delta_dy = new_dy - self._dy
-        elif handle == self._handler.handle[2]:
-            shift_x = point.x() - x2
-            shift_y = point.y() - y1
-            new_dx = max(0.0, self._dx + shift_x)
-            new_dy = max(0.0, self._dy - shift_y)
-            delta_dy = new_dy - self._dy
-        elif handle == self._handler.handle[3]:
-            shift_x = point.x() - x2
-            shift_y = point.y() - y2
-            new_dx = max(0.0, self._dx + shift_x)
-            new_dy = max(0.0, self._dy + shift_y)
-        elif handle == self._handler.handle[4]:
-            shift_x = point.x() - x1
-            shift_y = point.y() - y2
-            new_dx = max(0.0, self._dx - shift_x)
-            new_dy = max(0.0, self._dy + shift_y)
-            delta_dx = new_dx - self._dx
+    def topY(self, point):
+        dy = max(0.0, self.deltaY() - point.y() + self.rect().topLeft().y())
+        return dy, self.deltaY() - dy
 
-        if self._dx != new_dx or self._dy != new_dy:
-            self._dx = new_dx
-            self._dy = new_dy
+    def bottomY(self, point):
+        dy = max(0.0, self.deltaY() + point.y() - self.rect().bottomRight().y())
+        return dy, 0.0
+
+    def doResize(self, dx, dy, rx, ry, handle):
+        if self.deltaX() != dx or self.deltaY() != dy:
+            self.setDeltaX(dx)
+            self.setDeltaY(dy)
             handle.is_resizing = True
-            self._recalculate()
-            if abs(delta_dx) + abs(delta_dy) > 0.0:
-                self.moveBy(-delta_dx, -delta_dy)
+            self.recalculate()
+            self.moveBy(rx, ry)
             handle.is_resizing = False
-
         return handle.pos()
+
+    def topLeftResize(self, point: QPointF, handle: ResizeHandleItem):
+        if not self.isResizing():
+            return point
+        dx, rx = self.leftX(point)
+        dy, ry = self.topY(point)
+        return self.doResize(dx, dy, rx, ry, handle)
+
+    def topRightResize(self, point: QPointF, handle: ResizeHandleItem):
+        if not self.isResizing():
+            return point
+        dx, rx = self.rightX(point)
+        dy, ry = self.topY(point)
+        return self.doResize(dx, dy, rx, ry, handle)
+
+    def bottomRightResize(self, point: QPointF, handle: ResizeHandleItem):
+        if not self.isResizing():
+            return point
+        dx, rx = self.rightX(point)
+        dy, ry = self.bottomY(point)
+        return self.doResize(dx, dy, rx, ry, handle)
+
+    def bottomLeftResize(self, point: QPointF, handle: ResizeHandleItem):
+        if not self.isResizing():
+            return point
+        dx, rx = self.leftX(point)
+        dy, ry = self.bottomY(point)
+        return self.doResize(dx, dy, rx, ry, handle)
 
     def isResizing(self) -> bool:
         return not self.isSelected() and self._handler.isResizing()
