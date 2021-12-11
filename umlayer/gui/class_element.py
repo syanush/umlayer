@@ -2,7 +2,6 @@ from PySide6.QtCore import Qt, QPointF, QRectF
 from PySide6.QtGui import QPainter, QPainterPath
 from PySide6.QtWidgets import (
     QApplication,
-    QAbstractGraphicsShapeItem,
     QGraphicsItem,
     QStyleOptionGraphicsItem,
 )

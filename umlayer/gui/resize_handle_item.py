@@ -14,13 +14,14 @@ class ResizeHandleItem(QGraphicsObject):
     position_changed_signal = Signal(QPointF)
     selection_changed_signal = Signal(bool)
 
-    def __init__(self, size: int, calculateHandlePositionChange, parent=None):
+    def __init__(self, size: int, calculateHandlePositionChange, name: str = "", parent=None):
         super().__init__(parent)
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges, True)
         self.size = size
         self._calculateHandlePositionChange = calculateHandlePositionChange
+        self._name = name
         self._bounding_rect = QRectF(
             -self.size, -self.size, 2 * self.size, 2 * self.size
         )
@@ -31,7 +32,7 @@ class ResizeHandleItem(QGraphicsObject):
         self._isPositionChangeAccepted = False
 
     def __str__(self):
-        return f"<Handle {self.size}: {self.pos().x()}, {self.pos().y()}>"
+        return f"<Handle {self._name} size={self.size}: {self.pos().x()}, {self.pos().y()}>"
 
     def isPositionChangeAccepted(self) -> bool:
         return self._isPositionChangeAccepted
@@ -77,7 +78,8 @@ class ResizeHandleItem(QGraphicsObject):
 
     def calculateItemPositionChange(self, position):
         snapped_position = gui_utils.snap_position(position)
-        return self._calculateHandlePositionChange(self, snapped_position)
+        result_position = self._calculateHandlePositionChange(self, snapped_position)
+        return result_position
 
     def onItemSelectedHasChanged(self, value):
         is_selected = bool(value)

@@ -7,6 +7,7 @@ from umlayer.gui.base_element import BaseElement, Abilities
 from umlayer.gui.line_handle_item import LineHandleItem
 from umlayer.gui.resize_handle_item import ResizeHandleItem
 from umlayer.gui.handler import Handler
+from umlayer.gui.resizable_element import ResizableElement
 
 from umlayer.gui.tips import (
     Tip,
