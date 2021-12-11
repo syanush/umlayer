@@ -25,16 +25,24 @@ class ResizableElement(BaseElement):
 
     def _createHandles(self):
         self._handler.handle[1] = ResizeHandleItem(
-            Settings.RESIZE_HANDLE_SIZE, self.calculateTopLeftHandlePositionChange, name="1"
+            Settings.RESIZE_HANDLE_SIZE,
+            self.calculateTopLeftHandlePositionChange,
+            name="1",
         )
         self._handler.handle[2] = ResizeHandleItem(
-            Settings.RESIZE_HANDLE_SIZE, self.calculateTopRightHandlePositionChange, name="2"
+            Settings.RESIZE_HANDLE_SIZE,
+            self.calculateTopRightHandlePositionChange,
+            name="2",
         )
         self._handler.handle[3] = ResizeHandleItem(
-            Settings.RESIZE_HANDLE_SIZE, self.calculateBottomRightHandlePositionChange, name="3"
+            Settings.RESIZE_HANDLE_SIZE,
+            self.calculateBottomRightHandlePositionChange,
+            name="3",
         )
         self._handler.handle[4] = ResizeHandleItem(
-            Settings.RESIZE_HANDLE_SIZE, self.calculateBottomLeftHandlePositionChange, name="4"
+            Settings.RESIZE_HANDLE_SIZE,
+            self.calculateBottomLeftHandlePositionChange,
+            name="4",
         )
 
         self._handler.on_zvalue_change()
@@ -48,7 +56,6 @@ class ResizableElement(BaseElement):
     def setDeltaX(self, dx):
         if self._dx != dx:
             self._dx = dx
-            self.recalculate()
 
     def deltaY(self):
         return self._dy
@@ -56,7 +63,6 @@ class ResizableElement(BaseElement):
     def setDeltaY(self, dy):
         if self._dy != dy:
             self._dy = dy
-            self.recalculate()
 
     @abc.abstractmethod
     def rect(self) -> QRectF:
@@ -152,14 +158,17 @@ class ResizableElement(BaseElement):
         # The order of checks is important
 
         if handle.isPositionChangeAccepted():
+            # print(handle, "isPositionChangeAccepted", position)
             # the handle that resizes the element changes position
             return position
 
         if self.isMoveForbidden(handle):
+            # print(handle, "isMoveForbidden", handle.pos())
             # the handle position stays unchanged because conditions for resize are not met
             return handle.pos()
 
         if not self.isResizeAllowed(handle):
+            # print(handle, "isResizeAllowed", position)
             # the handle does not take part in resize
             return position
 
@@ -167,11 +176,16 @@ class ResizableElement(BaseElement):
         size_y, shift_y = calculate_y_change(position)
 
         if self.deltaX() != size_x or self.deltaY() != size_y:
+            # print(handle, "RESIZE")
             handle.setPositionChangeAccepted(True)
             self.setDeltaX(size_x)
             self.setDeltaY(size_y)
+            self.recalculate()
             self.moveBy(shift_x, shift_y)
             handle.setPositionChangeAccepted(False)
+        # else:
+        #     print(handle, "NO RESIZE")
+        # print(handle, handle.pos())
         return handle.pos()  # the handle position has changed
 
     def calculateTopLeftHandlePositionChange(
@@ -208,8 +222,15 @@ class ResizableElement(BaseElement):
         return size_x, shift_x
 
     def calculateRightXChange(self, position):
-        size_x = max(0.0, self.deltaX() + position.x() - self.sceneRect().bottomRight().x())
+        # print("calculateRightXChange")
+        # print(f"{self.deltaX()=}")
+        # print(f"{position.x()=}")
+        # print(f"{self.sceneRect().bottomRight().x()=}")
+        size_x = max(
+            0.0, self.deltaX() + position.x() - self.sceneRect().bottomRight().x()
+        )
         shift_x = 0.0
+        # print(f"{size_x=}")
         return size_x, shift_x
 
     def calculateTopYChange(self, position):
@@ -218,7 +239,9 @@ class ResizableElement(BaseElement):
         return size_y, shift_y
 
     def calculateBottomYChange(self, position):
-        size_y = max(0.0, self.deltaY() + position.y() - self.sceneRect().bottomRight().y())
+        size_y = max(
+            0.0, self.deltaY() + position.y() - self.sceneRect().bottomRight().y()
+        )
         shift_y = 0.0
         return size_y, shift_y
 

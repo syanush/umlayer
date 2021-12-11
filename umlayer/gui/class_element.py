@@ -1,19 +1,18 @@
-from PySide6.QtCore import Qt, QPointF, QRectF
+from PySide6.QtCore import QRectF
 from PySide6.QtGui import QPainter, QPainterPath
 from PySide6.QtWidgets import (
-    QApplication,
     QGraphicsItem,
     QStyleOptionGraphicsItem,
 )
 
-from . import gui_utils, Abilities, BaseElement, Settings, TextItem
+from . import gui_utils, Abilities, Settings, TextItem, ResizableElement
 
 
-class ClassElement(BaseElement):
+class ClassElement(ResizableElement):
     def __init__(
         self, text: str = "", dx: float = 0, dy: float = 0, parent=None
     ) -> None:
-        super().__init__(parent=parent)
+        super().__init__(dx=dx, dy=dy, parent=parent)
         self._abilities = {Abilities.EDITABLE_TEXT}
 
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
@@ -22,12 +21,10 @@ class ClassElement(BaseElement):
 
         # serializable data
         self._text = text or ""
-        self._dx = dx  # must be non-negative
-        self._dy = dy
         # end of serializable data
 
         self._text_items = []
-        self._recalculate()
+        self.recalculate()
 
     def text(self):
         return self._text
@@ -35,36 +32,19 @@ class ClassElement(BaseElement):
     def setText(self, text: str):
         if self._text != text:
             self._text = text
-            self._recalculate()
+            self.recalculate()
 
-    def deltaX(self):
-        return self._dx
-
-    def setDeltaX(self, dx):
-        if self._dx != dx:
-            self._dx = dx
-            self._recalculate()
-
-    def deltaY(self):
-        return self._dy
-
-    def setDeltaY(self, dy):
-        if self._dy != dy:
-            self._dy = dy
-            self._recalculate()
+    def rect(self) -> QRectF:
+        return self._rect
 
     def toDto(self):
         dto = super().toDto()
         dto["text"] = self.text()
-        dto["dx"] = self.deltaX()
-        dto["dy"] = self.deltaY()
         return dto
 
     def setFromDto(self, dto: dict):
         super().setFromDto(dto)
         self.setText(dto["text"])
-        self.setDeltaX(dto["dx"])
-        self.setDeltaY(dto["dy"])
 
     def boundingRect(self) -> QRectF:
         extra = max(Settings.ELEMENT_PEN_SIZE, Settings.ELEMENT_SHAPE_SIZE) / 2
@@ -93,17 +73,8 @@ class ClassElement(BaseElement):
             painter.setPen(shape_pen)
             painter.drawPath(self.shape())
 
-    def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
-        self.positionNotify(change)
-        if (
-            self.scene()
-            and change == QGraphicsItem.ItemPositionChange
-            and QApplication.mouseButtons() == Qt.LeftButton
-        ):
-            return QPointF(gui_utils.snap(value.x()), gui_utils.snap(value.y()))
-        return super().itemChange(change, value)
-
-    def _recalculate(self):
+    def recalculate(self):
+        self.notify()
         self.prepareGeometryChange()
 
         self._texts = gui_utils.split_to_sections(self._text)
@@ -122,8 +93,7 @@ class ClassElement(BaseElement):
         path.addRect(self._rect)
         self._shape_path = path
 
-        self.update()
-        self.notify()
+        self.updateHandlePositions()
 
     def _get_rect(self, item: TextItem) -> QRectF:
         br = item.boundingRect()
@@ -157,7 +127,7 @@ class ClassElement(BaseElement):
             2 * Settings.ELEMENT_PADDING
             if n == 0
             else max(self._get_rect(item).width() for item in self._text_items)
-        )
+        ) + self.deltaX()
         return width
 
     def _createCompartments(self, width: float) -> list[QRectF]:
@@ -179,7 +149,7 @@ class ClassElement(BaseElement):
                 height += compartment.height()
 
             if i == n - 1:
-                compartment.adjust(0, 0, 0, self._dy)
+                compartment.adjust(0, 0, 0, self.deltaY())
 
             compartments.append(compartment)
         return compartments

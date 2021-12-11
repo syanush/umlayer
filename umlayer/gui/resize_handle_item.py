@@ -14,7 +14,9 @@ class ResizeHandleItem(QGraphicsObject):
     position_changed_signal = Signal(QPointF)
     selection_changed_signal = Signal(bool)
 
-    def __init__(self, size: int, calculateHandlePositionChange, name: str = "", parent=None):
+    def __init__(
+        self, size: int, calculateHandlePositionChange, name: str = "", parent=None
+    ):
         super().__init__(parent)
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.setFlag(QGraphicsItem.ItemIsMovable, True)

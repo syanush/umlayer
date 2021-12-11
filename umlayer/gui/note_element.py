@@ -9,7 +9,9 @@ from . import (
     Abilities,
     Settings,
     TextItem,
-    ResizableElement, ResizeHandleItem, Handler
+    ResizableElement,
+    ResizeHandleItem,
+    Handler,
 )
 
 
