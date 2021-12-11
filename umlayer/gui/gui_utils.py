@@ -1,5 +1,7 @@
 import math
 
+from PySide6.QtCore import QPointF, QSizeF
+
 from . import Settings
 
 
@@ -13,6 +15,14 @@ def snap_up(x: float) -> float:
 
 def snap_round(x: float) -> float:
     return round(x / Settings.BLOCK_SIZE) * Settings.BLOCK_SIZE
+
+
+def snap_position(position: QPointF) -> QPointF:
+    return QPointF(snap(position.x()), snap(position.y()))
+
+
+def snap_size(size: QSizeF) -> QSizeF:
+    return QSizeF(snap(size.x()), snap(size.y()))
 
 
 def split_to_sections(text) -> list[str]:

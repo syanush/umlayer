@@ -1,13 +1,12 @@
-from PySide6.QtCore import Qt, QPointF, QRectF, Signal
+from PySide6.QtCore import QPointF, QRectF, Signal
 from PySide6.QtGui import QPainter, QPainterPath
 from PySide6.QtWidgets import (
-    QApplication,
     QGraphicsItem,
     QStyleOptionGraphicsItem,
     QGraphicsObject,
 )
 
-from . import gui_utils, Settings, BaseElement
+from . import gui_utils, Settings
 
 
 class ResizeHandleItem(QGraphicsObject):
@@ -15,13 +14,13 @@ class ResizeHandleItem(QGraphicsObject):
     position_changed_signal = Signal(QPointF)
     selection_changed_signal = Signal(bool)
 
-    def __init__(self, size: int, calculate, parent=None):
+    def __init__(self, size: int, calculateHandlePositionChange, parent=None):
         super().__init__(parent)
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges, True)
         self.size = size
-        self._calculate = calculate
+        self._calculateHandlePositionChange = calculateHandlePositionChange
         self._bounding_rect = QRectF(
             -self.size, -self.size, 2 * self.size, 2 * self.size
         )
@@ -29,10 +28,16 @@ class ResizeHandleItem(QGraphicsObject):
         path.addEllipse(self._bounding_rect)
         self._shape_path = path
         self._is_live = False
-        self.is_resizing = False
+        self._isPositionChangeAccepted = False
 
     def __str__(self):
         return f"<Handle {self.size}: {self.pos().x()}, {self.pos().y()}>"
+
+    def isPositionChangeAccepted(self) -> bool:
+        return self._isPositionChangeAccepted
+
+    def setPositionChangeAccepted(self, accepted: bool) -> None:
+        self._isPositionChangeAccepted = accepted
 
     def setLive(self, is_live):
         self._is_live = is_live
@@ -64,21 +69,16 @@ class ResizeHandleItem(QGraphicsObject):
         painter.drawRect(self._bounding_rect)
 
     def itemChange(self, change, value):
-        if (
-            self.scene()
-            and change == QGraphicsItem.ItemPositionChange
-            and QApplication.mouseButtons() == Qt.LeftButton
-        ):
-            snapped_value = QPointF(
-                gui_utils.snap(value.x()),
-                gui_utils.snap(value.y())
-            )
-            value = (
-                snapped_value
-                if not self.isSelected() or self.is_resizing
-                else self._calculate(snapped_value, self)
-            )
+        if self.scene() and change == QGraphicsItem.ItemPositionChange:
+            value = self.calculateItemPositionChange(value)
         if change == QGraphicsItem.GraphicsItemChange.ItemSelectedHasChanged:
-            is_selected = bool(value)
-            self.selection_changed_signal.emit(is_selected)
+            self.onItemSelectedHasChanged(value)
         return super().itemChange(change, value)
+
+    def calculateItemPositionChange(self, position):
+        snapped_position = gui_utils.snap_position(position)
+        return self._calculateHandlePositionChange(self, snapped_position)
+
+    def onItemSelectedHasChanged(self, value):
+        is_selected = bool(value)
+        self.selection_changed_signal.emit(is_selected)

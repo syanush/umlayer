@@ -35,21 +35,29 @@ class NoteElement(BaseElement):
         self._dy = dy
         # end of serializable data
 
+        self._text_item = TextItem(center=center, parent=self)
         self._handler = Handler(item=self)
-        self._handler.handle[1] = ResizeHandleItem(Settings.RESIZE_HANDLE_SIZE, self.topLeftResize)
-        self._handler.handle[2] = ResizeHandleItem(Settings.RESIZE_HANDLE_SIZE, self.topRightResize)
-        self._handler.handle[3] = ResizeHandleItem(Settings.RESIZE_HANDLE_SIZE, self.bottomRightResize)
-        self._handler.handle[4] = ResizeHandleItem(Settings.RESIZE_HANDLE_SIZE, self.bottomLeftResize)
+        self._createHandles()
+        self.setLive(False)
+
+    def _createHandles(self):
+        self._handler.handle[1] = ResizeHandleItem(
+            Settings.RESIZE_HANDLE_SIZE, self.calculateTopLeftHandlePositionChange
+        )
+        self._handler.handle[2] = ResizeHandleItem(
+            Settings.RESIZE_HANDLE_SIZE, self.calculateTopRightHandlePositionChange
+        )
+        self._handler.handle[3] = ResizeHandleItem(
+            Settings.RESIZE_HANDLE_SIZE, self.calculateBottomRightHandlePositionChange
+        )
+        self._handler.handle[4] = ResizeHandleItem(
+            Settings.RESIZE_HANDLE_SIZE, self.calculateBottomLeftHandlePositionChange
+        )
 
         self._handler.on_zvalue_change()
 
         for handle in self._handler.handle.values():
-            handle.selection_changed_signal.connect(self._handle_selection_changed)
-
-        self.setLive(False)
-
-        self._text_item = TextItem(center=center, parent=self)
-        self.recalculate()
+            handle.selection_changed_signal.connect(self.onHandleSelectionChanged)
 
     def text(self):
         return self._text
@@ -73,7 +81,7 @@ class NoteElement(BaseElement):
     def setDeltaX(self, dx):
         if self._dx != dx:
             self._dx = dx
-            # self.recalculate()
+            self.recalculate()
 
     def deltaY(self):
         return self._dy
@@ -81,12 +89,21 @@ class NoteElement(BaseElement):
     def setDeltaY(self, dy):
         if self._dy != dy:
             self._dy = dy
-            # self.recalculate()
+            self.recalculate()
 
     def rect(self):
         x1 = self.pos().x()
         y1 = self.pos().y()
         return QRectF(x1, y1, self._rect.width(), self._rect.height())
+
+    def setLive(self, is_live):
+        """An element must stay live when the one or its handle were selected"""
+        is_really_live = (
+            is_live or self.isSelected() or self._handler.is_handle_selected()
+        )
+        self._is_live = is_really_live
+        self._handler.setLive(is_really_live)
+        self.recalculate()
 
     def toDto(self):
         dto = super().toDto()
@@ -130,28 +147,40 @@ class NoteElement(BaseElement):
 
     def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
         self.positionNotify(change)
-        if (
-            self.scene()
-            and change == QGraphicsItem.ItemPositionChange
-            and QApplication.mouseButtons() == Qt.LeftButton
-        ):
-            return QPointF(gui_utils.snap(value.x()), gui_utils.snap(value.y()))
+        if self.scene() and change == QGraphicsItem.ItemPositionChange:
+            value = self.calculateItemPositionChange(value)
         if change == QGraphicsItem.ItemPositionHasChanged:
-            self._on_item_move(value)
+            self.onItemPositionHasChanged(value)
         if change == QGraphicsItem.ItemSceneChange:
-            self._handler.on_scene_change(value)
+            self.onItemSceneChange(value)
         if change == QGraphicsItem.ItemZValueHasChanged:
-            self._handler.on_zvalue_change()
+            self.onItemZValueHasChanged(value)
         if change == QGraphicsItem.ItemSelectedHasChanged:
-            is_selected = bool(value)
-            self.setLive(is_selected)
+            self.onItemSelectedHasChanged(value)
         return super().itemChange(change, value)
 
-    def _handle_selection_changed(self, is_selected):
+    def calculateItemPositionChange(self, position):
+        if QApplication.mouseButtons() == Qt.LeftButton:
+            return gui_utils.snap_position(position)
+        return position
+
+    def onItemSceneChange(self, value) -> None:
+        self._handler.on_scene_change(value)
+
+    def onItemZValueHasChanged(self, value):
+        self._handler.on_zvalue_change()
+
+    def onItemSelectedHasChanged(self, value):
+        is_selected = bool(value)
+        self.setLive(is_selected)
+
+    def onHandleSelectionChanged(self, is_selected):
         self.setLive(is_selected)
 
     def recalculate(self):
+        self.notify()
         self.prepareGeometryChange()
+
         text = self._text or ""
         self._text_item.setText(text)
         self._text_item.setPos(Settings.ELEMENT_PADDING, Settings.ELEMENT_PADDING)
@@ -187,91 +216,137 @@ class NoteElement(BaseElement):
         path.lineTo(x, Settings.NOTE_DELTA)
         self._border_path = path
 
-        self.update()
-        self.notify()
+        self.updateHandlePositions()
 
-        self._updateHandles()
-
-    def _updateHandles(self):
-        x1, y1, x2, y2 = self._getCoordinates()
+    def updateHandlePositions(self):
+        x1 = self.rect().topLeft().x()
+        y1 = self.rect().topLeft().y()
+        x2 = self.rect().bottomRight().x()
+        y2 = self.rect().bottomRight().y()
         self._handler.handle[1].setPos(x1, y1)
         self._handler.handle[2].setPos(x2, y1)
         self._handler.handle[3].setPos(x2, y2)
         self._handler.handle[4].setPos(x1, y2)
 
-    def _getCoordinates(self):
-        p1 = self.rect().topLeft()
-        p2 = self.rect().bottomRight()
-        x1 = p1.x()
-        y1 = p1.y()
-        x2 = p2.x()
-        y2 = p2.y()
-        return x1, y1, x2, y2
-
-    def setLive(self, is_live):
-        """An element must stay live when the one or its handle were selected"""
-        is_really_live = (
-            is_live or self.isSelected() or self._handler.is_handle_selected()
-        )
-        self._is_live = is_really_live
-        self._handler.setLive(is_really_live)
-
-    def _on_item_move(self, position):
+    def onItemPositionHasChanged(self, position):
         self.recalculate()
 
-    def leftX(self, point):
-        dx = max(0.0, self.deltaX() - point.x() + self.rect().topLeft().x())
-        return dx, self.deltaX() - dx
+    def calculateHandlePositionChange(
+        self,
+        handle: ResizeHandleItem,
+        position: QPointF,
+        calculate_x_change,
+        calculate_y_change,
+    ):
+        """Calculates and sets the actual handle position for ItemPositionChange of the handle
 
-    def rightX(self, point):
-        dx = max(0.0, self.deltaX() + point.x() - self.rect().bottomRight().x())
-        return dx, 0.0
+        handle - the handle that is used for resize.
+        position - proposed position for handle to move to.
+        calculate_x_change, calculate_y_change - methods for calculating size and position changes.
+        """
 
-    def topY(self, point):
-        dy = max(0.0, self.deltaY() - point.y() + self.rect().topLeft().y())
-        return dy, self.deltaY() - dy
+        # The order of checks is important
 
-    def bottomY(self, point):
-        dy = max(0.0, self.deltaY() + point.y() - self.rect().bottomRight().y())
-        return dy, 0.0
+        if handle.isPositionChangeAccepted():
+            # the handle that resizes the element changes position
+            return position
 
-    def doResize(self, dx, dy, rx, ry, handle):
-        if self.deltaX() != dx or self.deltaY() != dy:
-            self.setDeltaX(dx)
-            self.setDeltaY(dy)
-            handle.is_resizing = True
-            self.recalculate()
-            self.moveBy(rx, ry)
-            handle.is_resizing = False
-        return handle.pos()
+        if self.isMoveForbidden(handle):
+            # the handle position stays unchanged because conditions for resize are not met
+            return handle.pos()
 
-    def topLeftResize(self, point: QPointF, handle: ResizeHandleItem):
-        if not self.isResizing():
-            return point
-        dx, rx = self.leftX(point)
-        dy, ry = self.topY(point)
-        return self.doResize(dx, dy, rx, ry, handle)
+        if not self.isResizeAllowed(handle):
+            # the handle does not take part in resize
+            return position
 
-    def topRightResize(self, point: QPointF, handle: ResizeHandleItem):
-        if not self.isResizing():
-            return point
-        dx, rx = self.rightX(point)
-        dy, ry = self.topY(point)
-        return self.doResize(dx, dy, rx, ry, handle)
+        size_x, shift_x = calculate_x_change(position)
+        size_y, shift_y = calculate_y_change(position)
 
-    def bottomRightResize(self, point: QPointF, handle: ResizeHandleItem):
-        if not self.isResizing():
-            return point
-        dx, rx = self.rightX(point)
-        dy, ry = self.bottomY(point)
-        return self.doResize(dx, dy, rx, ry, handle)
+        if self.deltaX() != size_x or self.deltaY() != size_y:
+            handle.setPositionChangeAccepted(True)
+            self.setDeltaX(size_x)
+            self.setDeltaY(size_y)
+            self.moveBy(shift_x, shift_y)
+            handle.setPositionChangeAccepted(False)
+        return handle.pos()  # the handle position has changed
 
-    def bottomLeftResize(self, point: QPointF, handle: ResizeHandleItem):
-        if not self.isResizing():
-            return point
-        dx, rx = self.leftX(point)
-        dy, ry = self.bottomY(point)
-        return self.doResize(dx, dy, rx, ry, handle)
+    def calculateTopLeftHandlePositionChange(
+        self, handle: ResizeHandleItem, position: QPointF
+    ):
+        return self.calculateHandlePositionChange(
+            handle, position, self.calculateLeftXChange, self.calculateTopYChange
+        )
 
-    def isResizing(self) -> bool:
-        return not self.isSelected() and self._handler.isResizing()
+    def calculateTopRightHandlePositionChange(
+        self, handle: ResizeHandleItem, position: QPointF
+    ):
+        return self.calculateHandlePositionChange(
+            handle, position, self.calculateRightXChange, self.calculateTopYChange
+        )
+
+    def calculateBottomRightHandlePositionChange(
+        self, handle: ResizeHandleItem, position: QPointF
+    ):
+        return self.calculateHandlePositionChange(
+            handle, position, self.calculateRightXChange, self.calculateBottomYChange
+        )
+
+    def calculateBottomLeftHandlePositionChange(
+        self, handle: ResizeHandleItem, position: QPointF
+    ):
+        return self.calculateHandlePositionChange(
+            handle, position, self.calculateLeftXChange, self.calculateBottomYChange
+        )
+
+    def calculateLeftXChange(self, point):
+        size_x = max(0.0, self.deltaX() - point.x() + self.rect().topLeft().x())
+        shift_x = self.deltaX() - size_x
+        return size_x, shift_x
+
+    def calculateRightXChange(self, point):
+        size_x = max(0.0, self.deltaX() + point.x() - self.rect().bottomRight().x())
+        shift_x = 0.0
+        return size_x, shift_x
+
+    def calculateTopYChange(self, point):
+        size_y = max(0.0, self.deltaY() - point.y() + self.rect().topLeft().y())
+        shift_y = self.deltaY() - size_y
+        return size_y, shift_y
+
+    def calculateBottomYChange(self, point):
+        size_y = max(0.0, self.deltaY() + point.y() - self.rect().bottomRight().y())
+        shift_y = 0.0
+        return size_y, shift_y
+
+    def isResizeAllowed(self, handle: ResizeHandleItem) -> bool:
+        """Indicates when element resizing by dragging the handle is allowed.
+
+        Conditions:
+        1) Left mouse button must be pressed.
+        2) The element must be deselected.
+        3) The handle must be selected.
+        4) Exactly one of all handles must be selected.
+        """
+        return (
+            QApplication.mouseButtons() == Qt.LeftButton
+            and not self.isSelected()
+            and handle.isSelected()
+            and self._handler.isResizing()
+        )
+
+    def isMoveForbidden(self, handle: ResizeHandleItem) -> bool:
+        """Indicates the state when the handle should not change position
+
+        Conditions:
+        1) Left mouse button must be pressed.
+        2) The element must be deselected.
+        3) The handle must be selected.
+        4) More than one handle are selected.
+        """
+
+        return (
+            QApplication.mouseButtons() == Qt.LeftButton
+            and not self.isSelected()
+            and handle.isSelected()
+            and not self._handler.isResizing()
+        )
