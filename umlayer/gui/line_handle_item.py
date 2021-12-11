@@ -10,16 +10,20 @@ from PySide6.QtWidgets import (
 from . import gui_utils, Settings
 
 
-class HandleItem(QGraphicsObject):
+class LineHandleItem(QGraphicsObject):
     position_changed_signal = Signal(QPointF)
     selection_changed_signal = Signal(bool)
 
-    def __init__(self, size: int, parent=None):
+    def __init__(self, item, size: int, is_rect=False, parent=None):
         super().__init__(parent)
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges, True)
+        if item is None:
+            raise ValueError("item")
+        self._item = item
         self.size = size
+        self._is_rect = is_rect
         self._bounding_rect = QRectF(
             -self.size, -self.size, 2 * self.size, 2 * self.size
         )

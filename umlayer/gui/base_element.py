@@ -2,9 +2,7 @@ import abc
 import importlib
 import json
 from enum import Enum
-from typing import Optional
 
-import PySide6.QtWidgets
 from PySide6.QtCore import QPointF
 from PySide6.QtWidgets import QGraphicsItem
 

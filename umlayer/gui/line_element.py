@@ -14,9 +14,10 @@ from . import (
     Abilities,
     BaseElement,
     Settings,
+    Handler,
     NoTip,
     Tip,
-    HandleItem,
+    LineHandleItem,
     ArrowTip,
     TriangleTip,
     DiamondTip,
@@ -65,10 +66,13 @@ class LineElement(BaseElement):
         self._tip1_figure: Tip = NoTip()
         self._tip2_figure: Tip = NoTip()
 
-        self._handle = {
-            1: HandleItem(Settings.LINE_HANDLE_SIZE),
-            2: HandleItem(Settings.LINE_HANDLE_SIZE),
-        }
+        self._handler = Handler(self)
+        self._handler.handle[1] = LineHandleItem(
+            item=self, size=Settings.LINE_HANDLE_SIZE
+        )
+        self._handler.handle[2] = LineHandleItem(
+            item=self, size=Settings.LINE_HANDLE_SIZE
+        )
 
         self.is_move_enabled = True
         self._position = QPointF()
@@ -77,25 +81,14 @@ class LineElement(BaseElement):
         self.setPoint1(x1, y1)
         self.setPoint2(x2, y2)
 
-        self._handle[1].position_changed_signal.connect(self.on_handle1_move)
-        self._handle[2].position_changed_signal.connect(self.on_handle2_move)
+        self._handler.handle[1].position_changed_signal.connect(self.on_handle1_move)
+        self._handler.handle[2].position_changed_signal.connect(self.on_handle2_move)
 
-        for handle in self._handle.values():
+        for handle in self._handler.handle.values():
             handle.selection_changed_signal.connect(self._handle_selection_changed)
 
         self.setLive(False)
         # self._recalculate()
-
-    def on_scene_change(self, scene: QGraphicsScene):
-        for handle in self._handle.values():
-            if scene is None:
-                self.scene().removeItem(handle)
-            else:
-                scene.addItem(handle)
-
-    def on_zvalue_change(self):
-        for handle in self._handle.values():
-            handle.setZValue(self.zValue() + 1.0)
 
     def text(self):
         return self._text
@@ -112,7 +105,7 @@ class LineElement(BaseElement):
     def setPoint1(self, x: float, y: float):
         point = QPointF(x, y)
         self.is_move_enabled = False
-        self._handle[1].setPos(self.pos() + point)
+        self._handler.handle[1].setPos(self.pos() + point)
         self.is_move_enabled = True
         self._recalculate()
         self.notify()
@@ -123,15 +116,14 @@ class LineElement(BaseElement):
     def setPoint2(self, x: float, y: float):
         point = QPointF(x, y)
         self.is_move_enabled = False
-        self._handle[2].setPos(self.pos() + point)
+        self._handler.handle[2].setPos(self.pos() + point)
         self.is_move_enabled = True
         self._recalculate()
         self.notify()
 
     def selectAll(self):
         self.setSelected(True)
-        for handle in self._handle.values():
-            handle.setSelected(True)
+        self._handler.selectAll()
 
     def toDto(self):
         dto = super().toDto()
@@ -187,24 +179,6 @@ class LineElement(BaseElement):
     def paint(
         self, painter: QPainter, option: QStyleOptionGraphicsItem, widget=None
     ) -> None:
-        def get_tip_brush(tip_type):
-            if tip_type in [
-                TipType.FullTriangle,
-                TipType.FullDiamond,
-                TipType.FullHalfTriangle,
-            ]:
-                brush = (
-                    Settings.LINE_SELECTED_BRUSH
-                    if self.isSelected()
-                    else Settings.ELEMENT_NORMAL_BRUSH
-                )
-            else:
-                brush = (
-                    Settings.ELEMENT_SELECTED_TRANSPARENT_BRUSH
-                    if self.isSelected()
-                    else Settings.ELEMENT_NORMAL_TRANSPARENT_BRUSH
-                )
-            return brush
 
         x1 = self._tip1_figure.point().x()
         y1 = self._tip1_figure.point().y()
@@ -225,10 +199,10 @@ class LineElement(BaseElement):
         painter.drawLine(x1, y1, x2, y2)
 
         painter.setPen(pen)
-        painter.setBrush(get_tip_brush(self._tip1))
+        painter.setBrush(self._get_tip_brush(self._tip1))
         self._tip1_figure.paint(painter)
 
-        painter.setBrush(get_tip_brush(self._tip2))
+        painter.setBrush(self._get_tip_brush(self._tip2))
         self._tip2_figure.paint(painter)
 
         # pen = Settings.ELEMENT_SELECTED_PEN if self.isSelected() else Settings.ELEMENT_NORMAL_PEN
@@ -259,33 +233,46 @@ class LineElement(BaseElement):
 
     def setLive(self, is_live):
         """A line must stay live when the line or its handle were selected"""
-        is_really_live = (
-            is_live
-            or self.isSelected()
-            or self._handle[1].isSelected()
-            or self._handle[2].isSelected()
-        )
+        is_really_live = is_live or self.isSelected() or self._is_handle_selected()
         self._is_live = is_really_live
-        for handle in self._handle.values():
-            handle.setLive(is_really_live)
+        self._handler.setLive(is_really_live)
         # self.update()
+
+    def _get_tip_brush(self, tip_type):
+        if tip_type in [
+            TipType.FullTriangle,
+            TipType.FullDiamond,
+            TipType.FullHalfTriangle,
+        ]:
+            brush = (
+                Settings.LINE_SELECTED_BRUSH
+                if self.isSelected()
+                else Settings.ELEMENT_NORMAL_BRUSH
+            )
+        else:
+            brush = (
+                Settings.ELEMENT_SELECTED_TRANSPARENT_BRUSH
+                if self.isSelected()
+                else Settings.ELEMENT_NORMAL_TRANSPARENT_BRUSH
+            )
+        return brush
 
     def _handle_selection_changed(self, is_selected):
         self.setLive(is_selected)
 
     def on_item_move(self, position):
-        if self.is_move_enabled:
-            delta = position - self._position
-            self._position = position
-            self.recalculate_item_move(delta)
+        if not self.is_move_enabled:
+            return
+        delta = position - self._position
+        self._position = position
+        self.recalculate_item_move(delta)
 
     def recalculate_item_move(self, delta):
         """item -> handles"""
         self.prepareGeometryChange()
 
         self.is_move_enabled = False
-        for handle in self._handle.values():
-            handle.moveBy(delta.x(), delta.y())
+        self._handler.moveBy(delta)
         self.is_move_enabled = True
 
         self.update()
@@ -300,12 +287,27 @@ class LineElement(BaseElement):
 
     def recalculate_handle_move(self):
         """handles -> item"""
-        initial_rect = QRectF(self._handle[1].pos(), self._handle[2].pos()).normalized()
+        p1, p2 = self._getLinePoints()
+        initial_rect = QRectF(p1, p2).normalized()
         self.is_move_enabled = False
         self.setPos(initial_rect.topLeft())
         self.is_move_enabled = True
         self._position = self.pos()
         self._recalculate()
+
+    def on_scene_change(self, scene: QGraphicsScene):
+        self._handler.on_scene_change(scene)
+
+    def on_zvalue_change(self):
+        self._handler.on_zvalue_change()
+
+    def _is_handle_selected(self):
+        return self._handler.is_handle_selected()
+
+    def _getLinePoints(self):
+        p1 = self._handler.handle[1].pos()
+        p2 = self._handler.handle[2].pos()
+        return p1, p2
 
     _tip_class_from_tip_type = {
         TipType.Empty: NoTip,
@@ -321,9 +323,7 @@ class LineElement(BaseElement):
         self.prepareGeometryChange()
         self._parse_text()
 
-        p1 = self._handle[1].pos()
-        p2 = self._handle[2].pos()
-
+        p1, p2 = self._getLinePoints()
         initial_rect = QRectF(p1, p2).normalized()
         topLeft = initial_rect.topLeft()
         q1 = p1 - topLeft
