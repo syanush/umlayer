@@ -45,7 +45,7 @@ class ResizableElement(BaseElement):
             name="4",
         )
 
-        self._handler.on_zvalue_change()
+        self.onItemZValueHasChanged()
 
         for handle in self._handler.handle.values():
             handle.selection_changed_signal.connect(self.onHandleSelectionChanged)
@@ -108,7 +108,7 @@ class ResizableElement(BaseElement):
 
     def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
         self.positionNotify(change)
-        if self.scene() and change == QGraphicsItem.ItemPositionChange:
+        if change == QGraphicsItem.ItemPositionChange:
             value = self.calculateItemPositionChange(value)
         if change == QGraphicsItem.ItemPositionHasChanged:
             self.onItemPositionHasChanged(value)
@@ -131,7 +131,7 @@ class ResizableElement(BaseElement):
     def onItemSceneChange(self, value) -> None:
         self._handler.on_scene_change(value)
 
-    def onItemZValueHasChanged(self, value):
+    def onItemZValueHasChanged(self, value=0.0):
         self._handler.on_zvalue_change()
 
     def onItemSelectedHasChanged(self, value):
@@ -158,17 +158,14 @@ class ResizableElement(BaseElement):
         # The order of checks is important
 
         if handle.isPositionChangeAccepted():
-            # print(handle, "isPositionChangeAccepted", position)
             # the handle that resizes the element changes position
             return position
 
         if self.isMoveForbidden(handle):
-            # print(handle, "isMoveForbidden", handle.pos())
             # the handle position stays unchanged because conditions for resize are not met
             return handle.pos()
 
         if not self.isResizeAllowed(handle):
-            # print(handle, "isResizeAllowed", position)
             # the handle does not take part in resize
             return position
 
@@ -176,16 +173,12 @@ class ResizableElement(BaseElement):
         size_y, shift_y = calculate_y_change(position)
 
         if self.deltaX() != size_x or self.deltaY() != size_y:
-            # print(handle, "RESIZE")
             handle.setPositionChangeAccepted(True)
             self.setDeltaX(size_x)
             self.setDeltaY(size_y)
             self.recalculate()
             self.moveBy(shift_x, shift_y)
             handle.setPositionChangeAccepted(False)
-        # else:
-        #     print(handle, "NO RESIZE")
-        # print(handle, handle.pos())
         return handle.pos()  # the handle position has changed
 
     def calculateTopLeftHandlePositionChange(
@@ -222,15 +215,10 @@ class ResizableElement(BaseElement):
         return size_x, shift_x
 
     def calculateRightXChange(self, position):
-        # print("calculateRightXChange")
-        # print(f"{self.deltaX()=}")
-        # print(f"{position.x()=}")
-        # print(f"{self.sceneRect().bottomRight().x()=}")
         size_x = max(
             0.0, self.deltaX() + position.x() - self.sceneRect().bottomRight().x()
         )
         shift_x = 0.0
-        # print(f"{size_x=}")
         return size_x, shift_x
 
     def calculateTopYChange(self, position):
@@ -258,7 +246,7 @@ class ResizableElement(BaseElement):
             QApplication.mouseButtons() == Qt.LeftButton
             and not self.isSelected()
             and handle.isSelected()
-            and self._handler.isResizing()
+            and self._handler.countSelected() == 1
         )
 
     def isMoveForbidden(self, handle: ResizeHandleItem) -> bool:
@@ -275,5 +263,5 @@ class ResizableElement(BaseElement):
             QApplication.mouseButtons() == Qt.LeftButton
             and not self.isSelected()
             and handle.isSelected()
-            and not self._handler.isResizing()
+            and self._handler.countSelected() > 1
         )

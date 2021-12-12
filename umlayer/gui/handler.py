@@ -46,7 +46,10 @@ class Handler(object):
         for handle in self._handle.values():
             handle.setLive(is_live)
 
-    def isResizing(self) -> bool:
+    def countSelected(self):
         if not self._handle:
-            return False
-        return 1 == sum(int(handle.isSelected()) for handle in self._handle.values())
+            return 0
+        return sum(int(handle.isSelected()) for handle in self._handle.values())
+
+    def isResizing(self) -> bool:
+        return self.countSelected() == 1

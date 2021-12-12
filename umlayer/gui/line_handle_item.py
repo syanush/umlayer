@@ -1,29 +1,26 @@
-from PySide6.QtCore import Qt, QPointF, QRectF, Signal
+from PySide6.QtCore import Qt, QRectF, Signal
 from PySide6.QtGui import QPainter, QPainterPath
 from PySide6.QtWidgets import (
-    QApplication,
     QGraphicsItem,
     QStyleOptionGraphicsItem,
-    QGraphicsObject,
+    QGraphicsObject, QApplication,
 )
 
 from . import gui_utils, Settings
 
 
 class LineHandleItem(QGraphicsObject):
-    position_changed_signal = Signal(QPointF)
     selection_changed_signal = Signal(bool)
 
-    def __init__(self, item, size: int, is_rect=False, parent=None):
+    def __init__(self, size: int, calculateHandlePositionChange, name: str = "", parent=None):
         super().__init__(parent)
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges, True)
-        if item is None:
-            raise ValueError("item")
-        self._item = item
         self.size = size
-        self._is_rect = is_rect
+        self._calculateHandlePositionChange = calculateHandlePositionChange
+        self._name = name
+
         self._bounding_rect = QRectF(
             -self.size, -self.size, 2 * self.size, 2 * self.size
         )
@@ -31,9 +28,16 @@ class LineHandleItem(QGraphicsObject):
         path.addEllipse(self._bounding_rect)
         self._shape_path = path
         self._is_live = False
+        self._isPositionChangeAccepted = False
 
     def __str__(self):
-        return f"<Handle {self.size}: {self.pos().x()}, {self.pos().y()}>"
+        return f"<Handle {self._name} size={self.size}: {self.pos().x()}, {self.pos().y()}>"
+
+    def isPositionChangeAccepted(self) -> bool:
+        return self._isPositionChangeAccepted
+
+    def setPositionChangeAccepted(self, accepted: bool) -> None:
+        self._isPositionChangeAccepted = accepted
 
     def setLive(self, is_live):
         self._is_live = is_live
@@ -59,15 +63,21 @@ class LineHandleItem(QGraphicsObject):
         painter.drawEllipse(self._bounding_rect)
 
     def itemChange(self, change, value):
-        if (
-            self.scene()
-            and change == QGraphicsItem.ItemPositionChange
-            and QApplication.mouseButtons() == Qt.LeftButton
-        ):
-            return QPointF(gui_utils.snap(value.x()), gui_utils.snap(value.y()))
-        if change == QGraphicsItem.ItemPositionHasChanged:
-            self.position_changed_signal.emit(value)
+        if change == QGraphicsItem.ItemPositionChange:
+            value = self.calculateItemPositionChange(value)
         if change == QGraphicsItem.GraphicsItemChange.ItemSelectedHasChanged:
-            is_selected = bool(value)
-            self.selection_changed_signal.emit(is_selected)
+            self.onItemSelectedHasChanged(value)
         return super().itemChange(change, value)
+
+    def calculateItemPositionChange(self, position):
+        if self.isPositionChangeAccepted():
+            return position
+        if QApplication.mouseButtons() == Qt.LeftButton:
+            position = gui_utils.snap_position(position)
+        if self.pos() == position:
+            return position
+        return self._calculateHandlePositionChange(self, position)
+
+    def onItemSelectedHasChanged(self, value):
+        is_selected = bool(value)
+        self.selection_changed_signal.emit(is_selected)

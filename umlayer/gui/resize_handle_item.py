@@ -10,8 +10,6 @@ from . import gui_utils, Settings
 
 
 class ResizeHandleItem(QGraphicsObject):
-    position_change_signal = Signal(QPointF)
-    position_changed_signal = Signal(QPointF)
     selection_changed_signal = Signal(bool)
 
     def __init__(
@@ -24,6 +22,7 @@ class ResizeHandleItem(QGraphicsObject):
         self.size = size
         self._calculateHandlePositionChange = calculateHandlePositionChange
         self._name = name
+
         self._bounding_rect = QRectF(
             -self.size, -self.size, 2 * self.size, 2 * self.size
         )
@@ -72,7 +71,7 @@ class ResizeHandleItem(QGraphicsObject):
         painter.drawRect(self._bounding_rect)
 
     def itemChange(self, change, value):
-        if self.scene() and change == QGraphicsItem.ItemPositionChange:
+        if change == QGraphicsItem.ItemPositionChange:
             value = self.calculateItemPositionChange(value)
         if change == QGraphicsItem.GraphicsItemChange.ItemSelectedHasChanged:
             self.onItemSelectedHasChanged(value)
