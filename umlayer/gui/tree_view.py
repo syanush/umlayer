@@ -10,7 +10,6 @@ from PySide6.QtWidgets import (
     QAbstractItemView,
     QFrame,
     QAbstractItemDelegate,
-    QItemDelegate,
 )
 
 from umlayer import model, adapters

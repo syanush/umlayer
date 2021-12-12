@@ -15,7 +15,7 @@ class DataModel:
     def project(self) -> Project:
         return self._project
 
-    def create_project(self) -> Project:
+    def create_project(self) -> None:
         self._project = Project()
 
     def delete_project(self) -> None:

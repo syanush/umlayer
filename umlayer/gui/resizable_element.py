@@ -107,7 +107,6 @@ class ResizableElement(BaseElement):
         self._handler.handle[4].setPos(x1, y2)
 
     def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
-        self.positionNotify(change)
         if change == QGraphicsItem.ItemPositionChange:
             value = self.calculateItemPositionChange(value)
         if change == QGraphicsItem.ItemPositionHasChanged:
@@ -166,7 +165,7 @@ class ResizableElement(BaseElement):
             return handle.pos()
 
         if not self.isResizeAllowed(handle):
-            # the handle does not take part in resize
+            # the handle does not take part in resizing
             return position
 
         size_x, shift_x = calculate_x_change(position)

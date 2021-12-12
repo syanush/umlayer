@@ -40,15 +40,15 @@ class GraphicsView(QGraphicsView):
         v: QScrollBar = self.verticalScrollBar()
         return h.value(), h.minimum(), h.maximum(), v.value(), v.minimum(), v.maximum()
 
-    def setScrollData(self, hv, hmin, hmax, vv, vmin, vmax):
+    def setScrollData(self, h_val, h_min, h_max, v_val, v_min, v_max):
         h: QScrollBar = self.horizontalScrollBar()
         v: QScrollBar = self.verticalScrollBar()
-        h.setMinimum(hmin)
-        h.setMaximum(hmax)
-        h.setValue(hv)
-        v.setMinimum(vmin)
-        v.setMaximum(vmax)
-        v.setValue(vv)
+        h.setMinimum(h_min)
+        h.setMaximum(h_max)
+        h.setValue(h_val)
+        v.setMinimum(v_min)
+        v.setMaximum(v_max)
+        v.setValue(v_val)
 
     panMouseButton = Qt.RightButton
 
@@ -106,16 +106,8 @@ class GraphicsView(QGraphicsView):
         self.current_ticks += event.angleDelta().y()
         while self.current_ticks >= self.last_ticks + self.step_ticks:
             self.last_ticks += self.step_ticks
-            self._zoom(1)
+            self.window.zoom(1)
         while self.current_ticks <= self.last_ticks - self.step_ticks:
             self.last_ticks -= self.step_ticks
-            self._zoom(-1)
+            self.window.zoom(-1)
         event.accept()
-
-    def _zoom(self, change):
-        assert abs(change) == 1
-        if change > 0 and self.window.scaleIndex() == self.window.scaleCount() - 1:
-            return
-        if change < 0 and self.window.scaleIndex() == 0:
-            return
-        self.window.setScaleIndex(self.window.scaleIndex() + change)

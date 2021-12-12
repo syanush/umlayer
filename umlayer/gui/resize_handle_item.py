@@ -1,4 +1,4 @@
-from PySide6.QtCore import QPointF, QRectF, Signal
+from PySide6.QtCore import QRectF, Signal
 from PySide6.QtGui import QPainter, QPainterPath
 from PySide6.QtWidgets import (
     QGraphicsItem,

@@ -35,7 +35,7 @@ class Handler(object):
                 # the scene is about to disappear
                 self._item.scene().removeItem(handle)
             else:
-                # new scene
+                # a new scene
                 scene.addItem(handle)
 
     def moveBy(self, delta: QPointF) -> None:

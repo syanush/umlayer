@@ -30,9 +30,10 @@ class ClassElement(ResizableElement):
         return self._text
 
     def setText(self, text: str):
-        if self._text != text:
-            self._text = text
-            self.recalculate()
+        if self._text == text:
+            return
+        self._text = text
+        self.recalculate()
 
     def rect(self) -> QRectF:
         return self._rect

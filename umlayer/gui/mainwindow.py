@@ -221,22 +221,22 @@ class MainWindow(QMainWindow):
         # toolbar.addAction(self.app_actions.printProjectAction)
         self.aToolBar = toolbar
 
-    def setSceneWidgetsEnabled(self, isEnabled: bool) -> None:
-        self._line_button.setEnabled(isEnabled)
-        self._scene_scale_combo.setEnabled(isEnabled)
+    def setSceneWidgetsEnabled(self, is_enabled: bool) -> None:
+        self._line_button.setEnabled(is_enabled)
+        self._scene_scale_combo.setEnabled(is_enabled)
 
     def _createLineButton(self) -> QPushButton:
-        lineButton = QPushButton("Lines")
-        menu = QMenu(lineButton)
+        line_button = QPushButton("Lines")
+        menu = QMenu(line_button)
 
         for action in self.app_actions.lineActions:
-            action.setParent(lineButton)
+            action.setParent(line_button)
             menu.addAction(action)
 
-        lineButton.setMenu(menu)
-        myStyle = LineIconsProxyStyle()
-        menu.setStyle(myStyle)
-        return lineButton
+        line_button.setMenu(menu)
+        proxy_style = LineIconsProxyStyle()
+        menu.setStyle(proxy_style)
+        return line_button
 
     def scene_scale_changed(self, scale_percent: str) -> None:
         self.sceneView.scale_changed(scale_percent)
@@ -249,19 +249,19 @@ class MainWindow(QMainWindow):
         self.setStatusBar(self.aStatusBar)
 
     def createElementsWindow(self) -> None:
-        elementsWindow = QDockWidget("Elements", self)
-        elementsWindow.setMinimumHeight(150)
-        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, elementsWindow)
+        elements_window = QDockWidget("Elements", self)
+        elements_window.setMinimumHeight(150)
+        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, elements_window)
 
     def createPropertyEditor(self) -> None:
-        propertyWindow = QDockWidget("Property editor", self)
+        property_window = QDockWidget("Property editor", self)
         self.propertyView = QPlainTextEdit()
         self.propertyView.textChanged.connect(self.on_text_changed)
         self.propertyView.setFont(Settings.element_font)
         self.propertyView.setWordWrapMode(QTextOption.NoWrap)
         self.propertyView.setEnabled(False)
-        propertyWindow.setWidget(self.propertyView)
-        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, propertyWindow)
+        property_window.setWidget(self.propertyView)
+        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, property_window)
 
     def on_text_changed(self) -> None:
         if self.element_with_text is None:
@@ -368,10 +368,10 @@ class MainWindow(QMainWindow):
     def center(self) -> None:
         """Center the main window"""
 
-        qRect = self.frameGeometry()
-        centerPoint = self.screen().availableGeometry().center()
-        qRect.moveCenter(centerPoint)
-        self.move(qRect.topLeft())
+        rect = self.frameGeometry()
+        center_point = self.screen().availableGeometry().center()
+        rect.moveCenter(center_point)
+        self.move(rect.topLeft())
 
     def closeEvent(self, event) -> None:
         if self._interactors.project_interactor.save_project_if_needed():
@@ -410,16 +410,16 @@ class MainWindow(QMainWindow):
         tree_view.customContextMenuRequested.connect(
             self.onTreeViewCustomContextMenuRequested
         )
-        proxyModel: adapters.TreeSortModel = adapters.TreeSortModel(self)
-        proxyModel.setSourceModel(adapters.StandardItemModel())
-        tree_view.setModel(proxyModel)
+        proxy_model: adapters.TreeSortModel = adapters.TreeSortModel(self)
+        proxy_model.setSourceModel(adapters.StandardItemModel())
+        tree_view.setModel(proxy_model)
         return tree_view
 
     def createProjectTree(self) -> None:
         self.treeView = self._createTreeView()
-        treeWindow = QDockWidget("Project", self)
-        treeWindow.setWidget(self.treeView)
-        self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, treeWindow)
+        tree_window = QDockWidget("Project", self)
+        tree_window.setWidget(self.treeView)
+        self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, tree_window)
 
     def clearProjectTree(self) -> None:
         self.treeView.itemModel.clear()
@@ -526,7 +526,10 @@ class MainWindow(QMainWindow):
             parent=self,
             caption="Export diagram as raster image",
             dir=QDir.currentPath() + "/" + initial_filename,
-            filter="PNG (*.png);;JPG (*.jpg);;JPEG (*.jpeg);;BMP (*.bmp);;PPM (*.ppm);;XBM (*.xbm);;XPM (*.xpm);;All (*)",
+            filter=(
+                "PNG (*.png);;JPG (*.jpg);;JPEG (*.jpeg);;BMP (*.bmp);;"
+                "PPM (*.ppm);;XBM (*.xbm);;XPM (*.xpm);;All (*)"
+            ),
             selectedFilter="PNG (*.png)",
         )
         return filename
@@ -613,7 +616,18 @@ class MainWindow(QMainWindow):
             f"<h3 align=center>UMLayer</h3>"
             f"<p align=center>{version.__version__}</p>"
             "<p align=center>UML diagram editor</p>"
-            '<p align=center><a href="https://github.com/selforthis/umlayer">https://github.com/selforthis/umlayer</a></p>'
+            "<p align=center>"
+            '<a href="https://github.com/selforthis/umlayer">'
+            "https://github.com/selforthis/umlayer"
+            "</a></p>"
             "<p align=center>Copyright 2021 Serguei Yanush &lt;selforthis@gmail.com&gt;<p>"
             "<p align=center>MIT License</p>",
         )
+
+    def zoom(self, change):
+        assert abs(change) == 1
+        if change > 0 and self.scaleIndex() == self.scaleCount() - 1:
+            return
+        if change < 0 and self.scaleIndex() == 0:
+            return
+        self.setScaleIndex(self.scaleIndex() + change)

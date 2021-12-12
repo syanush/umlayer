@@ -68,8 +68,7 @@ class TextElement(BaseElement):
     def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
         self.positionNotify(change)
         if (
-            self.scene()
-            and change == QGraphicsItem.ItemPositionChange
+            change == QGraphicsItem.ItemPositionChange
             and QApplication.mouseButtons() == Qt.LeftButton
         ):
             return QPointF(gui_utils.snap(value.x()), gui_utils.snap(value.y()))

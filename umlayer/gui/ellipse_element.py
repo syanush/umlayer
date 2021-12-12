@@ -1,6 +1,6 @@
-from PySide6.QtCore import Qt, QPointF, QRectF
+from PySide6.QtCore import QRectF
 from PySide6.QtGui import QPainter, QPainterPath
-from PySide6.QtWidgets import QApplication, QGraphicsItem, QStyleOptionGraphicsItem
+from PySide6.QtWidgets import QGraphicsItem, QStyleOptionGraphicsItem
 
 from . import gui_utils, Abilities, Settings, TextItem, ResizableElement
 
@@ -27,9 +27,10 @@ class EllipseElement(ResizableElement):
         return self._text
 
     def setText(self, text: str):
-        if self._text != text:
-            self._text = text
-            self.recalculate()
+        if self._text == text:
+            return
+        self._text = text
+        self.recalculate()
 
     def rect(self) -> QRectF:
         return self._rect

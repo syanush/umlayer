@@ -73,7 +73,6 @@ class LineElement(BaseElement):
         self._pos1 = QPointF(x1, y1)
         self._pos2 = QPointF(x2, y2)
         self.setLive(False)
-        self.notify()
         self.recalculate()
 
     def _createHandles(self):
@@ -100,7 +99,6 @@ class LineElement(BaseElement):
         if self._text == text:
             return
         self._text = text
-        self.notify()
         self.recalculate()
 
     def point1(self):
@@ -111,7 +109,6 @@ class LineElement(BaseElement):
         if self._pos1 == position:
             return
         self._pos1 = position
-        self.notify()
         self.recalculate()
 
     def point2(self):
@@ -122,7 +119,6 @@ class LineElement(BaseElement):
         if self._pos2 == position:
             return
         self._pos2 = position
-        self.notify()
         self.recalculate()
 
     def rect(self) -> QRectF:
@@ -161,19 +157,21 @@ class LineElement(BaseElement):
         self._handler.handle[2].setPositionChangeAccepted(accepted)
 
     def recalculate(self):
+        self.notify()
         self.prepareGeometryChange()
 
         self._parse_text()
 
-        # internal points
-        position = QPointF(min(self._pos1.x(), self._pos2.x()), min(self._pos1.y(), self._pos2.y()))
+        position = QPointF(
+            min(self._pos1.x(), self._pos2.x()), min(self._pos1.y(), self._pos2.y())
+        )
 
-        # optimization
         if position != self.pos():
             self.setAllPositionChangeAccepted(True)
             self.setPos(position)
             self.setAllPositionChangeAccepted(False)
 
+        # internal points
         self._point1 = self._pos1 - position
         self._point2 = self._pos2 - position
         self._rect = QRectF(self._point1, self._point2).normalized()
@@ -199,10 +197,7 @@ class LineElement(BaseElement):
 
         self.updateHandlePositions()
 
-    # count = 0
-
     def updateHandlePositions(self):
-        # optimization
         self.setAllPositionChangeAccepted(True)
 
         if self._handler.handle[1].pos() != self._pos1:
@@ -213,13 +208,7 @@ class LineElement(BaseElement):
 
         self.setAllPositionChangeAccepted(False)
 
-        # self.count += 1
-        # print("RECALCULATE", self.count)
-        # print(self._handler.handle[1].pos())
-        # print(self._handler.handle[2].pos())
-
     def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
-        # self.positionNotify(change)
         if change == QGraphicsItem.ItemPositionChange:
             value = self.onItemPositionChange(value)
         if change == QGraphicsItem.ItemSceneChange:
@@ -231,7 +220,6 @@ class LineElement(BaseElement):
         return super().itemChange(change, value)
 
     def onItemPositionChange(self, position):
-        # print("onItemPositionChange", position)
         if self.isPositionChangeAccepted():
             return position
 
@@ -240,9 +228,9 @@ class LineElement(BaseElement):
 
         if self.pos() == position:
             return position
-        return self._calculateLinePositionChange(position)
+        return self.calculateLinePositionChange(position)
 
-    def _calculateLinePositionChange(self, position):
+    def calculateLinePositionChange(self, position):
         shift = position - self.pos()
         self._pos1 += shift
         self._pos2 += shift
@@ -266,7 +254,7 @@ class LineElement(BaseElement):
         self.setLive(is_selected)
 
     def calculateHandlePositionChange(self, handle: LineHandleItem, position: QPointF):
-        # optimization
+        # This check simplifies dragging when line and both handles are selected
         if self.isSelected() and self._handler.countSelected() == 2:
             return position
 
@@ -386,8 +374,7 @@ class LineElement(BaseElement):
     def _parse_text(self):
         """Parse
 
-        Every line of text is either command or text for central label
-
+        Every line of text is either a command or a text for central label
         """
         label_lines = []
         lines = self.text().split("\n")

@@ -10,8 +10,6 @@ from . import (
     Settings,
     TextItem,
     ResizableElement,
-    ResizeHandleItem,
-    Handler,
 )
 
 
@@ -35,17 +33,19 @@ class NoteElement(ResizableElement):
         return self._text
 
     def setText(self, text: str) -> None:
-        if self._text != text:
-            self._text = text
-            self.recalculate()
+        if self._text == text:
+            return
+        self._text = text
+        self.recalculate()
 
     def center(self) -> bool:
         return self._center
 
     def setCenter(self, center: bool) -> None:
-        if self._center != center:
-            self._center = center
-            self.recalculate()
+        if self._center == center:
+            return
+        self._center = center
+        self.recalculate()
 
     def rect(self) -> QRectF:
         return self._rect

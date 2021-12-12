@@ -79,8 +79,7 @@ class PackageElement(ResizableElement):
     def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
         self.positionNotify(change)
         if (
-            self.scene()
-            and change == QGraphicsItem.ItemPositionChange
+            change == QGraphicsItem.ItemPositionChange
             and QApplication.mouseButtons() == Qt.LeftButton
         ):
             return QPointF(gui_utils.snap(value.x()), gui_utils.snap(value.y()))
@@ -90,7 +89,6 @@ class PackageElement(ResizableElement):
         self.notify()
         self.prepareGeometryChange()
 
-        # TODO: improve parsing
         self._text = self._text or ""
         self._text1, self._text2 = gui_utils.split_to_two_sections(self._text)
 

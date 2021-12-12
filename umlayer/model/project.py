@@ -4,7 +4,7 @@ from . import BaseItem
 
 
 class Project:
-    """Repository?"""
+    """Contains project data"""
 
     def __init__(self):
         self.project_items = {}  # bad design
@@ -70,10 +70,10 @@ class Project:
     def printProjectItems(self):
         """Debugging feature"""
         print(self)
-        for id, project_item in self.project_items.items():
+        for item_id, project_item in self.project_items.items():
             print(
                 f"{project_item.name():15s} id={project_item.id} par={project_item.parent_id}"
             )
-            if project_item.id != id:
+            if item_id != project_item.id:
                 print("Bad item")
         print()

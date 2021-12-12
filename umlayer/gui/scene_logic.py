@@ -19,7 +19,6 @@ from umlayer import model
 
 class SceneLogic:
     def __init__(self):
-        """Do not use window here"""
         self.temp_list = []
         self._grid_enabled = False
         self.window = None
@@ -31,10 +30,7 @@ class SceneLogic:
         self.window.setDirty(True)
 
     def selectElement(self, element):
-        if isinstance(element, LineElement):
-            element.selectAll()
-        else:
-            element.setSelected(True)
+        element.setSelected(True)
 
     def addElement(self, element: BaseElement) -> None:
         self.window.scene.deselectAll()
@@ -106,14 +102,14 @@ class SceneLogic:
         diagram: model.Diagram = self.window.getSelectedProjectItem()
         self.storeSceneTo(diagram)
 
-    def storeSceneTo(self, diagram: model.Diagram):
+    def storeSceneTo(self, diagram: model.BaseItem):
         logging.info(f"Store scene to {diagram.name()}")
         diagram.dtos.clear()
         for item in self.window.scene.elements():
             json_dto = item.toJson()
             diagram.dtos.append(json_dto)
-        hv, hmin, hmax, vv, vmin, vmax = self.window.sceneView.scrollData()
-        diagram.scroll_data = [hv, hmin, hmax, vv, vmin, vmax]
+        h_val, h_min, h_max, v_val, v_min, v_max = self.window.sceneView.scrollData()
+        diagram.scroll_data = [h_val, h_min, h_max, v_val, v_min, v_max]
 
     def buildSceneFrom(self, project_item):
         for json_dto in project_item.dtos:
@@ -121,8 +117,8 @@ class SceneLogic:
             # TODO: override addItem and move setNotify there
             self.window.scene.addItem(element)
         if project_item.scroll_data is not None:
-            hv, hmin, hmax, vv, vmin, vmax = project_item.scroll_data
-            self.window.sceneView.setScrollData(hv, hmin, hmax, vv, vmin, vmax)
+            hv, h_min, h_max, v_val, v_min, v_max = project_item.scroll_data
+            self.window.sceneView.setScrollData(hv, h_min, h_max, v_val, v_min, v_max)
 
     def delete_selected_elements(self):
         elements = self.window.scene.selectedElements()
@@ -148,18 +144,18 @@ class SceneLogic:
         self.setDirty()
         self.window.scene.deselectAll()
 
-        topleft: QPointF = elements[0].pos()
+        top_left: QPointF = elements[0].pos()
         for element in elements[1:]:
             ep = element.pos()
-            if topleft.x() > ep.x():
-                topleft.setX(ep.x())
-            if topleft.y() > ep.y():
-                topleft.setY(ep.y())
+            if top_left.x() > ep.x():
+                top_left.setX(ep.x())
+            if top_left.y() > ep.y():
+                top_left.setY(ep.y())
 
-        ipos: QPointF = self.initialPosition() - topleft
+        corner_pos: QPointF = self.initialPosition() - top_left
 
         for element in elements:
-            new_pos = ipos + element.pos()
+            new_pos = corner_pos + element.pos()
             # print(element, new_pos)
             element.setPos(new_pos)
             self.window.scene.addItem(element)
@@ -238,7 +234,6 @@ class SceneLogic:
             if element.zValue() >= z_value:
                 z_value = element.zValue() + 0.1
         selected_element.setZValue(z_value)
-        # print(z_value)
         selected_element.update()
 
     def send_to_back(self):

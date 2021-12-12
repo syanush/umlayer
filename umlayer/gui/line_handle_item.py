@@ -3,7 +3,8 @@ from PySide6.QtGui import QPainter, QPainterPath
 from PySide6.QtWidgets import (
     QGraphicsItem,
     QStyleOptionGraphicsItem,
-    QGraphicsObject, QApplication,
+    QGraphicsObject,
+    QApplication,
 )
 
 from . import gui_utils, Settings
@@ -12,7 +13,9 @@ from . import gui_utils, Settings
 class LineHandleItem(QGraphicsObject):
     selection_changed_signal = Signal(bool)
 
-    def __init__(self, size: int, calculateHandlePositionChange, name: str = "", parent=None):
+    def __init__(
+        self, size: int, calculateHandlePositionChange, name: str = "", parent=None
+    ):
         super().__init__(parent)
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.setFlag(QGraphicsItem.ItemIsMovable, True)

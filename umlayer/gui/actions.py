@@ -6,9 +6,7 @@ class Actions:
         self.window = window
         self.createActions()
 
-        self.toggleGridAction.triggered[bool].connect(
-            self.window.scene_logic.toggleGrid
-        )
+        self.toggleGridAction.triggered.connect(self.window.scene_logic.toggleGrid)
 
     def createActions(self):
         self.newAction = QAction(

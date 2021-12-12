@@ -17,7 +17,7 @@ class ActorElement(BaseElement):
 
     def __init__(self, text: str = "", parent=None):
         super().__init__(parent=parent)
-        self._abilities = set([Abilities.EDITABLE_TEXT])
+        self._abilities = {Abilities.EDITABLE_TEXT}
 
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
@@ -87,8 +87,7 @@ class ActorElement(BaseElement):
     def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
         self.positionNotify(change)
         if (
-            self.scene()
-            and change == QGraphicsItem.ItemPositionChange
+            change == QGraphicsItem.ItemPositionChange
             and QApplication.mouseButtons() == Qt.LeftButton
         ):
             return QPointF(gui_utils.snap(value.x()), gui_utils.snap(value.y()))
