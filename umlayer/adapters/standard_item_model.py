@@ -1,8 +1,6 @@
 from PySide6.QtGui import QStandardItemModel, QStandardItem
 
-from .. import model, adapters
-
-# from . import itemize, StandardItem
+from umlayer import model, adapters
 
 
 class StandardItemModel(QStandardItemModel):

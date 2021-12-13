@@ -1,6 +1,6 @@
 from PySide6.QtCore import QModelIndex, QSortFilterProxyModel
 
-from umlayer.adapters import StandardItem, StandardItemModel
+from . import StandardItem, StandardItemModel
 
 
 class TreeSortModel(QSortFilterProxyModel):

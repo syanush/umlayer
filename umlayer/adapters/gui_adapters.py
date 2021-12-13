@@ -1,6 +1,6 @@
 from PySide6.QtGui import QIcon, QStandardItem
 
-from .. import model
+from umlayer import model
 from . import StandardItem
 
 ITEM_TYPE_TO_ICON = {
