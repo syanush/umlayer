@@ -3,7 +3,7 @@ from uuid import UUID
 
 from PySide6.QtCore import Qt, QItemSelectionModel, QModelIndex
 
-from PySide6.QtGui import QStandardItem, QFocusEvent
+from PySide6.QtGui import QFocusEvent
 
 from PySide6.QtWidgets import (
     QTreeView,

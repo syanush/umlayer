@@ -118,6 +118,14 @@ class Actions:
             triggered=self.window.deleteSelectedItem,
         )
 
+        self.renameProjectItemAction = QAction(
+            text="Rename",
+            shortcut="F2",
+            parent=self.window.treeView,
+            statusTip="Rename project item",
+            triggered=self.window.renameSelectedItem,
+        )
+
         self.toggleGridAction = QAction(
             icon=QIcon("icons:grid.png"),
             text="Toggle grid",

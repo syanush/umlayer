@@ -394,8 +394,10 @@ class MainWindow(QMainWindow):
             menu.addAction(self.app_actions.createDiagramAction)
             menu.addAction(self.app_actions.createFolderAction)
             if project_item.id != self.project.root.id:
+                menu.addAction(self.app_actions.renameProjectItemAction)
                 menu.addAction(self.app_actions.deleteProjectItemAction)
         elif item_type is model.ProjectItemType.DIAGRAM:
+            menu.addAction(self.app_actions.renameProjectItemAction)
             menu.addAction(self.app_actions.deleteProjectItemAction)
 
         menu.exec(self.treeView.viewport().mapToGlobal(point))
@@ -590,6 +592,14 @@ class MainWindow(QMainWindow):
             return
         item: adapters.StandardItem = self.treeView.getSelectedItem()
         self.deleteItem(item)
+        self.updateTitle()
+
+    def renameSelectedItem(self) -> None:
+        logging.info("Action: Rename selected project item")
+        if not self.treeView.isSelected():
+            return
+        item: adapters.StandardItem = self.treeView.getSelectedItem()
+        self.treeView.startEditName(item)
         self.updateTitle()
 
     def deleteItem(self, item: adapters.StandardItem) -> None:
