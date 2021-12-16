@@ -11,6 +11,7 @@ and put it in some directory on your filesystem.
 cd <path/to/umlayer>
 ```
 
+Install Python 3.9 or higher.
 Create and activate a virtual environment:
 
 on Linux:
@@ -21,7 +22,7 @@ source venv/bin/activate
 
 on Windows:
 ```bash
-python3 -m venv venv
+python -m venv venv
 
 venv\Scripts\activate.bat
            or

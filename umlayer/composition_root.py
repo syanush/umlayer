@@ -1,9 +1,9 @@
 import sys
 
-import model
-import gui
-import storage
-import usecases
+from umlayer import model
+from umlayer import gui
+from umlayer import storage
+from umlayer import usecases
 
 
 class CompositionRoot:

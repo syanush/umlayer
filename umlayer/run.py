@@ -5,12 +5,10 @@ import os
 import sys
 import traceback
 
-from PySide6.QtWidgets import QApplication, QMainWindow
-
 
 def run():
     """Construct and run the UMLayer application"""
-    from composition_root import CompositionRoot
+    from umlayer.composition_root import CompositionRoot
 
     init_logging()
 
