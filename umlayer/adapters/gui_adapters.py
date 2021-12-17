@@ -21,7 +21,7 @@ def itemize(project_item, project) -> StandardItem:
 def makeItemFromProjectItem(project_item: model.BaseItem) -> StandardItem:
     item_name = project_item.name()
     item_id = project_item.id
-    item_type = project_item.item_type
+    item_type = project_item.itemType
     item: StandardItem = _makeItem(item_name, item_id, item_type)
     return item
 

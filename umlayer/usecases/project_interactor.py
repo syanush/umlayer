@@ -153,7 +153,7 @@ class ProjectInteractor:
     def _do_save_project(self, filename) -> None:
         """Actually saves the project"""
 
-        self._window.scene_logic.storeScene()
+        self._window.storeScene()
         self._save(filename)
 
     def _save(self, filename: str) -> None:

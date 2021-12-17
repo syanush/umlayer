@@ -11,7 +11,7 @@ class BaseItem(ABC):
         self.id = uuid4()
 
     @property
-    def item_type(self) -> ProjectItemType:
+    def itemType(self) -> ProjectItemType:
         raise NotImplementedError
 
     def name(self):

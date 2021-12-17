@@ -388,7 +388,7 @@ class MainWindow(QMainWindow):
         item = self.treeView.getSelectedItem()
         project_item = self.projectItemFromItem(item)
         menu = QMenu(self.treeView)
-        item_type = project_item.item_type
+        item_type = project_item.itemType
 
         if item_type is model.ProjectItemType.FOLDER:
             menu.addAction(self.app_actions.createDiagramAction)
@@ -446,7 +446,7 @@ class MainWindow(QMainWindow):
         if not self.treeView.isSelected():
             return False
         project_item: model.BaseItem = self.getSelectedProjectItem()
-        return project_item.item_type == model.ProjectItemType.DIAGRAM
+        return project_item.itemType == model.ProjectItemType.DIAGRAM
 
     def printProjectItems(self):
         """Debugging feature"""
@@ -645,3 +645,6 @@ class MainWindow(QMainWindow):
     def initializeTreeFromProject(self):
         self.treeView.itemModel.initializeFromProject(self.project)
         self.treeView.initializeTree()
+
+    def storeScene(self):
+        self.scene_logic.storeScene()

@@ -8,5 +8,5 @@ class Folder(BaseItem):
         super().__init__(name, parent_id)
 
     @property
-    def item_type(self) -> ProjectItemType:
+    def itemType(self) -> ProjectItemType:
         return ProjectItemType.FOLDER

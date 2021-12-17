@@ -188,7 +188,7 @@ class SceneLogic:
             self.on_select_project_item(selected_items[0])
 
     def on_deselect_project_item(self, project_item: model.BaseItem) -> None:
-        if project_item.item_type == model.ProjectItemType.DIAGRAM:
+        if project_item.itemType == model.ProjectItemType.DIAGRAM:
             self.storeSceneTo(project_item)
             logging.debug(f"The scene was stored to diagram {project_item.name()}")
         self.window.scene.clearElements()

@@ -13,5 +13,5 @@ class Diagram(BaseItem):
         self.scroll_data = None
 
     @property
-    def item_type(self) -> ProjectItemType:
+    def itemType(self) -> ProjectItemType:
         return ProjectItemType.DIAGRAM
