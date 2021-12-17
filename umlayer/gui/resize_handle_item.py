@@ -27,7 +27,7 @@ class ResizeHandleItem(QGraphicsObject):
             -self.size, -self.size, 2 * self.size, 2 * self.size
         )
         path = QPainterPath()
-        path.addEllipse(self._bounding_rect)
+        path.addRect(self._bounding_rect)
         self._shape_path = path
         self._is_live = False
         self._isPositionChangeAccepted = False
