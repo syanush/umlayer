@@ -641,3 +641,7 @@ class MainWindow(QMainWindow):
         if change < 0 and self.scaleIndex() == 0:
             return
         self.setScaleIndex(self.scaleIndex() + change)
+
+    def initializeTreeFromProject(self):
+        self.treeView.itemModel.initializeFromProject(self.project)
+        self.treeView.initializeTree()

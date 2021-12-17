@@ -170,7 +170,7 @@ class ProjectInteractor:
         self.set_dirty(False)
 
     def _initializeTreeViewFromProject(self):
-        self._window.treeView.initializeFromProject(self._project)
+        self._window.initializeTreeFromProject()
         self.set_dirty(False)
 
     def _do_open_project(self, filename) -> None:

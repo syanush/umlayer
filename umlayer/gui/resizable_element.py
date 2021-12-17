@@ -4,7 +4,7 @@ from PySide6.QtCore import QRectF, QPointF
 from PySide6.QtGui import Qt
 from PySide6.QtWidgets import QGraphicsItem, QApplication
 
-from umlayer.gui import BaseElement, Handler, ResizeHandleItem, Settings, gui_utils
+from . import BaseElement, Handler, ResizeHandleItem, Settings, gui_utils
 
 
 class ResizableElement(BaseElement):

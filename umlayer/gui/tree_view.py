@@ -12,7 +12,7 @@ from PySide6.QtWidgets import (
     QAbstractItemDelegate,
 )
 
-from umlayer import model, adapters
+from umlayer import adapters
 
 
 class TreeView(QTreeView):
@@ -79,8 +79,7 @@ class TreeView(QTreeView):
         """Returns selected item id or throws Exception"""
         return self.getSelectedItem().itemId()
 
-    def initializeFromProject(self, project: model.Project) -> None:
-        self.itemModel.initializeFromProject(project)
+    def initializeTree(self) -> None:
         self.sortByColumn(0, Qt.SortOrder.AscendingOrder)
         self.expandAll()
         root_item = self.itemModel.rootItem()
